@@ -61,3 +61,11 @@ flycheck_*.el
 
 auto_pert_results/
 untracked/
+
+# renv
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/staging/
