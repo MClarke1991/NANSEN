@@ -81,7 +81,6 @@ nosat <- TRUE
 loserum <- FALSE
 node_col_name <- "node"
 use_vmcai <- TRUE
-git_log <- FALSE
 
 ## Visualisation Options ------
 
@@ -152,7 +151,6 @@ if (!skip_autopert) {
                  missing_nodes_perturbed_overide,
              missing_nodes_expected_overide =
                  missing_nodes_expected_overide,
-             git_log = git_log,
              project_path = project_path,
              bma_tools_path = bma_tools_path
              )
@@ -173,7 +171,6 @@ if (!skip_combo_sim) {
           phenotypes = phenotypes,
           use_exclusions = use_exclusions,
           exclusions_path = NA,
-          git_log = git_log,
           bma_tools_path = bma_tools_path, 
           log_filename = "Combo.log", 
           drug_conflict_overide = drug_conflict_overide,

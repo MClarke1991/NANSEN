@@ -23,8 +23,6 @@
 ##'     for pertrubred nodes that are missing from network
 ##' @param missing_nodes_expected_overide option to override check for
 ##'     expected nodes that are missing from network
-##' @param git_log option for logging of git SHA of project and
-##'     BMATools. Dev only.
 ##' @param project_path project path for git SHA log, point to git
 ##'     repo of the network and specification being tested
 ##' @return Writes out results as JSON, CSV and PNG
@@ -39,7 +37,6 @@ autopert <- function(netw_file_path,
                      loserum = FALSE,
                      missing_nodes_perturbed_overide = FALSE,
                      missing_nodes_expected_overide = FALSE,
-                     git_log = FALSE,
                      project_path = NA,
                      bma_tools_path = NA,
                      group_vars = c("source", "cell_line",
@@ -75,10 +72,6 @@ autopert <- function(netw_file_path,
                                         # Starting timestamp
     futile.logger::flog.info("Start", name = log_file)
 
-    if (git_log) {
-        futile.logger::flog.warn("git_log feature disabled - git2r dependency removed", 
-                               name = log_file)
-    }
     
     futile.logger::flog.info(paste("Running Autopert on model:",
                     netw_file_path,

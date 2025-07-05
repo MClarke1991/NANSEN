@@ -727,8 +727,6 @@ get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_fi
 ##'     perturb e.g. phenotype nodes
 ##' @param exclusions_path list of nodes in format `c("node_name_1",
 ##'     "node_name_2")` for use if use_exclusions is TRUE
-##' @param git_log option for logging of git SHA of project and
-##'     BMATools. Dev only.
 ##' @param bma_tools_path path for BMATools development repo
 ##' @param drug_conflict_overide allow overide of drug conflicts
 ##'     check, only used for testing
@@ -753,7 +751,6 @@ combo <- function(netw_file_path,
                   phenotypes = NA,
                   use_exclusions = FALSE,
                   exclusions_path = NA,
-                  git_log = FALSE,
                   bma_tools_path = NA,
                   drug_conflict_overide = FALSE,
                   skip_drugs_single = FALSE,
@@ -785,10 +782,6 @@ combo <- function(netw_file_path,
     options(error = function()
         futile.logger::flog.warn(geterrmessage(), name = log_file))
     futile.logger::flog.info("Start", name = log_file)
-    if (git_log) {
-        futile.logger::flog.warn("git_log feature disabled - git2r dependency removed", 
-                               name = log_file)
-    }
     
     futile.logger::flog.info(paste("Running Combo on model:",
                                    netw_file_path,
