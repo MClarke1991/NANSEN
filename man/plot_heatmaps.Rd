@@ -32,29 +32,16 @@ plot_heatmaps(
 \arguments{
 \item{results_prefix}{prefix to results directory}
 
-\item{project_path}{project path}
+\item{project_path}{project path for git SHA log, point to git
+repo of the network and specification being tested}
 
-\item{out_dir}{results directory}
+\item{out_dir}{output directory}
 
 \item{netw_file_path}{path to network JSON file}
 
 \item{vis_dir}{subdirectory for heatmaps}
 
 \item{cluster_rows}{cluster_rows TRUE/FALSE}
-
-\item{type}{node, druggable or drug heatmaps}
-
-\item{single_fontsize}{fontsize for monotherapy node perturbation heatmaps}
-
-\item{single_druggable_fontsize}{fontsize for monotherapy druggable perturbation heatmaps}
-
-\item{single_drugs_fontsize}{fontsize for monotherapy drug perturbation heatmaps}
-
-\item{double_fontsize}{fontsize for combination therapy node perturbation heatmaps}
-
-\item{double_druggable_font_size}{fontsize for combination therapy druggable perturbation heatmaps}
-
-\item{double_drugs_font_size}{fontsize for combination therapy drug perturbation heatmaps}
 }
 \value{
 plot heatmaps and save to directory

@@ -727,28 +727,6 @@ loop_plot_diff_double <- function(bkg,
 ##' @inheritParams combo
 ##' @inheritParams get_combo_results_dir
 ##' @inheritParams get_netw_variables
-##' @param results_file name of results file to plot
-##' @param results_prefix prefix of results file to plot
-##' @param project_path project path
-##' @param out_dir results directory
-##' @param netw_file_path path to network file
-##' @param vis_dir directory to save heatmaps
-##' @param cluster_rows cluster rows (TRUE/FALSE)
-##' @param cluster_double_cols cluster double columns (TRUE/FALSE)
-##' @param type node, druggable or drug heatmaps
-##' @param background_order order of backgrounds to plot
-##' @param background_order_neat order of backgrounds to plot, with background names replaced with neat names
-##' @param neaten_background whether to replace background names with neat names
-##' @param single_fontsize fontsize for monotherapy node perturbation heatmaps
-##' @param single_druggable_fontsize fontsize for monotherapy druggable perturbation heatmaps
-##' @param single_drugs_fontsize fontsize for monotherapy drug perturbation heatmaps
-##' @param double_fontsize fontsize for combination therapy node perturbation heatmaps
-##' @param double_druggable_font_size fontsize for combination therapy druggable perturbation heatmaps
-##' @param double_drugs_font_size fontsize for combination therapy drug perturbation heatmaps
-##' @param h_s height of single node heatmaps
-##' @param h_d height of double node heatmaps
-##' @param w_s width of single node heatmaps
-##' @param w_d width of double node heatmaps
 ##' @return plot heatmaps and save to directory
 ##' @export
 plot_heatmaps <- function(results_file,
