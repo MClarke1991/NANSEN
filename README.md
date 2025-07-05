@@ -1,7 +1,6 @@
 # NANSEN
 Repository for NANSEN (Network Analysis aNd ScrEeNing)
-
-Authors: [Matthew A. Clarke](https://mclarke1991.github.io/), [Pedro Victori](https://www.linkedin.com/in/pedro-victori/), [Jasmin Fisher](https://www.ucl.ac.uk/medical-sciences/divisions/cancer/our-research/computational-cancer-biology). 
+[Matthew A. Clarke](https://mclarke1991.github.io/), [Pedro Victori](https://www.linkedin.com/in/pedro-victori/), [Jasmin Fisher](https://www.ucl.ac.uk/medical-sciences/divisions/cancer/our-research/computational-cancer-biology). 
 
 To use, please install Bio Model Analyzer command line tools from [here](http://biomodelanalyzer.org/#:~:text=View%20Source-,Get%20Standalone,-Alumni), the package will automatically point to the default path for this installation on Windows. 
 
