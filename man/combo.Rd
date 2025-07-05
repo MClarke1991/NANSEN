@@ -18,7 +18,6 @@ combo(
   phenotypes = NA,
   use_exclusions = FALSE,
   exclusions_path = NA,
-  git_log = FALSE,
   bma_tools_path = NA,
   drug_conflict_overide = FALSE,
   skip_drugs_single = FALSE,
@@ -62,9 +61,6 @@ processing by skipping those nodes which are uninteresting to
 perturb e.g. phenotype nodes}
 
 \item{exclusions_path}{list of nodes in format \code{c("node_name_1", "node_name_2")} for use if use_exclusions is TRUE}
-
-\item{git_log}{option for logging of git SHA of project and
-BMATools. Dev only.}
 
 \item{bma_tools_path}{path for BMATools development repo}
 
