@@ -28,7 +28,6 @@ Imports:
     tidyr,
     here,
     futile.logger,
-    git2r,
     janitor,
     jsonlite,
     progress,

@@ -786,32 +786,15 @@ combo <- function(netw_file_path,
         futile.logger::flog.warn(geterrmessage(), name = log_file))
     futile.logger::flog.info("Start", name = log_file)
     if (git_log) {
-        project_version <- git2r::revparse_single(
-                                      git2r::repository(project_path),
-                                      "HEAD")
-        bma_tools_version <- git2r::revparse_single(
-                                        git2r::repository(bma_tools_path),
-                                        "HEAD")
-        futile.logger::flog.info(paste("Running Combo on model:",
-                                       netw_file_path,
-                                       "with backgrounds",
-                                       basename(backgrounds_path),
-                                       "at project version",
-                                       capture.output(project_version),
-                                       "Full SHA: ",
-                                       project_version$sha,
-                                       "and BMATools version",
-                                       capture.output(bma_tools_version),
-                                       "Full SHA: ",
-                                       bma_tools_version$sha),
-                                 name = log_file)
-    } else {
-        futile.logger::flog.info(paste("Running Combo on model:",
-                                       netw_file_path,
-                                       "with backgrounds",
-                                       basename(backgrounds_path),
-                                       name = log_file))
+        futile.logger::flog.warn("git_log feature disabled - git2r dependency removed", 
+                               name = log_file)
     }
+    
+    futile.logger::flog.info(paste("Running Combo on model:",
+                                   netw_file_path,
+                                   "with backgrounds",
+                                   basename(backgrounds_path)),
+                             name = log_file)
     futile.logger::flog.info(paste("Using VMCAI?:", use_vmcai), name = log_file)
 
 

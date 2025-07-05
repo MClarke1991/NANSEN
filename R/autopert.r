@@ -76,32 +76,15 @@ autopert <- function(netw_file_path,
     futile.logger::flog.info("Start", name = log_file)
 
     if (git_log) {
-        project_version <- git2r::revparse_single(git2r::repository(project_path),
-                                                  "HEAD")
-
-        bma_tools_version <- git2r::revparse_single(git2r::repository(bma_tools_path),
-                                                    "HEAD")
-
-        futile.logger::flog.info(paste("Running Autopert on model:",
-                        netw_file_path,
-                        "using specification",
-                        spec_path,
-                        "at project version",
-                        utils::capture.output(project_version),
-                        "Full SHA: ",
-                        project_version$sha,
-                        "and BMATools version",
-                        utils::capture.output(bma_tools_version),
-                        "Full SHA: ",
-                        bma_tools_version$sha),
-                  name = log_file)
-    } else {
-        futile.logger::flog.info(paste("Running Autopert on model:",
-                        netw_file_path,
-                        "using specification",
-                        spec_path,
-                        name = log_file))
+        futile.logger::flog.warn("git_log feature disabled - git2r dependency removed", 
+                               name = log_file)
     }
+    
+    futile.logger::flog.info(paste("Running Autopert on model:",
+                    netw_file_path,
+                    "using specification",
+                    spec_path),
+              name = log_file)
 
 
     ## Functions ----
