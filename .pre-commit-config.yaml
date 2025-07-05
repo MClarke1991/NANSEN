@@ -1,0 +1,20 @@
+repos:
+  - repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.3.2.9025
+    hooks:
+      - id: style-files
+        args: [--style_pkg=styler, --style_fun=tidyverse_style]
+      - id: roxygenize
+        additional_dependencies:
+          # Add your package dependencies here if needed for documentation
+          # - devtools
+          # - your-package-deps
+      - id: use-tidy-description
+  - repo: local
+    hooks:
+      - id: test-unit
+        name: Run unit tests
+        entry: Rscript -e "testthat::test_dir('tests')"
+        language: system
+        files: \.(R|r)$
+        pass_filenames: false

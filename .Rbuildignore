@@ -3,3 +3,4 @@
 ^scripts$
 ^auto_pert_results$
 ^untracked$
+^\.pre-commit-config\.yaml$
