@@ -1,0 +1,13 @@
+cell_line,paper_title,Paper DOI,source,experiment_overview,experiment_particular,gene,perturbation,expected_result_bma,notes
+a,a,a,a,a,a,in,1,,
+a,a,a,a,a,a,b,0,,
+a,a,a,a,a,a,c,,1,
+a,a,a,a,a,a,out,,1,
+a,a,a,a,a,b,in,1,,
+a,a,a,a,a,b,b,1,,
+a,a,a,a,a,b,c,,0,
+a,a,a,a,a,b,out,,0,
+c,c,c,c,c,c,in,1,,
+c,c,c,c,c,c,c,0,,
+c,c,c,c,c,c,b,,1,
+c,c,c,c,c,c,out,,0,

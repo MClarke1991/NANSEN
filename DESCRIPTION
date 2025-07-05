@@ -1,0 +1,32 @@
+Package: BMAToolsTesting
+Title: Testing BMA Specifications
+Version: 2.0.0
+Authors@R: 
+    person(given = "Matthew",
+           family = "Clarke",
+           role = c("aut", "cre"),
+           email = "matthewaclarke1991@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Testing BMA Specifications.
+License: file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    dplyr,
+    ggplot2,
+    magrittr,
+    readr,
+    stats,
+    tibble,
+    tidyr,
+    here,
+    futile.logger,
+    git2r,
+    janitor,
+    jsonlite,
+    progress,
+    purrr,
+    stringr,
+    utils
