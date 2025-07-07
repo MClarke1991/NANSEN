@@ -39,7 +39,7 @@ stop_missing_nodes_expected <- function(spec,
                 name = log_file
             )
         } else {
-            flog.error(
+            futile.logger::flog.error(
                 stop(paste0(message), call. = FALSE),
                 name = log_file
             )

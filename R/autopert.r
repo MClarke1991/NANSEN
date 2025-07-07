@@ -107,7 +107,7 @@ autopert <- function(netw_file_path,
 
     ## ----- Import Data -------
 
-    netw_variables <- BMAToolsTesting::get_netw_variables(netw_file_path)
+    netw_variables <- NANSEN::get_netw_variables(netw_file_path)
     ## TEMP get rid of weird character encoding of RangeTo in json
     netw_variables <- netw_variables %>%
         dplyr::mutate(range_to = as.integer(range_to))
@@ -226,7 +226,7 @@ autopert <- function(netw_file_path,
     ## ----- Parse Results-----
 
     ## Get files with progress bar
-    data <- BMAToolsTesting::parse_biocheck_dir(parse_dir, netw_variables)
+    data <- NANSEN::parse_biocheck_dir(parse_dir, netw_variables)
 
     readr::write_csv(data, file.path(results_dir, "parse_results.csv"))
 
@@ -278,7 +278,7 @@ autopert <- function(netw_file_path,
         dplyr::filter(!is.na(expectation_bma) &
             (is.na(lo) | is.na(hi) | is.na(mean_result)))
     if (nrow(missing_results) > 0) {
-        flog.error(
+        futile.logger::flog.error(
             warning(
                 "Results missing, did you try and get an output without specifying any
     inputs?\n See:\n ",

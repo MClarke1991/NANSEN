@@ -1,10 +1,10 @@
 ## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
 
-library(BMAToolsTesting)
+library(NANSEN)
 
 ## For you to set up
-path_to_netw <- file.path("tests", "testthat", "autopert","helper_autopert_1.json")
-path_to_spec <- file.path(file.path("tests", "testthat", "autopert", "helper_spec_1.csv"))
+path_to_netw <- file.path("examples", "autopert", "helper_autopert_1.json")
+path_to_spec <- file.path(file.path("examples", "autopert", "helper_spec_1.csv"))
 
 ## options
 out_dir <- file.path("auto_pert_results")
