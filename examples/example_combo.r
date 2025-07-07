@@ -28,9 +28,9 @@ if (!dir.exists(pipe_dir)) {
 ## Note that the `netw_file_path` must be RELATIVE to the working
 ## directory, not an absolute path, due to how BMA command line
 ## works. All other paths can be absolute or relative.
-netw_file_path <- file.path("tests", "testthat", "combo", "helper_combo_1.json")
-spec_path <- file.path("tests", "testthat", "autopert", "helper_spec_2.csv")
-combo_backgrounds_path <- file.path("tests", "testthat", "combo", "helper_combo_bkg_1.csv")
+netw_file_path <- file.path("examples", "combo", "helper_combo_1.json")
+spec_path <- file.path("examples", "autopert", "helper_spec_2.csv")
+combo_backgrounds_path <- file.path("examples", "combo", "helper_combo_bkg_1.csv")
 combo_drug_path <- NA
 
 ## Optional: list of nodes not to perturb, so as to speed up computation
