@@ -1,6 +1,6 @@
 ## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
 
-library(BMAToolsTesting)
+library(NANSEN)
 
 ## For you to set up
 path_to_netw <- file.path("examples", "autopert", "helper_autopert_1.json")
