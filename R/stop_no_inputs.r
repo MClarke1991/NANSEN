@@ -12,13 +12,13 @@
 ##' @export
 stop_no_inputs <- function(spec, log_file, group_vars) {
     no_inputs <- spec %>%
-        dplyr::mutate(approx_csv_row_id = 1 + seq(1:nrow(.))) %>%
+        dplyr::mutate(approx_csv_row_id = 1 + seq_len(nrow(.))) %>%
         dplyr::group_by(across(all_of(group_vars))) %>% # https://stackoverflow.com/a/66253244/10923234
-        dplyr::summarise(n_blank_input = sum(is.na(perturbation)),
-                         n_total = dplyr::n(), csv_row_id = approx_csv_row_id) %>%
+        dplyr::reframe(n_blank_input = sum(is.na(perturbation)),
+                       n_total = dplyr::n(), csv_row_id = approx_csv_row_id) %>%
         dplyr::filter(n_blank_input == n_total)
     if (nrow(no_inputs) > 0) {
-        flog.error(
+        futile.logger::flog.error(
             stop(
                 "There are cases where there are no perturbations of the network, only
       measurement of the basal output. Currently (2020-02-26) this will cause
