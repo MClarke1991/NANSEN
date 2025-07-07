@@ -278,7 +278,7 @@ autopert <- function(netw_file_path,
         dplyr::filter(!is.na(expectation_bma) &
             (is.na(lo) | is.na(hi) | is.na(mean_result)))
     if (nrow(missing_results) > 0) {
-        flog.error(
+        futile.logger::flog.error(
             warning(
                 "Results missing, did you try and get an output without specifying any
     inputs?\n See:\n ",

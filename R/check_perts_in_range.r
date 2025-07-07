@@ -24,7 +24,7 @@ check_perts_in_range <- function(spec_levels) {
                                     expectation_bma > range_to)
 
     if (nrow(perturbation_out_range) > 0) {
-        flog.error(
+        futile.logger::flog.error(
             stop(
                 "There are perturbations that are outside the range the node can take: \n",
 
@@ -37,7 +37,7 @@ check_perts_in_range <- function(spec_levels) {
     }
 
     if (nrow(expectation_out_range) > 0) {
-        flog.error(
+        futile.logger::flog.error(
             stop(
                 "There are perturbations that are outside the range the node can take: \n",
                 paste(utils::capture.output(dplyr::select(expectation_out_range, -perturbation_bma)), collapse = "\n"),
