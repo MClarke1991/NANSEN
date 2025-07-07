@@ -11,7 +11,7 @@ test_that("convert_spec_levels converts min/mid/max to numeric values", {
     range_to = c(10, 11, 12)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(0, 6, 12))
   expect_equal(result$expectation_bma, c(0, 6, 12))
@@ -31,7 +31,7 @@ test_that("convert_spec_levels handles numeric strings", {
     range_to = c(10, 11)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(5, 7))
   expect_equal(result$expectation_bma, c(3, 9))
@@ -51,7 +51,7 @@ test_that("convert_spec_levels handles NA values", {
     range_to = c(10, 11, 12)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(0, NA, 12))
   expect_equal(result$expectation_bma, c(NA, 6, 12))
@@ -71,7 +71,7 @@ test_that("convert_spec_levels handles mixed relative and numeric values", {
     range_to = c(10, 11, 12, 13)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(0, 5, 7, 13))
   expect_equal(result$expectation_bma, c(3, 6, 12, 3))
@@ -91,7 +91,7 @@ test_that("convert_spec_levels handles zero-width ranges", {
     range_to = c(5, 5)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(5, 5))
   expect_equal(result$expectation_bma, c(5, 5))
@@ -111,7 +111,7 @@ test_that("convert_spec_levels handles negative ranges", {
     range_to = c(-1, 5)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(-10, 5))
   expect_equal(result$expectation_bma, c(-5.5, -5))
@@ -131,7 +131,7 @@ test_that("convert_spec_levels uses direct assignment for numeric columns", {
     range_to = c(10, 11)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(5, 7))
   expect_equal(result$expectation_bma, c(3, 9))
@@ -151,7 +151,7 @@ test_that("convert_spec_levels handles mixed column types", {
     range_to = c(10, 11)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c("min", "max"))
   expect_equal(result$expectation_bma, c(3, 9))
@@ -171,7 +171,7 @@ test_that("convert_spec_levels handles empty dataframe", {
     range_to = numeric(0)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(nrow(result), 0)
   expect_true("perturbation_bma" %in% names(result))
@@ -192,7 +192,7 @@ test_that("convert_spec_levels handles single row dataframe", {
     range_to = 10
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, 5)
   expect_equal(result$expectation_bma, 10)
@@ -212,7 +212,7 @@ test_that("convert_spec_levels handles large ranges", {
     range_to = c(1000000, 2000000)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(0, 1000500))
   expect_equal(result$expectation_bma, c(1000000, 1000500))
@@ -232,7 +232,7 @@ test_that("convert_spec_levels handles decimal ranges", {
     range_to = c(10.5, 11.5)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(0.5, 6.5))
   expect_equal(result$expectation_bma, c(10.5, 6.5))
@@ -254,7 +254,7 @@ test_that("convert_spec_levels preserves original columns", {
     experiment_particular = c("exp1", "exp2")
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_true(all(c("gene", "source", "perturbation", "expected_result_bma", 
                    "range_from", "range_to", "experiment_particular") %in% names(result)))
@@ -277,7 +277,7 @@ test_that("convert_spec_levels handles case sensitivity", {
     range_to = c(10, 11, 12)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(0, 6, 12))
   expect_equal(result$expectation_bma, c(0, 6, 12))
@@ -297,7 +297,7 @@ test_that("convert_spec_levels handles partial matches", {
     range_to = c(10, 11, 12)
   )
   
-  result <- convert_spec_levels(spec, log_file)
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   
   expect_equal(result$perturbation_bma, c(0, 6, 12))
   expect_equal(result$expectation_bma, c(0, 6, 12))
