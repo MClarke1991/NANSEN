@@ -1,0 +1,1 @@
+linters: linters_with_defaults(indentation_linter = NULL, object_usage_linter = object_usage_linter(skip_with = c("%>%"))) 

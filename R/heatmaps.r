@@ -727,28 +727,6 @@ loop_plot_diff_double <- function(bkg,
 ##' @inheritParams combo
 ##' @inheritParams get_combo_results_dir
 ##' @inheritParams get_netw_variables
-##' @param results_file
-##' @param results_prefix
-##' @param project_path project path
-##' @param out_dir results directory
-##' @param netw_file_path
-##' @param vis_dir
-##' @param cluster_rows
-##' @param cluster_double_cols
-##' @param type node, druggable or drug heatmaps
-##' @param background_order
-##' @param background_order_neat
-##' @param neaten_background
-##' @param single_fontsize fontsize for monotherapy node perturbation heatmaps
-##' @param single_druggable_fontsize fontsize for monotherapy druggable perturbation heatmaps
-##' @param single_drugs_fontsize fontsize for monotherapy drug perturbation heatmaps
-##' @param double_fontsize fontsize for combination therapy node perturbation heatmaps
-##' @param double_druggable_font_size fontsize for combination therapy druggable perturbation heatmaps
-##' @param double_drugs_font_size fontsize for combination therapy drug perturbation heatmaps
-##' @param h_s
-##' @param h_d
-##' @param w_s
-##' @param w_d
 ##' @return plot heatmaps and save to directory
 ##' @export
 plot_heatmaps <- function(results_file,

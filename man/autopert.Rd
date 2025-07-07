@@ -13,7 +13,6 @@ autopert(
   loserum = FALSE,
   missing_nodes_perturbed_overide = FALSE,
   missing_nodes_expected_overide = FALSE,
-  git_log = FALSE,
   project_path = NA,
   bma_tools_path = NA,
   group_vars = c("source", "cell_line", "experiment_particular")
@@ -39,9 +38,6 @@ for pertrubred nodes that are missing from network}
 
 \item{missing_nodes_expected_overide}{option to override check for
 expected nodes that are missing from network}
-
-\item{git_log}{option for logging of git SHA of project and
-BMATools. Dev only.}
 
 \item{project_path}{project path for git SHA log, point to git
 repo of the network and specification being tested}
