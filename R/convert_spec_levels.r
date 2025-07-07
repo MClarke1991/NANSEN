@@ -17,24 +17,24 @@ convert_spec_levels <- function(spec, log_file) {
     if (is.character(dplyr::pull(spec, perturbation)) &
         is.character(dplyr::pull(spec, expected_result_bma))) {
         spec_levels <- spec %>%
-            dplyr::mutate(perturbation_bma = case_when(
-                       str_detect(perturbation, "min") ~ as.numeric(range_from),
-                       str_detect(perturbation, "max") ~ as.numeric(range_to),
-                       str_detect(perturbation, "mid") ~
+            dplyr::mutate(perturbation_bma = dplyr::case_when(
+                       stringr::str_detect(perturbation, stringr::regex("min", ignore_case = TRUE)) ~ as.numeric(range_from),
+                       stringr::str_detect(perturbation, stringr::regex("max", ignore_case = TRUE)) ~ as.numeric(range_to),
+                       stringr::str_detect(perturbation, stringr::regex("mid", ignore_case = TRUE)) ~
                            as.numeric((range_to + range_from) / 2),
-                       str_detect(perturbation, "[:digit:]") ~
+                       stringr::str_detect(perturbation, "[[:digit:]]") ~
                            as.numeric(perturbation),
                        is.na(perturbation)             ~ as.numeric(NA)
                    )
                    ) %>%
-            dplyr::mutate(expectation_bma = case_when(
-                       str_detect(expected_result_bma, "min") ~
+            dplyr::mutate(expectation_bma = dplyr::case_when(
+                       stringr::str_detect(expected_result_bma, stringr::regex("min", ignore_case = TRUE)) ~
                            as.numeric(range_from),
-                       str_detect(expected_result_bma, "max") ~
+                       stringr::str_detect(expected_result_bma, stringr::regex("max", ignore_case = TRUE)) ~
                            as.numeric(range_to),
-                       str_detect(expected_result_bma, "mid") ~
+                       stringr::str_detect(expected_result_bma, stringr::regex("mid", ignore_case = TRUE)) ~
                            as.numeric((range_to + range_from) / 2),
-                       str_detect(expected_result_bma, "[:digit:]") ~
+                       stringr::str_detect(expected_result_bma, "[[:digit:]]") ~
                            as.numeric(expected_result_bma),
                        is.na(expected_result_bma)             ~ as.numeric(NA)
                    )
