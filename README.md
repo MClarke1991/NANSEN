@@ -7,6 +7,72 @@ To use, please install Bio Model Analyzer command line tools from [here](http://
 
 Use on UNIX systems is experimental, and requires installing the full command-line tools from [here](https://github.com/hallba/BioModelAnalyzer/issues/68). 
 
+## Key Features
+
+NANSEN ("Network Analysis aNd ScrEeNing") is an open–source R package that wraps the **Bio Model Analyzer (BMA)** command-line tools in a tidy, reproducible workflow for verifying, perturbing and systematically screening discrete gene-regulatory network models.
+
+The package allows modellers and experimentalists to:
+
+* **Validate network specifications** – automatically check that experimental perturbation spreadsheets are consistent with the logical model and flag common errors before running long simulations.
+* **Run large perturbation screens** – generate, execute and parse thousands of BMA jobs that test every gene perturbation ("autopert") or pair-wise gene/drug combination ("combo").
+* **Perform high–throughput drug & mutation searches** – quantify phenotypic effects of single or double perturbations, optionally against user-defined genetic backgrounds.
+* **Visualise results** – produce publication-ready heat-maps that highlight the most influential nodes, druggable targets or synthetic-lethal pairs.
+
+## Key functionality
+
+| Category | Function(s) | Purpose |
+| -------- | ----------- | ------- |
+| Specification testing | `autopert()` | Runs a full single-node perturbation screen using a network `.json` file and a specification `.csv`.  Automatically writes BMA commands, executes them and parses JSON output back into tidy data frames. |
+| Combination testing | `combo()` + helpers (`make_bkg_commands_combo()`, `make_pair_drugs()`, …) | Screens all pairwise perturbations (node×node, druggable×druggable or drug×drug) across multiple genetic backgrounds. |
+| Data import | `import_spec()`, `import_drugs_clean()`, `get_netw_variables()` | Read and sanitise network variables, perturbation sheets and drug mapping files. |
+| Quality control | `check_spec_groups()`, `check_perts_in_range()`, `stop_missing_*()` | Early-exit guards that stop a run when inputs are malformed or biologically impossible. |
+| Visualisation | `plot_*`, `heatmaps.R` | Utility functions for clustered/un-clustered heat-maps and difference plots (single vs double perturbations). |
+
+Most functions follow tidyverse conventions and return `tibble` objects for easy downstream manipulation.
+
+### 1. Automated model verification – `autopert()`
+
+`autopert()` compares model behaviour against an experimental specification that lists node perturbations and the expected outcomes.
+It automatically:
+
+* validates the specification (`check_spec_groups()`, `check_perts_in_range()` …)
+* executes BioModelAnalyzer in *VMCAI* (no-SAT) mode for every experimental condition
+* aggregates results and scores the mismatch to highlight potential issues with the model
+
+Minimal example
+
+```r
+library(NANSEN)
+
+autopert(
+  netw_file_path = "examples/autopert/helper_autopert_1.json",
+  spec_path      = "examples/autopert/helper_spec_1.csv",
+  out_dir        = "examples/autopert/results"
+)
+```
+
+### 2. Combination perturbation screening – `combo()` & helpers in `combo_funcs.r`
+
+The functions defined in `R/combo_funcs.r` allow exhaustive screening of single and pairwise perturbations—including drug-like interventions—across multiple genetic backgrounds.
+
+Key helpers include:
+
+* `make_bkg_commands_combo()` – build background-specific BMA command strings
+* `make_single_muts()` / `make_pair_muts()` – generate all single/double node perturbations
+* `import_drugs_clean()`, `get_drugs_commands()` – integrate pharmacological perturbations
+
+`combo()` orchestrates the workflow, runs BMA for every background/perturbation combination and outputs tidy result tables (`parsed_results.csv`, `processed_results.csv`) that can be mined for synergistic pairs or synthetic lethal interactions.
+
+```r
+combo(
+  netw_file_path    = "examples/combo/helper_combo_1.json",
+  backgrounds_path  = "examples/combo/helper_combo_bkg_1.csv",
+  drug_path         = "examples/combo/helper_combo_drugs_1.csv",
+  out_dir           = "examples/combo/results",
+  log_filename      = "combo.log"
+)
+```
+
 If you use NANSEN in your research, please cite:
 
 ```bibtex
