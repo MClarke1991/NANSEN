@@ -6,7 +6,8 @@
 ##' @param netw_file_path path to network JSON file
 ##' @param spec_path path to specification csv file
 ##' @param bma_path path to BMA command line installation, defaults to
-##'     the path produced by the one click installer (.msi)
+##'     the path produced by the one click installer (.msi). The path
+##'     is automatically normalized for cross-platform compatibility.
 ##' @param group_vars variables used to group rows of the
 ##'     specification into a single experiment. Defaults to "source"
 ##'     (citation key or other unique identifier of source of
@@ -43,12 +44,9 @@ autopert <- function(netw_file_path,
                          "source", "cell_line",
                          "experiment_particular"
                      )) {
-    ## Validate BMA executable exists
-    if (!file.exists(bma_path)) {
-        stop("BMA executable not found at: ", bma_path, 
-             "\nPlease ensure BMA tools are installed at the expected location.")
-    }
-
+    ## Normalize BMA path for cross-platform compatibility
+    bma_path <- normalize_bma_path(bma_path)
+    
     ## Output files
 
     autopert_dir <- here::here(out_dir, paste("AP_RUN",
@@ -365,7 +363,7 @@ autopert <- function(netw_file_path,
     ## Plot ----
     results_plot <- results_short %>%
         dplyr::filter(!is.na(expectation_bma)) %>%
-        tidyr::unite(label, all_of(group_vars), gene, sep = "_")
+        tidyr::unite(label, group_vars, gene, sep = "_")
 
     results_plot$label <- factor(results_plot$label,
         levels = results_plot$label
@@ -443,7 +441,7 @@ autopert <- function(netw_file_path,
 
 
     results_short %>%
-        tidyr::unite(label, all_of(group_vars), sep = "_") %>%
+        tidyr::unite(label, group_vars, sep = "_") %>%
         ## need label to be able to seperate bars, otherwise ggplot groups
         ## automatically and only get one bar per gene
         dplyr::select(label, gene, diff) %>%

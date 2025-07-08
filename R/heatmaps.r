@@ -771,7 +771,7 @@ plot_heatmaps <- function(results_file,
     if(!missing(background_order)){
         results <- results %>%
             arrange(factor(background, levels = background_order)) %>%
-            BMATools::preserve_order("background")
+            NANSEN::preserve_order("background")
     }
 
     max_level <- max(
@@ -1055,7 +1055,7 @@ plot_diff_heatmaps <- function(results_file,
     if(!missing(background_order)){
         results <- results %>%
             arrange(factor(background, levels = background_order)) %>%
-            BMATools::preserve_order("background")
+            NANSEN::preserve_order("background")
     }
 
     max_level <- max(
