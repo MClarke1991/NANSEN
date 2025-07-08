@@ -15,6 +15,7 @@ normalize_bma_path <- function(bma_path) {
         # Convert old format to new format
         # Remove extra escaping: \\" -> "
         new_path <- gsub('\\\\"', '"', bma_path)
+        new_path <- stringr::str_remove_all(new_path, '"')
         # Convert backslashes to forward slashes: \\ -> /
         new_path <- gsub('\\\\', '/', new_path)
         # Convert "C:" to "C:/" if not already present
