@@ -35,7 +35,8 @@ combo(
 in addition to node perturbations (CSV)}
 
 \item{bma_path}{path to BMA command line installation, defaults to
-the path produced by the one click installer (.msi)}
+the path produced by the one click installer (.msi). The path
+is automatically normalized for cross-platform compatibility.}
 
 \item{results_prefix}{prefix to results directory}
 
