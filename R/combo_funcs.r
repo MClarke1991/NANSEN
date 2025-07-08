@@ -389,7 +389,7 @@ run_all_backgrounds <- function(background_commands,
                                 log_file,
                                 precedence = "perturbation") {
     ## Normalize BMA path for cross-platform compatibility
-    bma_path <- normalize_bma_path(bma_path)
+    # bma_path <- normalize_bma_path(bma_path)
 
     ## Log and report in console what type of command is being run as
     ## these can take a long time
@@ -764,7 +764,7 @@ combo <- function(netw_file_path,
                   skip_all_pairs = FALSE,
                   log_filename) {
     ## Normalize BMA path for cross-platform compatibility
-    bma_path <- normalize_bma_path(bma_path)
+    # bma_path <- normalize_bma_path(bma_path)
 
     results_dir <- get_combo_results_dir(results_prefix = results_prefix,
                                          project_path = project_path,

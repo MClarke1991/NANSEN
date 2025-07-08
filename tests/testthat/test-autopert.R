@@ -4,8 +4,8 @@ test_that("autopert integration test - Windows only", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
   
   # Check if BMA executable exists
-  bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
-  skip_if_not(file.exists(bma_path), paste("BMA executable not found at:", bma_path))
+  # bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
+  # skip_if_not(file.exists(bma_path), paste("BMA executable not found at:", bma_path))
   
   # Create temporary directory for test outputs
   test_dir <- tempdir()
