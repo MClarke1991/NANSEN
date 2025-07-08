@@ -3,6 +3,10 @@ source(here::here("tests", "testthat", "testing_utils.r"))
 test_that("autopert integration test - Windows only", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
   
+  # Check if BMA executable exists
+  bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
+  skip_if_not(file.exists(bma_path), paste("BMA executable not found at:", bma_path))
+  
   # Create temporary directory for test outputs
   test_dir <- tempdir()
   out_dir <- file.path(test_dir, "autopert_test_output")
@@ -22,7 +26,7 @@ test_that("autopert integration test - Windows only", {
       netw_file_path = here::here("examples", "autopert", "helper_autopert_1.json"),
       spec_path = here::here("examples", "autopert", "helper_spec_1.csv"),
       out_dir = out_dir,
-      bma_path = 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
+      bma_path = bma_path
     )
   )
   

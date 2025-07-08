@@ -43,6 +43,12 @@ autopert <- function(netw_file_path,
                          "source", "cell_line",
                          "experiment_particular"
                      )) {
+    ## Validate BMA executable exists
+    if (!file.exists(bma_path)) {
+        stop("BMA executable not found at: ", bma_path, 
+             "\nPlease ensure BMA tools are installed at the expected location.")
+    }
+
     ## Output files
 
     autopert_dir <- here::here(out_dir, paste("AP_RUN",
