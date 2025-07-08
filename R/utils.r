@@ -17,6 +17,8 @@ normalize_bma_path <- function(bma_path) {
         new_path <- gsub('\\\\"', '"', bma_path)
         # Convert backslashes to forward slashes: \\ -> /
         new_path <- gsub('\\\\', '/', new_path)
+        # Convert "C:" to "C:/" if not already present
+        new_path <- gsub('^C:', 'C:/', new_path)
         
         if (file.exists(new_path)) {
             return(new_path)
