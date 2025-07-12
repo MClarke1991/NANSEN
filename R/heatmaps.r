@@ -760,7 +760,7 @@ plot_heatmaps <- function(results_file,
         dir.create(file.path(results_dir, vis_dir))
     }
 
-    results <- read_csv(file.path(results_dir, results_file), lazy = FALSE)
+    results <- readr::read_csv(file.path(results_dir, results_file), lazy = FALSE, show_col_types = FALSE)
 
     if (neaten_background) {
         results <- results %>%
@@ -1044,7 +1044,7 @@ plot_diff_heatmaps <- function(results_file,
         dir.create(file.path(results_dir, vis_dir))
     }
 
-    results <- read_csv(file.path(results_dir, results_file), lazy = FALSE)
+    results <- readr::read_csv(file.path(results_dir, results_file), lazy = FALSE, show_col_types = FALSE)
 
     if (neaten_background) {
         results <- results %>%

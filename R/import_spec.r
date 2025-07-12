@@ -15,8 +15,8 @@ import_spec <- function(spec_path,
                         loserum,
                         clean_underscores,
                         netw_variables) {
-    spec <- readr::read_csv(spec_path, lazy = FALSE) %>%
-        janitor::remove_empty() %>%
+    spec <- readr::read_csv(spec_path, lazy = FALSE, show_col_types = FALSE) %>%
+        janitor::remove_empty(which = c("rows", "cols")) %>%
         dplyr::mutate(experiment_particular =
                    factor(experiment_particular,
                           levels = unique(experiment_particular)
