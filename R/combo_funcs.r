@@ -269,7 +269,7 @@ check_drug_conflicts <- function(drugs, node_col_name) {
 get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
     ## Get ids etcs
     drugs_w_nodes <- drugs %>%
-        select(drug, .data[[node_col_name]], activity) %>%
+        dplyr::select(drug, .data[[node_col_name]], activity) %>%
         ## Cannot do normal mutate as make_clean_names will make dups
         ## unique, purr avoids this
         dplyr::mutate(drug_name_original = drug) %>%
@@ -838,11 +838,11 @@ combo <- function(netw_file_path,
     }
 
     s_muts <- make_single_muts(netw_variables = netw_variables %>%
-                 filter(!(.data[[node_col_name]] %in% exclusions)),
+                 dplyr::filter(!(.data[[node_col_name]] %in% exclusions)),
                                node_col = "node")
 
     pairs <- make_pair_muts(netw_variables = netw_variables %>%
-                 filter(!(.data[[node_col_name]] %in% exclusions)),
+                 dplyr::filter(!(.data[[node_col_name]] %in% exclusions)),
                             node_col = "node")
 
 
