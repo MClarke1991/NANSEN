@@ -227,11 +227,11 @@ check_drug_nodes <- function(drugs,
 #' @export
 check_drug_conflicts <- function(drugs, node_col_name) {
     d_conflicts <- drugs %>%
-        select(.data[[node_col_name]], activity) %>%
-        distinct() %>%
-        group_by(.data[[node_col_name]]) %>%
-        summarise(n_unique = n()) %>%
-        filter(n_unique > 1)
+        dplyr::select(.data[[node_col_name]], activity) %>%
+        dplyr::distinct() %>%
+        dplyr::group_by(.data[[node_col_name]]) %>%
+        dplyr::summarise(n_unique = dplyr::n()) %>%
+        dplyr::filter(n_unique > 1)
     if (nrow(d_conflicts) > 0) {
         stop("Drug combinations have conflicting effects on the same node")
     } else {
@@ -293,7 +293,7 @@ get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
 #' @family combination_therapy
 #' @export
 check_drugs_in_range <- function(drugs_commands) {
-    activity_out_range <- filter(drugs_commands,
+    activity_out_range <- dplyr::filter(drugs_commands,
                                  activity < range_from |
                                  activity > range_to)
     if (nrow(activity_out_range) > 0) {
@@ -318,7 +318,7 @@ check_drugs_in_range <- function(drugs_commands) {
 #' @export
 make_single_drugs <- function(drugs_commands) {
     drugs_single <- drugs_commands %>%
-        group_by(drug) %>%
+        dplyr::group_by(drug) %>%
         dplyr::summarise(command_arg = paste(command_arg,
                                              collapse = " "),
                          alt_filename_part = paste(alt_filename_part,
@@ -693,7 +693,7 @@ check_conflicts <- function(results, backgrounds, node_col = "name") {
 ##' @return string with path to results directory
 ##' @export
 get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_file_path) {
-    results_dir <- here(project_path,
+    results_dir <- here::here(project_path,
                              out_dir,
                              paste(results_prefix,
                                    stringr::str_remove(
