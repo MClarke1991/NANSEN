@@ -6,7 +6,8 @@
 ##' @param netw_file_path path to network JSON file
 ##' @param spec_path path to specification csv file
 ##' @param bma_path path to BMA command line installation, defaults to
-##'     the path produced by the one click installer (.msi)
+##'     the path produced by the one click installer (.msi). The path
+##'     is automatically normalized for cross-platform compatibility.
 ##' @param group_vars variables used to group rows of the
 ##'     specification into a single experiment. Defaults to "source"
 ##'     (citation key or other unique identifier of source of
@@ -43,6 +44,9 @@ autopert <- function(netw_file_path,
                          "source", "cell_line",
                          "experiment_particular"
                      )) {
+    ## Normalize BMA path for cross-platform compatibility
+    bma_path <- normalize_bma_path(bma_path)
+    
     ## Output files
 
     autopert_dir <- here::here(out_dir, paste("AP_RUN",
