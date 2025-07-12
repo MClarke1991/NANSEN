@@ -44,8 +44,6 @@ autopert <- function(netw_file_path,
                          "source", "cell_line",
                          "experiment_particular"
                      )) {
-    ## Normalize BMA path for cross-platform compatibility
-    bma_path <- normalize_bma_path(bma_path)
     
     ## Output files
 
