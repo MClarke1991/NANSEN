@@ -67,7 +67,7 @@ make_bkg_commands_combo <- function(backgrounds,
     ## and netw variables by gene/nodename
     background_args <- dplyr::left_join(backgrounds, netw_variables,
                                  by = node_col) %>%
-        dplyr::select(background, sym(node_col), id, activity) %>%
+        dplyr::select(background, rlang::sym(node_col), id, activity) %>%
         make_command_args(node_col = node_col)
 
     ## group rows of the same background together and combine commands
