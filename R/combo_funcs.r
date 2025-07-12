@@ -136,6 +136,10 @@ make_single_muts <- function(netw_variables, node_col = "name") {
 #' @export
 make_pair_muts <- function(netw_variables, node_col = "name") {
     genes <- dplyr::pull(netw_variables, .data[[node_col]])
+    
+    if (length(genes) < 2) {
+        stop("Need at least 2 nodes to create pairs")
+    }
 
     netw_variables_short <- dplyr::select(netw_variables,
                                    .data[[node_col]],

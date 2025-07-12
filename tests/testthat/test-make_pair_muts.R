@@ -121,15 +121,8 @@ test_that("make_pair_muts handles single node (no pairs possible)", {
     range_to = c(2)
   )
   
-  result <- make_pair_muts(netw_variables)
-  
-  # With only 1 node, no pairs are possible
-  expect_equal(nrow(result), 0)
-  
-  # But should still have the correct column structure
-  expected_cols <- c("a", "b", "id_a", "id_b", "type_a", "type_b",
-                     "activity_a", "activity_b", "command_arg", "filename_part")
-  expect_true(all(expected_cols %in% colnames(result)))
+  # Should throw informative error when only 1 node available for pairs
+  expect_error(make_pair_muts(netw_variables), "Need at least 2 nodes to create pairs")
 })
 
 test_that("make_pair_muts handles empty network variables", {
@@ -141,13 +134,8 @@ test_that("make_pair_muts handles empty network variables", {
     range_to = numeric()
   )
   
-  result <- make_pair_muts(netw_variables)
-  
-  # Should return empty data frame with correct structure
-  expect_equal(nrow(result), 0)
-  expected_cols <- c("a", "b", "id_a", "id_b", "type_a", "type_b",
-                     "activity_a", "activity_b", "command_arg", "filename_part")
-  expect_true(all(expected_cols %in% colnames(result)))
+  # Should throw informative error when no nodes available for pairs
+  expect_error(make_pair_muts(netw_variables), "Need at least 2 nodes to create pairs")
 })
 
 test_that("make_pair_muts produces correct number of combinations", {
