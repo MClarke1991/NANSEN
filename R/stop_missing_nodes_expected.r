@@ -34,7 +34,7 @@ stop_missing_nodes_expected <- function(spec,
 
     if (length(missing_nodes_expected) > 0) {
         if (missing_nodes_expected_overide == TRUE) {
-            flog.warn(
+            futile.logger::flog.warn(
                 warning(paste0(message), call. = FALSE),
                 name = log_file
             )
