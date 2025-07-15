@@ -75,6 +75,11 @@ test_that("autopert integration test - Windows only", {
     json_path <- file.path(run_dir, "BioCheck_output", json_file)
     expect_no_error(jsonlite::fromJSON(json_path))
   }
+
+  # Snapshot test for results.csv to ensure output doesn't change
+  results_csv_path <- file.path(run_dir, "results", "results.csv")
+  results_data <- readr::read_csv(results_csv_path, show_col_types = FALSE)
+  expect_snapshot(results_data)
 })
 
 test_that("autopert handles missing network file", {
