@@ -72,6 +72,7 @@ autopert <- function(netw_file_path,
         futile.logger::appender.file(log_file),
         name = log_file
     )
+    futile.logger::flog.threshold(futile.logger::flog.threshold(), name = log_file)
     ## Capture all unflogged warnings and errors in flogger
     ## https://github.com/zatonovo/futile.logger/issues/36
     options(error = function() {

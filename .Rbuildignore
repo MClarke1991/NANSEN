@@ -3,3 +3,5 @@
 ^scripts$
 ^auto_pert_results$
 ^untracked$
+^.*\.Rproj$
+^\.Rproj\.user$

@@ -1,10 +1,10 @@
 # Testing utilities for NANSEN package tests
 
 # Helper function to set up log_file environment for functions that require it
-setup_log_file <- function() {
+setup_log_file <- function(level = futile.logger::ERROR) {
   assign("log_file", "test.log", envir = .GlobalEnv)
   # Suppress futile.logger output during testing
-  futile.logger::flog.threshold(futile.logger::ERROR)
+  futile.logger::flog.threshold(level)
 }
 
 # Helper function to clean up log_file environment after tests
