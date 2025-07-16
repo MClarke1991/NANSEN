@@ -693,7 +693,7 @@ check_conflicts <- function(results, backgrounds, node_col = "name") {
 ##' @return string with path to results directory
 ##' @export
 get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_file_path) {
-    results_dir <- here(project_path,
+    results_dir <- here::here(project_path,
                              out_dir,
                              paste(results_prefix,
                                    stringr::str_remove(
@@ -771,8 +771,8 @@ combo <- function(netw_file_path,
 
     print(paste("Using results directory:", results_dir))
 
-    if (!dir.exists(here(project_path, out_dir))) {
-        dir.create(here(project_path, out_dir))
+    if (!dir.exists(here::here(project_path, out_dir))) {
+        dir.create(here::here(project_path, out_dir))
     }
 
     if (!dir.exists(file.path(results_dir))) {
@@ -788,7 +788,7 @@ combo <- function(netw_file_path,
     options(error = function()
         futile.logger::flog.warn(geterrmessage(), name = log_file))
     futile.logger::flog.info("Start", name = log_file)
-    
+
     futile.logger::flog.info(paste("Running Combo on model:",
                                    netw_file_path,
                                    "with backgrounds",
