@@ -576,8 +576,9 @@ process_results <- function(parsed_results,
 #' @param results Results from \code{\link{process_results}}
 #' @param backgrounds Backgrounds
 #' @param node_col node column name in backgrounds
+#' @param drugs optional drugs data frame
 #' @export
-check_conflicts <- function(results, backgrounds, node_col = "name") {
+check_conflicts <- function(results, backgrounds, node_col = "name", drugs = NULL) {
 
     check_conflict_row <- function(pert,
                                    lev,
@@ -972,16 +973,16 @@ combo <- function(netw_file_path,
         if ((!skip_drugs_single) | (!skip_drugs_pairs)) {
             tictoc::tic("Conflicts")
             conflicts <- check_conflicts(results = results,
-                                         node_col = node_col_name,
                                          backgrounds = backgrounds,
+                                         node_col = node_col_name,
                                          drugs = drugs)
             readr::write_csv(conflicts, file.path(results_dir, "conflicts.csv"))
             futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
         } else {
             tictoc::tic("Conflicts")
             conflicts <- check_conflicts(results = results,
-                                         node_col = node_col_name,
-                                         backgrounds = backgrounds)
+                                         backgrounds = backgrounds,
+                                         node_col = node_col_name)
             readr::write_csv(conflicts, file.path(results_dir, "conflicts.csv"))
             futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
         }
