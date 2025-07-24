@@ -132,6 +132,10 @@ drug_heat_dir_uc <- "unclust_drug_heatmaps"
 ## Path to BMA install. Note exact format needed. By default is the
 ## path that the MSI installer from teh BMA website uses
 bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
+## BMA tools path (undefined variable fix)
+bma_tools_path <- NA
+## Allow drug conflicts override
+drug_conflict_overide <- TRUE
 ## Name for directory for all results from a run
 out_dir <- file.path(pipe_dir, "results")
 ## Filename for log of any errors

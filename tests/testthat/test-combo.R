@@ -25,7 +25,8 @@ test_that("combo integration test - Windows only", {
       drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
       out_dir = out_dir,
       bma_path = bma_path,
-      log_filename = "Combo.log"
+      log_filename = "Combo.log",
+      drug_conflict_overide = TRUE
     )
   )
 
@@ -172,7 +173,8 @@ test_that("combo creates expected directory structure", {
     drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
     out_dir = out_dir,
     bma_path = bma_path,
-    log_filename = "Combo.log"
+    log_filename = "Combo.log",
+    drug_conflict_overide = TRUE
   )
 
   # Test the specific directory structure from combo_example_structure.md
@@ -199,4 +201,66 @@ test_that("combo creates expected directory structure", {
     json_files <- list.files(file.path(run_dir, raw_dir), pattern = "\\.json$")
     expect_true(length(json_files) > 0, info = paste("No JSON files in", raw_dir))
   }
+})
+
+test_that("combo detects drug conflicts when override is FALSE", {
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+
+  test_dir <- tempdir()
+  out_dir <- file.path(test_dir, "combo_conflict_test")
+
+  setup_log_file()
+  on.exit({
+    cleanup_log_file()
+    if (dir.exists(out_dir)) {
+      unlink(out_dir, recursive = TRUE)
+    }
+  })
+
+  # Test with conflicting drugs (default helper_combo_drugs_1.csv has conflicts)
+  expect_error(
+    combo(
+      netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
+      backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
+      drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
+      out_dir = out_dir,
+      bma_path = bma_path,
+      log_filename = "Combo.log",
+      drug_conflict_overide = FALSE
+    ),
+    "Drug combinations have conflicting effects on the same node"
+  )
+})
+
+test_that("combo runs successfully with non-conflicting drugs", {
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+
+  test_dir <- tempdir()
+  out_dir <- file.path(test_dir, "combo_no_conflict_test")
+
+  setup_log_file()
+  on.exit({
+    cleanup_log_file()
+    if (dir.exists(out_dir)) {
+      unlink(out_dir, recursive = TRUE)
+    }
+  })
+
+  # Test with non-conflicting drugs
+  expect_no_error(
+    combo(
+      netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
+      backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
+      drug_path = here::here("tests", "testthat", "combo", "helper_combo_drugs_no_conflict.csv"),
+      out_dir = out_dir,
+      bma_path = bma_path,
+      log_filename = "Combo.log",
+      drug_conflict_overide = FALSE
+    )
+  )
+
+  # Verify basic output structure exists
+  run_dir <- file.path(out_dir, "COMBO_RUN_helper_combo_1")
+  expect_true(dir.exists(run_dir))
+  expect_true(file.exists(file.path(run_dir, "parsed_results.csv")))
 })
