@@ -693,13 +693,19 @@ check_conflicts <- function(results, backgrounds, node_col = "name") {
 ##' @return string with path to results directory
 ##' @export
 get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_file_path) {
-    results_dir <- here::here(project_path,
-                             out_dir,
-                             paste(results_prefix,
-                                   stringr::str_remove(
-                                                basename(netw_file_path),
-                                                ".json"),
-                                   sep = "_"))
+    run_dir <- paste(results_prefix,
+                                       stringr::str_remove(
+                                                    basename(netw_file_path),
+                                                    ".json"),
+                                       sep = "_")
+    if (project_path == "" || is.null(project_path)) {
+        results_dir <- here::here(out_dir,
+                                 run_dir)
+    } else {
+        results_dir <- here::here(project_path,
+                                 out_dir,
+                                 run_dir)
+    }
     results_dir
 }
 
