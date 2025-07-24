@@ -227,11 +227,11 @@ check_drug_nodes <- function(drugs,
 #' @export
 check_drug_conflicts <- function(drugs, node_col_name) {
     d_conflicts <- drugs %>%
-        select(.data[[node_col_name]], activity) %>%
-        distinct() %>%
-        group_by(.data[[node_col_name]]) %>%
-        summarise(n_unique = n()) %>%
-        filter(n_unique > 1)
+        dplyr::select(.data[[node_col_name]], activity) %>%
+        dplyr::distinct() %>%
+        dplyr::group_by(.data[[node_col_name]]) %>%
+        dplyr::summarise(n_unique = n()) %>%
+        dplyr::filter(n_unique > 1)
     if (nrow(d_conflicts) > 0) {
         stop("Drug combinations have conflicting effects on the same node")
     } else {
@@ -269,7 +269,7 @@ check_drug_conflicts <- function(drugs, node_col_name) {
 get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
     ## Get ids etcs
     drugs_w_nodes <- drugs %>%
-        select(drug, .data[[node_col_name]], activity) %>%
+        dplyr::select(drug, .data[[node_col_name]], activity) %>%
         ## Cannot do normal mutate as make_clean_names will make dups
         ## unique, purr avoids this
         dplyr::mutate(drug_name_original = drug) %>%
@@ -771,8 +771,15 @@ combo <- function(netw_file_path,
 
     print(paste("Using results directory:", results_dir))
 
-    if (!dir.exists(here::here(project_path, out_dir))) {
-        dir.create(here::here(project_path, out_dir))
+    # Handle empty project_path for directory creation
+    base_out_dir <- if (project_path == "" || is.null(project_path)) {
+        here::here(out_dir)
+    } else {
+        here::here(project_path, out_dir)
+    }
+    
+    if (!dir.exists(base_out_dir)) {
+        dir.create(base_out_dir)
     }
 
     if (!dir.exists(file.path(results_dir))) {
