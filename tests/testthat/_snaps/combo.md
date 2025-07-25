@@ -18,5 +18,5 @@
       10 double cancer     growth_fac~ a         0 b         4     4     4     0     0
       # i 2,214 more rows
       # i 6 more variables: node <chr>, range_from <dbl>, range_to <dbl>,
-      #   formula <lgl>, mean <dbl>, uncertainty <dbl>
+      #   formula <chr>, mean <dbl>, uncertainty <dbl>
 

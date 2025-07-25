@@ -567,6 +567,7 @@ process_results <- function(parsed_results,
                uncertainty = (hi - lo) / (range_to - range_from)) %>%
         tidyr::separate(pert, "__", into = c("muta", "leva", "mutb", "levb"),
                  fill = "right")
+    return(processed_results)
 }
 
 

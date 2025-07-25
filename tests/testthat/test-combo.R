@@ -46,10 +46,10 @@ test_that("combo integration test - Windows only", {
   expect_true(file.exists(file.path(run_dir, "conflicts.csv")))
 
   # Verify CSV structure and content
-  parsed_results <- readr::read_csv(file.path(run_dir, "parsed_results.csv"), show_col_types = FALSE)
+  parsed_results <- readr::read_csv(file.path(run_dir, "parsed_results.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
   expect_true(all(c("filename", "time", "id", "lo", "hi", "node", "range_from", "range_to", "formula") %in% colnames(parsed_results)))
 
-  processed_results <- readr::read_csv(file.path(run_dir, "processed_results.csv"), show_col_types = FALSE)
+  processed_results <- readr::read_csv(file.path(run_dir, "processed_results.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
   expect_true(all(c("case", "background", "bkg_pert", "muta", "leva", "mutb", "levb", "time", "id", "lo", "hi", "node", "range_from", "range_to", "formula", "mean", "uncertainty") %in% colnames(processed_results)))
 
   conflicts <- readr::read_csv(file.path(run_dir, "conflicts.csv"), show_col_types = FALSE)
@@ -76,7 +76,7 @@ test_that("combo integration test - Windows only", {
 
   # Snapshot test for processed_results.csv to ensure output doesn't change
   processed_csv_path <- file.path(run_dir, "processed_results.csv")
-  processed_data <- readr::read_csv(processed_csv_path, show_col_types = FALSE)
+  processed_data <- readr::read_csv(processed_csv_path, show_col_types = FALSE, col_types = cols(formula = "c"))
   expect_snapshot(processed_data)
 })
 

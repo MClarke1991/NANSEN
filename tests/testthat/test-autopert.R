@@ -52,18 +52,18 @@ test_that("autopert integration test - Windows only", {
   expect_true(file.exists(file.path(run_dir, "results", "results_per_pert_per_gene.png")))
 
   # Verify CSV structure and content
-  results <- readr::read_csv(file.path(run_dir, "results", "results.csv"), show_col_types = FALSE)
+  results <- readr::read_csv(file.path(run_dir, "results", "results.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
   expect_true(all(c("gene", "perturbation", "expectation_bma", "lo", "hi", "mean_result", "diff") %in% colnames(results)))
 
-  parse_results <- readr::read_csv(file.path(run_dir, "results", "parse_results.csv"), show_col_types = FALSE)
+  parse_results <- readr::read_csv(file.path(run_dir, "results", "parse_results.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
   expect_true(all(c("filename", "time", "id", "lo", "hi", "name", "range_from", "range_to", "formula") %in% colnames(parse_results)))
 
-  results_score <- readr::read_csv(file.path(run_dir, "results", "results_score.csv"), show_col_types = FALSE)
+  results_score <- readr::read_csv(file.path(run_dir, "results", "results_score.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
   expect_true("score" %in% colnames(results_score))
   expect_true(nrow(results_score) == 1)
   expect_true(is.numeric(results_score$score))
 
-  results_short_node_summary <- readr::read_csv(file.path(run_dir, "results", "results_short_node_summary.csv"), show_col_types = FALSE)
+  results_short_node_summary <- readr::read_csv(file.path(run_dir, "results", "results_short_node_summary.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
   expect_true(all(c("gene", "diff_per_gene", "abs_diff_per_gene") %in% colnames(results_short_node_summary)))
 
   # Verify BioCheck output files exist
@@ -78,7 +78,7 @@ test_that("autopert integration test - Windows only", {
 
   # Snapshot test for results.csv to ensure output doesn't change
   results_csv_path <- file.path(run_dir, "results", "results.csv")
-  results_data <- readr::read_csv(results_csv_path, show_col_types = FALSE)
+  results_data <- readr::read_csv(results_csv_path, show_col_types = FALSE, col_types = cols(formula = "c"))
   expect_snapshot(results_data)
 })
 
