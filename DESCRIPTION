@@ -24,6 +24,7 @@ Imports:
     ggplot2,
     magrittr,
     readr,
+    rlang,
     stats,
     tibble,
     tidyr,
