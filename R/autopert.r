@@ -362,7 +362,7 @@ autopert <- function(netw_file_path,
     ## Plot ----
     results_plot <- results_short %>%
         dplyr::filter(!is.na(expectation_bma)) %>%
-        tidyr::unite(label, group_vars, gene, sep = "_")
+        tidyr::unite(label, dplyr::all_of(group_vars), gene, sep = "_")
 
     results_plot$label <- factor(results_plot$label,
         levels = results_plot$label
@@ -440,7 +440,7 @@ autopert <- function(netw_file_path,
 
 
     results_short %>%
-        tidyr::unite(label, group_vars, sep = "_") %>%
+        tidyr::unite(label, dplyr::all_of(group_vars), sep = "_") %>%
         ## need label to be able to seperate bars, otherwise ggplot groups
         ## automatically and only get one bar per gene
         dplyr::select(label, gene, diff) %>%
