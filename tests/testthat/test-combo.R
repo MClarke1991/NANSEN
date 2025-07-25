@@ -19,14 +19,16 @@ test_that("combo integration test - Windows only", {
 
   # Run combo function with example data
   expect_no_error(
-    combo(
-      netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
-      backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
-      drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
-      out_dir = out_dir,
-      bma_path = bma_path,
-      log_filename = "Combo.log",
-      drug_conflict_overide = TRUE
+    suppressWarnings(
+      combo(
+        netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
+        backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
+        drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
+        out_dir = out_dir,
+        bma_path = bma_path,
+        log_filename = "Combo.log",
+        drug_conflict_overide = TRUE
+      )
     )
   )
 
@@ -56,13 +58,13 @@ test_that("combo integration test - Windows only", {
   # Verify JSON files exist in RAW directories
   single_wt_files <- list.files(file.path(run_dir, "RAW__single__wt"), pattern = "\\.json$")
   expect_true(length(single_wt_files) > 0)
-  
+
   single_cancer_files <- list.files(file.path(run_dir, "RAW__single__cancer"), pattern = "\\.json$")
   expect_true(length(single_cancer_files) > 0)
-  
+
   double_wt_files <- list.files(file.path(run_dir, "RAW__double__wt"), pattern = "\\.json$")
   expect_true(length(double_wt_files) > 0)
-  
+
   double_cancer_files <- list.files(file.path(run_dir, "RAW__double__cancer"), pattern = "\\.json$")
   expect_true(length(double_cancer_files) > 0)
 
@@ -167,7 +169,7 @@ test_that("combo creates expected directory structure", {
     }
   })
 
-  combo(
+  suppressWarnings(combo(
     netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
     backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
     drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
@@ -175,7 +177,7 @@ test_that("combo creates expected directory structure", {
     bma_path = bma_path,
     log_filename = "Combo.log",
     drug_conflict_overide = TRUE
-  )
+  ))
 
   # Test the specific directory structure from combo_example_structure.md
   run_dir <- file.path(out_dir, "COMBO_RUN_helper_combo_1")
@@ -189,14 +191,14 @@ test_that("combo creates expected directory structure", {
 
   # Check specific files match the documented structure
   expected_files <- c("parsed_results.csv", "processed_results.csv", "conflicts.csv")
-  
+
   for (file in expected_files) {
     expect_true(file.exists(file.path(run_dir, file)), info = paste("Missing file:", file))
   }
 
   # Check that each RAW directory contains JSON files
   raw_dirs <- c("RAW__single__wt", "RAW__single__cancer", "RAW__double__wt", "RAW__double__cancer")
-  
+
   for (raw_dir in raw_dirs) {
     json_files <- list.files(file.path(run_dir, raw_dir), pattern = "\\.json$")
     expect_true(length(json_files) > 0, info = paste("No JSON files in", raw_dir))
