@@ -26,10 +26,10 @@ make_command_args <- function(df,
 
     out <- dplyr::mutate(df,
                   command_arg = paste("-ko",
-                                      .data[[id_col]],
-                                      .data[[activity_col]]),
-                  filename_part = paste(.data[[node_col]],
-                                        .data[[activity_col]],
+                                      !!rlang::sym(id_col),
+                                      !!rlang::sym(activity_col)),
+                  filename_part = paste(!!rlang::sym(node_col),
+                                        !!rlang::sym(activity_col),
                                         sep = "__"))
     return(out)
 }
@@ -101,7 +101,7 @@ make_single_muts <- function(netw_variables, node_col = "name") {
     }
 
     s_muts <- netw_variables %>%
-        dplyr::select(.data[[node_col]], id, range_from, range_to) %>%
+        dplyr::select(dplyr::all_of(node_col), id, range_from, range_to) %>%
         dplyr::rename("inhibition" = range_from,
                       "activation" = range_to) %>%
         tidyr::pivot_longer(cols = c("activation", "inhibition"),
@@ -135,10 +135,10 @@ make_single_muts <- function(netw_variables, node_col = "name") {
 #' @family combination_therapy
 #' @export
 make_pair_muts <- function(netw_variables, node_col = "name") {
-    genes <- dplyr::pull(netw_variables, .data[[node_col]])
+    genes <- dplyr::pull(netw_variables, dplyr::all_of(node_col))
 
     netw_variables_short <- dplyr::select(netw_variables,
-                                   .data[[node_col]],
+                                   dplyr::all_of(node_col),
                                    id,
                                    range_from,
                                    range_to) %>%
@@ -203,13 +203,13 @@ check_drug_nodes <- function(drugs,
                              netw_variables,
                              node_col_name) {
     ## Check if all nodes drugged are in network
-    if (!all(unique(dplyr::pull(drugs, .data[[node_col_name]])) %in%
-             unique(dplyr::pull(netw_variables, .data[[node_col_name]])))) {
+    if (!all(unique(dplyr::pull(drugs, dplyr::all_of(node_col_name))) %in%
+             unique(dplyr::pull(netw_variables, dplyr::all_of(node_col_name))))) {
         stop(paste(
             "Nodes in drug list not in network: ",
             capture.output(
-                setdiff(unique(dplyr::pull(drugs, .data[[node_col_name]])),
-                        unique(dplyr::pull(netw_variables, .data[[node_col_name]]))))))
+                setdiff(unique(dplyr::pull(drugs, dplyr::all_of(node_col_name))),
+                        unique(dplyr::pull(netw_variables, dplyr::all_of(node_col_name)))))))
     }
 }
 
@@ -227,7 +227,7 @@ check_drug_nodes <- function(drugs,
 #' @export
 check_drug_conflicts <- function(drugs, node_col_name) {
     d_conflicts <- drugs %>%
-        dplyr::select(.data[[node_col_name]], activity) %>%
+        dplyr::select(dplyr::all_of(node_col_name), activity) %>%
         dplyr::distinct() %>%
         dplyr::group_by(.data[[node_col_name]]) %>%
         dplyr::summarise(n_unique = n()) %>%
@@ -269,7 +269,7 @@ check_drug_conflicts <- function(drugs, node_col_name) {
 get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
     ## Get ids etcs
     drugs_w_nodes <- drugs %>%
-        dplyr::select(drug, .data[[node_col_name]], activity) %>%
+        dplyr::select(drug, dplyr::all_of(node_col_name), activity) %>%
         ## Cannot do normal mutate as make_clean_names will make dups
         ## unique, purr avoids this
         dplyr::mutate(drug_name_original = drug) %>%
@@ -828,8 +828,8 @@ combo <- function(netw_file_path,
     backgrounds <- backgrounds %>%
         dplyr::mutate(background =
                    purrr::map_chr(background, janitor::make_clean_names))
-    if (!all(unique(dplyr::pull(backgrounds, .data[[node_col_name]])) %in%
-             unique(dplyr::pull(netw_variables, .data[[node_col_name]])))) {
+    if (!all(unique(dplyr::pull(backgrounds, dplyr::all_of(node_col_name))) %in%
+             unique(dplyr::pull(netw_variables, dplyr::all_of(node_col_name))))) {
         stop("Nodes in background not in network")
     }
 
