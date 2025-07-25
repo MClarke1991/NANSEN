@@ -954,7 +954,7 @@ combo <- function(netw_file_path,
                                              rec = TRUE)
     }
 
-    write_csv(parsed_results,
+    readr::write_csv(parsed_results,
               file = parsed_results_file)
     futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
 
