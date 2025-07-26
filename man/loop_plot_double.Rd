@@ -44,6 +44,8 @@ c(1:max_level) or "" for drugs}
 
 \item{cluster_rows}{cluster_rows TRUE/FALSE}
 
+\item{cluster_cols}{cluster columns (TRUE/FALSE)}
+
 \item{h}{height of heatmap}
 
 \item{w}{width of heatmap}

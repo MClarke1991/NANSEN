@@ -39,6 +39,8 @@ processed results}
 
 \item{cluster_rows}{cluster_rows TRUE/FALSE}
 
+\item{cluster_cols}{cluster columns (TRUE/FALSE)}
+
 \item{levs}{level of the mutations to visualise e.g. 0,
 c(1:max_level) or "" for drugs}
 
@@ -53,8 +55,6 @@ c(1:max_level) or "" for drugs}
 \item{node_col}{node column name in imported data}
 
 \item{na_col}{set colour for na}
-
-\item{cluster}{cluster rows and columns TRUE/FALSE}
 }
 \value{
 heatmap saved to drive, and a ggplot object for further
