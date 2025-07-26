@@ -19,7 +19,8 @@ split_combo_results <- function(results_prefix,
                                 project_path,
                                 out_dir,
                                 netw_file_path,
-                                drug_path = NA) {
+                                drug_path = NA,
+                                node_col_name = "node") {
     results_dir <- get_combo_results_dir(results_prefix = results_prefix,
                           project_path = project_path,
                           out_dir = out_dir,
@@ -31,28 +32,28 @@ split_combo_results <- function(results_prefix,
                                   show_col_types = FALSE)
 
     netw_variables <- get_netw_variables(netw_file_path) %>%
-        rename("node" = "name")
+        dplyr::rename("node" = "name")
 
-    all_nodes <- c(unique(pull(netw_variables, node_col_name)), "baseline")
+    all_nodes <- c(unique(dplyr::pull(netw_variables, node_col_name)), "baseline")
     results_no_drugs <- results_w_drugs %>%
-        filter(muta %in% all_nodes,
+        dplyr::filter(muta %in% all_nodes,
         (mutb %in% all_nodes | is.na(mutb)))
-    write_csv(results_no_drugs, file.path(results_dir, "node_results.csv"))
+    readr::write_csv(results_no_drugs, file.path(results_dir, "node_results.csv"))
 
     if (!is.na(drug_path)) {
-        drugs <- import_drugs_clean(drug_path = combo_drug_path, show_col_types = TRUE)
-        druggable_nodes <- c(unique(pull(drugs, node_col_name)), "baseline")
-        drug_names <- c(unique(pull(drugs, drug)), "baseline")
+        drugs <- import_drugs_clean(drug_path = drug_path, show_col_types = FALSE)
+        druggable_nodes <- c(unique(dplyr::pull(drugs, node_col_name)), "baseline")
+        drug_names <- c(unique(dplyr::pull(drugs, drug)), "baseline")
 
         results_druggable_broad <- results_w_drugs %>%
-            filter(muta %in% druggable_nodes,
+            dplyr::filter(muta %in% druggable_nodes,
             (mutb %in% druggable_nodes | is.na(mutb)))
 
         results_druggable_narrow <- results_w_drugs %>%
-            filter(muta %in% drug_names,
+            dplyr::filter(muta %in% drug_names,
             (mutb %in% drug_names | is.na(mutb))) %>%
-            mutate(leva = "", levb = "")
-        write_csv(results_druggable_broad, file.path(results_dir, "druggable_results.csv"))
-        write_csv(results_druggable_narrow, file.path(results_dir, "drug_results.csv"))
+            dplyr::mutate(leva = "", levb = "")
+        readr::write_csv(results_druggable_broad, file.path(results_dir, "druggable_results.csv"))
+        readr::write_csv(results_druggable_narrow, file.path(results_dir, "drug_results.csv"))
     }
 }

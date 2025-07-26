@@ -193,7 +193,8 @@ split_combo_results(
     project_path = project_path,
     out_dir = out_dir,
     netw_file_path = netw_file_path,
-    drug_path = combo_drug_path
+    drug_path = combo_drug_path, 
+    node_col_name = node_col_name
 )
 
 ## Visualisation ------------
