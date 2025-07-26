@@ -41,7 +41,7 @@ split_combo_results <- function(results_prefix,
     readr::write_csv(results_no_drugs, file.path(results_dir, "node_results.csv"))
 
     if (!is.na(drug_path)) {
-        drugs <- import_drugs_clean(drug_path = drug_path, show_col_types = TRUE)
+        drugs <- import_drugs_clean(drug_path = drug_path, show_col_types = FALSE)
         druggable_nodes <- c(unique(dplyr::pull(drugs, node_col_name)), "baseline")
         drug_names <- c(unique(dplyr::pull(drugs, drug)), "baseline")
 
