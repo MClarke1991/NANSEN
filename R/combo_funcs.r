@@ -303,9 +303,9 @@ get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
         ## unique, purr avoids this
         dplyr::mutate(drug_name_original = drug) %>%
         dplyr::mutate(drug = purrr::map_chr(drug_name_original, janitor::make_clean_names)) %>%
-        dplyr::left_join(netw_variables)
+        dplyr::left_join(netw_variables, by = node_col_name)
 
-    drugs_commands <- make_command_args(drugs_w_nodes, node_col = "node") %>%
+    drugs_commands <- make_command_args(drugs_w_nodes, node_col = rlang::sym(node_col_name)) %>%
         dplyr::rename("alt_filename_part" = "filename_part") %>%
         dplyr::mutate(filename_part = paste(drug, NA, sep = "__"))
 
