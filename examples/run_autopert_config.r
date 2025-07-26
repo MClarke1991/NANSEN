@@ -13,7 +13,7 @@
 ##
 ## Required config fields:
 ##   - netw_file_path: path to network JSON file
-##   - spec_path: path to specificli::cli_informion CSV file
+##   - spec_path: path to specificli::cli_alert_infoion CSV file
 ##   - out_dir: directory for output files
 ##
 ## Optional config fields (with defaults):
@@ -36,18 +36,17 @@ if (length(args) != 1) {
 
 config_path <- args[1]
 
-cli::cli_inform("Loading configuration from:", config_path, "\n")
+cli::cli_alert_info("Loading configuration from:", config_path, "\n")
 config <- validate_autopert_config(config_path)
 
-cli::cli_inform("Running autopert with configuration:\n")
-cli::cli_inform("  Network file:", config$netw_file_path, "\n")
-cli::cli_inform("  Spec file:", config$spec_path, "\n")
-cli::cli_inform("  Output directory:", config$out_dir, "\n")
+cli::cli_alert_info("Running autopert with configuration:\n")
+cli::cli_alert_info("  Network file:", config$netw_file_path, "\n")
+cli::cli_alert_info("  Spec file:", config$spec_path, "\n")
+cli::cli_alert_info("  Output directory:", config$out_dir, "\n")
 
 autopert(
     netw_file_path = config$netw_file_path,
     spec_path = config$spec_path,
-    bma_path = config$bma_path,
     out_dir = config$out_dir,
     nosat = config$nosat,
     loserum = config$loserum,
@@ -58,4 +57,4 @@ autopert(
     group_vars = config$group_vars
 )
 
-cli::cli_inform("AutoPert run completed.\n")
+cli::cli_alert_info("AutoPert run completed.\n")

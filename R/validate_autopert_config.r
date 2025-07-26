@@ -33,7 +33,6 @@ validate_autopert_config <- function(config_path) {
     }
     
     defaults <- list(
-        bma_path = 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe',
         nosat = TRUE,
         loserum = FALSE,
         missing_nodes_perturbed_overide = FALSE,
