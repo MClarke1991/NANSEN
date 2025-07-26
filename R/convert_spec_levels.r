@@ -39,14 +39,14 @@ convert_spec_levels <- function(spec, log_file) {
                        is.na(expected_result_bma)             ~ as.numeric(NA)
                    )
                    )
-        futile.logger::flog.warn(
-                           warning("Converted 'min', 'max','mid' levels to numeric in specification",
+        futile.logger::flog.info(
+                           message("Converted 'min', 'max','mid' levels to numeric in specification",
                                          call. = FALSE),
                                  name = log_file
                                  )
     } else {
-        futile.logger::flog.warn(
-                           warning("Using exact numeric values for perturbations
+        futile.logger::flog.info(
+                           message("Using exact numeric values for perturbations
 and expected results in the specification or background mutations
 may give misleading results if the node granularities change.",
 call. = FALSE),
