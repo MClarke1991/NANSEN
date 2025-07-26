@@ -7,30 +7,32 @@ if (!dir.exists(temp_dir)) {
   dir.create(temp_dir)
 }
 
-test_that("run_autopert_config.r works with valid config", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
+test_that("run_combo_config.r works with valid config", {
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
 
   # Create temporary valid config with absolute paths
   valid_config <- list(
-    netw_file_path = here::here("examples", "autopert", "helper_autopert_1.json"),
-    spec_path = here::here("examples", "autopert", "helper_spec_1.csv"),
-    out_dir = "auto_pert_results",
-    nosat = TRUE,
-    loserum = FALSE,
-    missing_nodes_perturbed_overide = FALSE,
-    missing_nodes_expected_overide = FALSE,
-    project_path = NULL,
-    bma_tools_path = NULL,
-    group_vars = c("source", "cell_line", "experiment_particular")
+    netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
+    backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
+    out_dir = "combo_results",
+    skip_autopert = TRUE,
+    skip_combo_sim = TRUE,
+    skip_heatmaps = TRUE,
+    skip_heatmaps_uc = TRUE,
+    pheno_only = TRUE,
+    phenotypes = c("output_a", "output_b"),
+    project_path = "",
+    node_col_name = "node",
+    use_vmcai = TRUE
   )
 
-  config_file <- file.path(temp_dir, "test_config.json")
+  config_file <- file.path(temp_dir, "test_combo_config.json")
   jsonlite::write_json(valid_config, config_file, auto_unbox = TRUE)
 
   # Clean up on exit
   on.exit(if (file.exists(config_file)) file.remove(config_file))
 
-  args <- c(here::here("examples/run_autopert_config.r"), config_file)
+  args <- c(here::here("examples/run_combo_config.r"), config_file)
 
   with_mocked_bindings(
     commandArgs = function(trailingOnly = FALSE) {
@@ -41,12 +43,12 @@ test_that("run_autopert_config.r works with valid config", {
       }
     },
     {
-      suppressMessages(expect_no_error(source(here::here("examples/run_autopert_config.r"))))
+      suppressMessages(expect_no_error(source(here::here("examples/run_combo_config.r"))))
     }
   )
 })
 
-test_that("run_autopert_config.r handles no arguments", {
+test_that("run_combo_config.r handles no arguments", {
   # Save original commandArgs
   old_commandArgs <- commandArgs
 
@@ -63,10 +65,10 @@ test_that("run_autopert_config.r handles no arguments", {
   on.exit(commandArgs <- old_commandArgs)
 
   # Test that script errors with usage message
-  expect_snapshot(source("examples/run_autopert_config.r"), error = TRUE)
+  expect_snapshot(source("examples/run_combo_config.r"), error = TRUE)
 })
 
-test_that("run_autopert_config.r handles multiple arguments", {
+test_that("run_combo_config.r handles multiple arguments", {
   # Save original commandArgs
   old_commandArgs <- commandArgs
 
@@ -83,19 +85,19 @@ test_that("run_autopert_config.r handles multiple arguments", {
   on.exit(commandArgs <- old_commandArgs)
 
   # Test that script errors with usage message
-  expect_snapshot(source("examples/run_autopert_config.r"), error = TRUE)
+  expect_snapshot(source("examples/run_combo_config.r"), error = TRUE)
 })
 
-test_that("run_autopert_config.r handles nonexistent config file", {
+test_that("run_combo_config.r handles nonexistent config file", {
   # Save original commandArgs
   old_commandArgs <- commandArgs
 
   # Mock commandArgs to return nonexistent file
   commandArgs <- function(trailingOnly = FALSE) {
     if (trailingOnly) {
-      return("nonexistent_config.json")
+      return("nonexistent_combo_config.json")
     } else {
-      return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", "nonexistent_config.json"))
+      return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", "nonexistent_combo_config.json"))
     }
   }
 
@@ -103,5 +105,5 @@ test_that("run_autopert_config.r handles nonexistent config file", {
   on.exit(commandArgs <- old_commandArgs)
 
   # Test that script errors when config file doesn't exist
-  expect_snapshot(source("examples/run_autopert_config.r"), error = TRUE)
+  expect_snapshot(source("examples/run_combo_config.r"), error = TRUE)
 })
