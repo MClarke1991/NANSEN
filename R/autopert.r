@@ -44,7 +44,7 @@ autopert <- function(netw_file_path,
                          "source", "cell_line",
                          "experiment_particular"
                      )) {
-    
+
     ## Output files
 
     autopert_dir <- here::here(out_dir, paste("AP_RUN",
@@ -406,7 +406,9 @@ autopert <- function(netw_file_path,
         ) +
         ggplot2::theme_bw()
     ggplot2::ggsave("results_short_node_summary.png",
-        device = "png"
+        device = "png",
+        height = 7,
+        width = 7,
         # , height = 1500
         # , width = 297
         # , units = "mm"
@@ -431,6 +433,8 @@ autopert <- function(netw_file_path,
         ggplot2::theme_bw()
     ggplot2::ggsave("results_short_node_summary_abs_and_diff.png",
         device = "png"
+        , height = 7
+        , width = 7
         # , height = 1500
         # , width = 297
         # , units = "mm"
@@ -466,6 +470,8 @@ autopert <- function(netw_file_path,
         ggplot2::theme(legend.position = "none")
     ggplot2::ggsave("results_per_pert_per_gene.png",
         device = "png"
+        , height = 7
+        , width = 7
         # , height = 1500
         # , width = 297
         # , units = "mm"
