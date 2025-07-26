@@ -47,7 +47,7 @@ plot_single <- function(df, filename, results_dir, vis_dir, palette,
         dplyr::filter(mutation != "baseline")
 
     ## hclust fails if there is no variation, so filter these out and warn
-    if (length(unique(pull(prep, mean))) == 1) {
+    if (length(unique(dplyr::pull(prep, mean))) == 1) {
         warning(paste("Could not plot:",
                       pheno,
                       "with levels",
@@ -110,8 +110,8 @@ plot_single <- function(df, filename, results_dir, vis_dir, palette,
     ## else pheatmap rescales, factor of 2 is because I double the
     ## number of colours to allow difference in shade for a .5 change
     ## in phenotype level
-    colour_range_baseline <- colours_full[(2 * min(pull(baseline_annotation, baseline)) + 1):
-                                          (2 * max(pull(baseline_annotation, baseline)) + 1)]
+    colour_range_baseline <- colours_full[(2 * min(dplyr::pull(baseline_annotation, baseline)) + 1):
+                                          (2 * max(dplyr::pull(baseline_annotation, baseline)) + 1)]
 
     wide <- prep %>%
         dplyr::select(background, pert, mean) %>%
@@ -206,7 +206,7 @@ plot_double <- function(df, filename, results_dir, vis_dir, palette,
                      remove = FALSE)
 
     ## hclust fails if there is no variation, so filter these out and warn
-    if (length(unique(pull(prep, mean))) == 1) {
+    if (length(unique(dplyr::pull(prep, mean))) == 1) {
         warning(paste("Could not plot:",
                       pheno,
                       "with levels",
@@ -340,7 +340,7 @@ plot_diff_single <- function(df, filename, results_dir, vis_dir,
         dplyr::filter(mutation != "baseline")
 
     ## hclust fails if there is no variation, so filter these out and warn
-    if (length(unique(pull(prep, mean))) == 1) {
+    if (length(unique(dplyr::pull(prep, mean))) == 1) {
         warning(paste("Could not plot:",
                       pheno,
                       "with levels",
@@ -403,8 +403,8 @@ plot_diff_single <- function(df, filename, results_dir, vis_dir,
     ## ## else pheatmap rescales, factor of 2 is because I double the
     ## ## number of colours to allow difference in shade for a .5 change
     ## ## in phenotype level
-    ## colour_range_baseline <- colours_full[(2*min(pull(baseline_annotation, baseline))+1):
-    ##                                       (2*max(pull(baseline_annotation, baseline))+1)]
+    ## colour_range_baseline <- colours_full[(2*min(dplyr::pull(baseline_annotation, baseline))+1):
+    ##                                       (2*max(dplyr::pull(baseline_annotation, baseline))+1)]
 
     wide <- prep %>%
         dplyr::select(background, pert, mean) %>%
@@ -510,7 +510,7 @@ plot_diff_double <- function(df, filename, results_dir, vis_dir,
                      remove = FALSE)
 
     ## hclust fails if there is no variation, so filter these out and warn
-    if (length(unique(pull(prep, mean))) == 1) {
+    if (length(unique(dplyr::pull(prep, mean))) == 1) {
         warning(paste("Could not plot:",
                       pheno,
                       "with levels",
@@ -561,8 +561,8 @@ plot_diff_double <- function(df, filename, results_dir, vis_dir,
     ## use colorRampPalette to extend number of colours to handle .5 gradation in phenotype
 
     ## min and max /observed/ in /this/ heatmap
-    ## min_pheno <- min(dplyr::pull(prep, mean))
-    ## max_pheno <- max(dplyr::pull(prep, mean))
+    ## min_pheno <- min(dplyr::dplyr::pull(prep, mean))
+    ## max_pheno <- max(dplyr::dplyr::pull(prep, mean))
     ## colours_actual <- colours_full[(2*min_pheno + 1):(2*max_pheno + 1)]
 
     ## force heatmap to show whole range to allow easier comparison
@@ -764,13 +764,13 @@ plot_heatmaps <- function(results_file,
 
     if (neaten_background) {
         results <- results %>%
-            mutate(background = background_neat)
+            dplyr::mutate(background = background_neat)
         background_order <- background_order_neat
     }
 
     if(!missing(background_order)){
         results <- results %>%
-            arrange(factor(background, levels = background_order)) %>%
+            dplyr::arrange(factor(background, levels = background_order)) %>%
             NANSEN::preserve_order("background")
     }
 
@@ -948,15 +948,15 @@ plot_heatmaps <- function(results_file,
            "drug" = {
                print("Plotting single drug heatmaps")
                results <- results %>%
-                   mutate(leva = as.character(leva),
+                   dplyr::mutate(leva = as.character(leva),
                           levb = as.character(levb),
-                          leva = replace_na(leva, ""),
-                          levb = replace_na(levb, ""),
-                          muta = case_when(
-                              muta != "baseline" ~ str_to_title(muta),
+                          leva = tidyr::replace_na(leva, ""),
+                          levb = tidyr::replace_na(levb, ""),
+                          muta = dplyr::case_when(
+                              muta != "baseline" ~ stringr::str_to_title(muta),
                               TRUE ~ muta),
-                          mutb = case_when(
-                              mutb != "baseline" ~ str_to_title(mutb),
+                          mutb = dplyr::case_when(
+                              mutb != "baseline" ~ stringr::str_to_title(mutb),
                               TRUE ~ mutb))
                purrr::walk2(.x = phenotypes,
                             .y = palettes,
@@ -1048,13 +1048,13 @@ plot_diff_heatmaps <- function(results_file,
 
     if (neaten_background) {
         results <- results %>%
-            mutate(background = background_neat)
+            dplyr::mutate(background = background_neat)
         background_order <- background_order_neat
     }
 
     if(!missing(background_order)){
         results <- results %>%
-            arrange(factor(background, levels = background_order)) %>%
+            dplyr::arrange(factor(background, levels = background_order)) %>%
             NANSEN::preserve_order("background")
     }
 
@@ -1241,15 +1241,15 @@ plot_diff_heatmaps <- function(results_file,
            "drug" = {
                print("Plotting single drug heatmaps")
                results <- results %>%
-                   mutate(leva = as.character(leva),
+                   dplyr::mutate(leva = as.character(leva),
                           levb = as.character(levb),
-                          leva = replace_na(leva, ""),
-                          levb = replace_na(levb, ""),
-                          muta = case_when(
-                              muta != "baseline" ~ str_to_title(muta),
+                          leva = tidyr::replace_na(leva, ""),
+                          levb = tidyr::replace_na(levb, ""),
+                          muta = dplyr::case_when(
+                              muta != "baseline" ~ stringr::str_to_title(muta),
                               TRUE ~ muta),
-                          mutb = case_when(
-                              mutb != "baseline" ~ str_to_title(mutb),
+                          mutb = dplyr::case_when(
+                              mutb != "baseline" ~ stringr::str_to_title(mutb),
                               TRUE ~ mutb))
                purrr::walk2(.x = phenotypes,
                             .y = palettes,
