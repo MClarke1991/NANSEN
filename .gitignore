@@ -68,4 +68,4 @@ renv/local/
 renv/cellar/
 renv/lock/
 renv/python/
-renv/staging/
+renv/staging/tests/testthat/temp_test_outputs/
