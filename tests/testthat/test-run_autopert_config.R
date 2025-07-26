@@ -5,54 +5,65 @@ if (!dir.exists(temp_dir)) {
   dir.create(temp_dir)
 }
 
-test_that("run_autopert_config.r handles command line arguments correctly", {
+# Helper function to mock commandArgs and source the script
+mock_script_with_args <- function(args) {
   script_path <- here::here("examples", "run_autopert_config.r")
   
-  # Test with no arguments
-  result <- tryCatch({
-    system2("Rscript", args = script_path, stdout = TRUE, stderr = TRUE)
-  }, error = function(e) e)
+  # Save original commandArgs function
+  old_commandArgs <- commandArgs
   
-  expect_snapshot(result, error = TRUE)
+  # Create mock commandArgs function
+  mock_commandArgs <- function(trailingOnly = FALSE) {
+    if (trailingOnly) {
+      return(args)
+    } else {
+      return(c("R", "--slave", "--no-restore", "--file=run_autopert_config.r", "--args", args))
+    }
+  }
   
-  # Test with multiple arguments
-  result <- tryCatch({
-    system2("Rscript", args = c(script_path, "arg1", "arg2"), stdout = TRUE, stderr = TRUE)
-  }, error = function(e) e)
+  # Temporarily replace commandArgs and source the script
+  on.exit(assign("commandArgs", old_commandArgs, envir = .GlobalEnv))
+  assign("commandArgs", mock_commandArgs, envir = .GlobalEnv)
   
-  expect_snapshot(result, error = TRUE)
+  source(script_path, local = TRUE)
+}
+
+test_that("run_autopert_config.r handles no command line arguments", {
+  expect_snapshot(
+    mock_script_with_args(character(0)),
+    error = TRUE
+  )
+})
+
+test_that("run_autopert_config.r handles multiple command line arguments", {
+  expect_snapshot(
+    mock_script_with_args(c("arg1", "arg2")),
+    error = TRUE
+  )
 })
 
 test_that("run_autopert_config.r handles nonexistent config file", {
-  script_path <- here::here("examples", "run_autopert_config.r")
-  
-  result <- tryCatch({
-    system2("Rscript", args = c(script_path, "nonexistent_config.json"), stdout = TRUE, stderr = TRUE)
-  }, error = function(e) e)
-  
-  expect_snapshot(result, error = TRUE)
+  expect_snapshot(
+    mock_script_with_args("nonexistent_config.json"),
+    error = TRUE
+  )
 })
 
 test_that("run_autopert_config.r handles invalid config file", {
-  script_path <- here::here("examples", "run_autopert_config.r")
-  
   # Create invalid config
   invalid_config_file <- file.path(temp_dir, "invalid_for_script.json")
   writeLines("{ invalid json", invalid_config_file)
   
   on.exit(unlink(invalid_config_file))
   
-  result <- tryCatch({
-    system2("Rscript", args = c(script_path, invalid_config_file), stdout = TRUE, stderr = TRUE)
-  }, error = function(e) e)
-  
-  expect_snapshot(result, error = TRUE)
+  expect_snapshot(
+    mock_script_with_args(invalid_config_file),
+    error = TRUE
+  )
 })
 
 test_that("run_autopert_config.r processes valid config file", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
-  
-  script_path <- here::here("examples", "run_autopert_config.r")
   
   # Create valid config that points to existing test files
   valid_config <- list(
@@ -73,22 +84,9 @@ test_that("run_autopert_config.r processes valid config file", {
     }
   })
   
-  # This test verifies the script can load and validate the config
-  # We don't actually run autopert due to BMA dependency requirements
-  # Instead we test that config loading works by checking initial output
-  result <- system2("Rscript", args = c(script_path, config_file), 
-                   stdout = TRUE, stderr = TRUE, timeout = 10)
-  
-  # Check that script started processing (config loading messages should appear)
-  expect_true(any(grepl("Loading configuration", result) | grepl("Running autopert", result)))
-})
-
-test_that("run_autopert_config.r shows proper usage message", {
-  script_path <- here::here("examples", "run_autopert_config.r")
-  
-  # Test the stop message for incorrect usage
-  expect_snapshot(
-    stop("Usage: Rscript run_autopert_config.r <config_file_path>"),
-    error = TRUE
+  # This test should not error but will be skipped on non-Windows due to autopert BMA dependencies
+  # We test that the script loads config successfully before trying to run autopert
+  expect_no_error(
+    mock_script_with_args(config_file)
   )
 })
