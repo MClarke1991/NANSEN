@@ -69,3 +69,8 @@ renv/cellar/
 renv/lock/
 renv/python/
 renv/staging/
+
+# Other
+combo_results/
+debug_csv_output/
+tests/testthat/temp_test_outputs/

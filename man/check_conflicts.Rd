@@ -5,7 +5,7 @@
 \title{Check for conflicts between perturbed nodes and background, ensures
 that backgrounds take precedence.}
 \usage{
-check_conflicts(results, backgrounds, node_col = "name")
+check_conflicts(results, backgrounds, node_col = "name", drugs = NULL)
 }
 \arguments{
 \item{results}{Results from \code{\link{process_results}}}
@@ -13,6 +13,8 @@ check_conflicts(results, backgrounds, node_col = "name")
 \item{backgrounds}{Backgrounds}
 
 \item{node_col}{node column name in backgrounds}
+
+\item{drugs}{optional drugs data frame}
 }
 \description{
 Check for conflicts between perturbed nodes and background, ensures

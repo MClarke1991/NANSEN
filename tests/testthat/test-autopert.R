@@ -1,5 +1,11 @@
 source(here::here("tests", "testthat", "testing_utils.r"))
 
+temp_dir <- here::here("tests/testthat/temp_test_outputs")
+# Create a directory for test outputs
+if (!dir.exists(temp_dir)) {
+  dir.create(temp_dir)
+}
+
 bma_path = 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 test_that("autopert integration test - Windows only", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
@@ -8,9 +14,8 @@ test_that("autopert integration test - Windows only", {
   # bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
   # skip_if_not(file.exists(bma_path), paste("BMA executable not found at:", bma_path))
 
-  # Create temporary directory for test outputs
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "autopert_test_output")
+  # Create temporary directory for test outputs (avoiding tempdir() to prevent testthat conflicts)
+  out_dir <- file.path(temp_dir, "autopert_test_output")
 
   # Set up test logging
   setup_log_file(futile.logger::INFO)
@@ -55,7 +60,7 @@ test_that("autopert integration test - Windows only", {
   results <- readr::read_csv(file.path(run_dir, "results", "results.csv"), show_col_types = FALSE)
   expect_true(all(c("gene", "perturbation", "expectation_bma", "lo", "hi", "mean_result", "diff") %in% colnames(results)))
 
-  parse_results <- readr::read_csv(file.path(run_dir, "results", "parse_results.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
+  parse_results <- readr::read_csv(file.path(run_dir, "results", "parse_results.csv"), show_col_types = FALSE, col_types = readr::cols(formula = "c"))
   expect_true(all(c("filename", "time", "id", "lo", "hi", "name", "range_from", "range_to", "formula") %in% colnames(parse_results)))
 
   results_score <- readr::read_csv(file.path(run_dir, "results", "results_score.csv"), show_col_types = FALSE)
@@ -85,8 +90,7 @@ test_that("autopert integration test - Windows only", {
 test_that("autopert handles missing network file", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "autopert_error_test")
+  out_dir <- file.path(temp_dir, "autopert_error_test")
 
   setup_log_file()
   on.exit({
@@ -108,8 +112,7 @@ test_that("autopert handles missing network file", {
 test_that("autopert handles missing specification file", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "autopert_error_test")
+  out_dir <- file.path(temp_dir, "autopert_error_test2")
 
   setup_log_file()
   on.exit({
@@ -131,8 +134,7 @@ test_that("autopert handles missing specification file", {
 test_that("autopert creates expected directory structure", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "autopert_structure_test")
+  out_dir <- file.path(temp_dir, "autopert_structure_test")
 
   setup_log_file(futile.logger::INFO)
   on.exit({
