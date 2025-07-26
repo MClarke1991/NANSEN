@@ -367,15 +367,15 @@ make_single_drugs <- function(drugs_commands) {
 make_pair_drugs <- function(drugs_single) {
     drugs_pairs <- combn(dplyr::pull(drugs_single, drug), 2) %>%
         t() %>%
-        tibble::as_tibble(.name_repair = "unique") %>%
-        dplyr::rename("a" = "...1", "b" = "...2") %>%
+        tibble::as_tibble(.name_repair = "minimal") %>%
+        setNames(c("a", "b")) %>%
         dplyr::left_join(drugs_single, by = c("a" = "drug")) %>%
         dplyr::left_join(drugs_single, by = c("b" = "drug")) %>%
         dplyr::mutate(filename_part = paste(filename_part.x,
-                                     filename_part.y, sep = "__"),
-               alt_filename_part = paste(alt_filename_part.x,
-                                         alt_filename_part.y, sep = "__"),
-               command_arg = paste(command_arg.x, command_arg.y)) %>%
+                                            filename_part.y, sep = "__"),
+                      alt_filename_part = paste(alt_filename_part.x,
+                                                alt_filename_part.y, sep = "__"),
+                      command_arg = paste(command_arg.x, command_arg.y)) %>%
         dplyr::select(a, b, filename_part, alt_filename_part, command_arg)
     return(drugs_pairs)
 }
