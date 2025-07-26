@@ -19,18 +19,42 @@
 #' @family combination_therapy
 #' @seealso \code{\link{get_netw_variables}}
 #' @export
+
 make_command_args <- function(df,
                               id_col = "id",
                               activity_col = "activity",
                               node_col = "name") {
+    # Check if id column contains non-numeric values or NA
+    id_values <- df[[id_col]]
+    if (!is.numeric(id_values)) {
+        stop(paste("Column", id_col, "must be numeric. Found values:",
+                   paste(head(unique(id_values), 5), collapse = ", ")))
+    }
+    if (any(is.na(id_values))) {
+        na_positions <- which(is.na(id_values))
+        stop(paste("Column", id_col, "contains NA values at positions:",
+                   paste(head(na_positions, 5), collapse = ", ")))
+    }
+
+    # Check if activity column contains non-numeric values or NA
+    activity_values <- df[[activity_col]]
+    if (!is.numeric(activity_values)) {
+        stop(paste("Column", activity_col, "must be numeric. Found values:",
+                   paste(head(unique(activity_values), 5), collapse = ", ")))
+    }
+    if (any(is.na(activity_values))) {
+        na_positions <- which(is.na(activity_values))
+        stop(paste("Column", activity_col, "contains NA values at positions:",
+                   paste(head(na_positions, 5), collapse = ", ")))
+    }
 
     out <- dplyr::mutate(df,
-                  command_arg = paste("-ko",
-                                      !!rlang::sym(id_col),
-                                      !!rlang::sym(activity_col)),
-                  filename_part = paste(!!rlang::sym(node_col),
-                                        !!rlang::sym(activity_col),
-                                        sep = "__"))
+                         command_arg = paste("-ko",
+                                             !!rlang::sym(id_col),
+                                             !!rlang::sym(activity_col)),
+                         filename_part = paste(!!rlang::sym(node_col),
+                                               !!rlang::sym(activity_col),
+                                               sep = "__"))
     return(out)
 }
 
@@ -136,7 +160,7 @@ make_single_muts <- function(netw_variables, node_col = "name") {
 #' @export
 make_pair_muts <- function(netw_variables, node_col = "name") {
     genes <- dplyr::pull(netw_variables, dplyr::all_of(node_col))
-    
+
     if (length(genes) < 2) {
         stop("Need at least 2 nodes to create pairs")
     }
