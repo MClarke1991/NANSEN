@@ -224,13 +224,14 @@ check_drug_nodes <- function(drugs,
 #' @param node_col_name name of the columns specifying nodes
 #' @return Stop if there are conflicts
 #' @family combination_therapy
+#' @importFrom rlang .data
 #' @export
 check_drug_conflicts <- function(drugs, node_col_name) {
     d_conflicts <- drugs %>%
         dplyr::select(dplyr::all_of(node_col_name), activity) %>%
         dplyr::distinct() %>%
         dplyr::group_by(.data[[node_col_name]]) %>%
-        dplyr::summarise(n_unique = n()) %>%
+        dplyr::summarise(n_unique = dplyr::n()) %>%
         dplyr::filter(n_unique > 1)
     if (nrow(d_conflicts) > 0) {
         stop("Drug combinations have conflicting effects on the same node")
@@ -293,7 +294,7 @@ get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
 #' @family combination_therapy
 #' @export
 check_drugs_in_range <- function(drugs_commands) {
-    activity_out_range <- filter(drugs_commands,
+    activity_out_range <- dplyr::filter(drugs_commands,
                                  activity < range_from |
                                  activity > range_to)
     if (nrow(activity_out_range) > 0) {
@@ -318,7 +319,7 @@ check_drugs_in_range <- function(drugs_commands) {
 #' @export
 make_single_drugs <- function(drugs_commands) {
     drugs_single <- drugs_commands %>%
-        group_by(drug) %>%
+        dplyr::group_by(drug) %>%
         dplyr::summarise(command_arg = paste(command_arg,
                                              collapse = " "),
                          alt_filename_part = paste(alt_filename_part,
@@ -533,6 +534,7 @@ run_all_backgrounds <- function(background_commands,
 #' @param pheno_only Boolean. If TRUE, only return measurements for
 #'     those nodes listed in \code{phenotypes}.
 #' @family combination_therapy
+#' @importFrom rlang .data
 #' @export
 process_results <- function(parsed_results,
                             phenotypes,
@@ -578,6 +580,7 @@ process_results <- function(parsed_results,
 #' @param backgrounds Backgrounds
 #' @param node_col node column name in backgrounds
 #' @param drugs optional drugs data frame
+#' @importFrom rlang .data
 #' @export
 check_conflicts <- function(results, backgrounds, node_col = "name", drugs = NULL) {
 
@@ -853,11 +856,11 @@ combo <- function(netw_file_path,
     }
 
     s_muts <- make_single_muts(netw_variables = netw_variables %>%
-                 filter(!(.data[[node_col_name]] %in% exclusions)),
+                 dplyr::filter(!(.data[[node_col_name]] %in% exclusions)),
                                node_col = "node")
 
     pairs <- make_pair_muts(netw_variables = netw_variables %>%
-                 filter(!(.data[[node_col_name]] %in% exclusions)),
+                 dplyr::filter(!(.data[[node_col_name]] %in% exclusions)),
                             node_col = "node")
 
 
