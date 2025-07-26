@@ -1,12 +1,19 @@
 source(here::here("tests", "testthat", "testing_utils.r"))
 
+# Create a directory for test outputs
+temp_dir <- here::here("tests/testthat/temp_test_outputs")
+# Create a directory for test outputs
+if (!dir.exists(temp_dir)) {
+  dir.create(temp_dir)
+}
+
+
 bma_path = 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 test_that("combo integration test - Windows only", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
 
   # Create temporary directory for test outputs
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "combo_test_output")
+  out_dir <- file.path(temp_dir, "combo_test_output")
 
   # Set up test logging
   setup_log_file(futile.logger::INFO)
@@ -46,10 +53,10 @@ test_that("combo integration test - Windows only", {
   expect_true(file.exists(file.path(run_dir, "conflicts.csv")))
 
   # Verify CSV structure and content
-  parsed_results <- readr::read_csv(file.path(run_dir, "parsed_results.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
+  parsed_results <- readr::read_csv(file.path(run_dir, "parsed_results.csv"), show_col_types = FALSE, col_types = readr::cols(formula = "c"))
   expect_true(all(c("filename", "time", "id", "lo", "hi", "node", "range_from", "range_to", "formula") %in% colnames(parsed_results)))
 
-  processed_results <- readr::read_csv(file.path(run_dir, "processed_results.csv"), show_col_types = FALSE, col_types = cols(formula = "c"))
+  processed_results <- readr::read_csv(file.path(run_dir, "processed_results.csv"), show_col_types = FALSE, col_types = readr::cols(formula = "c"))
   expect_true(all(c("case", "background", "bkg_pert", "muta", "leva", "mutb", "levb", "time", "id", "lo", "hi", "node", "range_from", "range_to", "formula", "mean", "uncertainty") %in% colnames(processed_results)))
 
   conflicts <- readr::read_csv(file.path(run_dir, "conflicts.csv"), show_col_types = FALSE)
@@ -76,15 +83,14 @@ test_that("combo integration test - Windows only", {
 
   # Snapshot test for processed_results.csv to ensure output doesn't change
   processed_csv_path <- file.path(run_dir, "processed_results.csv")
-  processed_data <- readr::read_csv(processed_csv_path, show_col_types = FALSE, col_types = cols(formula = "c"))
+  processed_data <- readr::read_csv(processed_csv_path, show_col_types = FALSE, col_types = readr::cols(formula = "c"))
   expect_snapshot(processed_data)
 })
 
 test_that("combo handles missing network file", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "combo_error_test")
+  out_dir <- file.path(temp_dir, "combo_error_test")
 
   setup_log_file()
   on.exit({
@@ -108,8 +114,7 @@ test_that("combo handles missing network file", {
 test_that("combo handles missing backgrounds file", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "combo_error_test")
+  out_dir <- file.path(temp_dir, "combo_error_test2")
 
   setup_log_file()
   on.exit({
@@ -133,8 +138,7 @@ test_that("combo handles missing backgrounds file", {
 test_that("combo handles missing drugs file", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "combo_error_test")
+  out_dir <- file.path(temp_dir, "combo_error_test3")
 
   setup_log_file()
   on.exit({
@@ -158,8 +162,7 @@ test_that("combo handles missing drugs file", {
 test_that("combo creates expected directory structure", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "combo_structure_test")
+  out_dir <- file.path(temp_dir, "combo_structure_test")
 
   setup_log_file(futile.logger::INFO)
   on.exit({
@@ -208,8 +211,7 @@ test_that("combo creates expected directory structure", {
 test_that("combo detects drug conflicts when override is FALSE", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "combo_conflict_test")
+  out_dir <- file.path(temp_dir, "combo_conflict_test")
 
   setup_log_file()
   on.exit({
@@ -237,8 +239,7 @@ test_that("combo detects drug conflicts when override is FALSE", {
 test_that("combo runs successfully with non-conflicting drugs", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
 
-  test_dir <- tempdir()
-  out_dir <- file.path(test_dir, "combo_no_conflict_test")
+  out_dir <- file.path(temp_dir, "combo_no_conflict_test")
 
   setup_log_file()
   on.exit({
