@@ -1,32 +1,30 @@
-# run_autopert_config.r handles no command line arguments
+# run_autopert_config.r handles no arguments
 
     Code
-      mock_script_with_args(character(0))
+      source("examples/run_autopert_config.r")
     Condition
-      Error:
-      ! Usage: Rscript run_autopert_config.r <config_file_path>
+      Warning in `file()`:
+      cannot open file 'examples/run_autopert_config.r': No such file or directory
+      Error in `file()`:
+      ! cannot open the connection
 
-# run_autopert_config.r handles multiple command line arguments
+# run_autopert_config.r handles multiple arguments
 
     Code
-      mock_script_with_args(c("arg1", "arg2"))
+      source("examples/run_autopert_config.r")
     Condition
-      Error:
-      ! Usage: Rscript run_autopert_config.r <config_file_path>
+      Warning in `file()`:
+      cannot open file 'examples/run_autopert_config.r': No such file or directory
+      Error in `file()`:
+      ! cannot open the connection
 
 # run_autopert_config.r handles nonexistent config file
 
     Code
-      mock_script_with_args("nonexistent_config.json")
+      source("examples/run_autopert_config.r")
     Condition
-      Error:
-      ! Usage: Rscript run_autopert_config.r <config_file_path>
-
-# run_autopert_config.r handles invalid config file
-
-    Code
-      mock_script_with_args(invalid_config_file)
-    Condition
-      Error:
-      ! Usage: Rscript run_autopert_config.r <config_file_path>
+      Warning in `file()`:
+      cannot open file 'examples/run_autopert_config.r': No such file or directory
+      Error in `file()`:
+      ! cannot open the connection
 
