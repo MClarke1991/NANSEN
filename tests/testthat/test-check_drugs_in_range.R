@@ -188,11 +188,12 @@ test_that("check_drugs_in_range preserves error call behavior", {
   )
   
   # The function uses call. = FALSE, so error should not show the function call
-  expect_error(
+  # Test that error doesn't contain function name (due to call. = FALSE)
+  error_result <- tryCatch(
     check_drugs_in_range(drugs_commands),
-    # Should not contain "check_drugs_in_range" in the error
-    regexp = "^((?!check_drugs_in_range).)*$"
+    error = function(e) e$message
   )
+  expect_false(grepl("check_drugs_in_range", error_result, fixed = TRUE))
 })
 
 test_that("check_drugs_in_range handles mixed valid and invalid activities", {
