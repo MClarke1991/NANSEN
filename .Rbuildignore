@@ -5,3 +5,7 @@
 ^untracked$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^combo_results$
+^debug_csv_output$
+^tests\testthat\temp_test_outputs$
+^.lintr$
