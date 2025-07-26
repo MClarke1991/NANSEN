@@ -4,7 +4,7 @@
 \alias{import_drugs_clean}
 \title{import_drugs_clean}
 \usage{
-import_drugs_clean(drug_path, show_col_types = TRUE)
+import_drugs_clean(drug_path, show_col_types = FALSE)
 }
 \arguments{
 \item{drug_path}{path to drugs CSV}
