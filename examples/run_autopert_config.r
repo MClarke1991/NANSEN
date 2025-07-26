@@ -1,7 +1,5 @@
 #!/usr/bin/env Rscript
 
-## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
-
 ## Config-based AutoPert runner script
 ##
 ## This script runs the autopert function using parameters specified in a JSON
