@@ -160,37 +160,35 @@ make_single_muts <- function(netw_variables, node_col = "name") {
 #' @export
 make_pair_muts <- function(netw_variables, node_col = "name") {
     genes <- dplyr::pull(netw_variables, dplyr::all_of(node_col))
-
     if (length(genes) < 2) {
         stop("Need at least 2 nodes to create pairs")
     }
-
     netw_variables_short <- dplyr::select(netw_variables,
-                                   dplyr::all_of(node_col),
-                                   id,
-                                   range_from,
-                                   range_to) %>%
+                                          dplyr::all_of(node_col),
+                                          id,
+                                          range_from,
+                                          range_to) %>%
         dplyr::rename("inhibition" = range_from,
-               "activation" = range_to)
+                      "activation" = range_to)
 
-    pairs <- combn(genes, 2) %>%
-        t() %>%
-        tibble::as_tibble(.name_repair = "unique") %>%
-        dplyr::rename("a" = "...1", "b" = "...2") %>%
+    # Create pairs with explicit column names to avoid tibble warnings
+    pairs_matrix <- combn(genes, 2) %>% t()
+    colnames(pairs_matrix) <- c("a", "b")
+
+    pairs <- tibble::as_tibble(pairs_matrix) %>%
         dplyr::left_join(netw_variables_short, by = c("a" = {{node_col}})) %>%
         dplyr::rename("id_a" = "id") %>%
         tidyr::pivot_longer(cols = c("inhibition", "activation"),
-                     names_to = "type_a",
-                     values_to = "activity_a") %>%
+                            names_to = "type_a",
+                            values_to = "activity_a") %>%
         dplyr::left_join(netw_variables_short, by = c("b" = {{node_col}})) %>%
         dplyr::rename("id_b" = "id") %>%
         tidyr::pivot_longer(cols = c("inhibition", "activation"),
-                     names_to = "type_b",
-                     values_to = "activity_b") %>%
+                            names_to = "type_b",
+                            values_to = "activity_b") %>%
         dplyr::mutate(command_arg = paste("-ko", id_a, activity_a,
-                                   "-ko", id_b, activity_b),
-               filename_part = paste(a, activity_a, b, activity_b, sep = "__"))
-
+                                          "-ko", id_b, activity_b),
+                      filename_part = paste(a, activity_a, b, activity_b, sep = "__"))
     return(pairs)
 }
 
@@ -202,7 +200,7 @@ make_pair_muts <- function(netw_variables, node_col = "name") {
 ##' @param show_col_types Mutes printing of columns types using readr::read_csv
 ##' @return tibble of drugs with drug names sanitised
 ##' @export
-import_drugs_clean <- function(drug_path, show_col_types = TRUE) {
+import_drugs_clean <- function(drug_path, show_col_types = FALSE) {
     drugs <- readr::read_csv(drug_path,
                              show_col_types = show_col_types, lazy = FALSE) %>%
         dplyr::mutate(drug = purrr::map_chr(drug, janitor::make_clean_names))
