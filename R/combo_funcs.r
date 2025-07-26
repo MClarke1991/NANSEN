@@ -19,18 +19,42 @@
 #' @family combination_therapy
 #' @seealso \code{\link{get_netw_variables}}
 #' @export
+
 make_command_args <- function(df,
                               id_col = "id",
                               activity_col = "activity",
                               node_col = "name") {
+    # Check if id column contains non-numeric values or NA
+    id_values <- df[[id_col]]
+    if (!is.numeric(id_values)) {
+        stop(paste("Column", id_col, "must be numeric. Found values:",
+                   paste(head(unique(id_values), 5), collapse = ", ")))
+    }
+    if (any(is.na(id_values))) {
+        na_positions <- which(is.na(id_values))
+        stop(paste("Column", id_col, "contains NA values at positions:",
+                   paste(head(na_positions, 5), collapse = ", ")))
+    }
+
+    # Check if activity column contains non-numeric values or NA
+    activity_values <- df[[activity_col]]
+    if (!is.numeric(activity_values)) {
+        stop(paste("Column", activity_col, "must be numeric. Found values:",
+                   paste(head(unique(activity_values), 5), collapse = ", ")))
+    }
+    if (any(is.na(activity_values))) {
+        na_positions <- which(is.na(activity_values))
+        stop(paste("Column", activity_col, "contains NA values at positions:",
+                   paste(head(na_positions, 5), collapse = ", ")))
+    }
 
     out <- dplyr::mutate(df,
-                  command_arg = paste("-ko",
-                                      !!rlang::sym(id_col),
-                                      !!rlang::sym(activity_col)),
-                  filename_part = paste(!!rlang::sym(node_col),
-                                        !!rlang::sym(activity_col),
-                                        sep = "__"))
+                         command_arg = paste("-ko",
+                                             !!rlang::sym(id_col),
+                                             !!rlang::sym(activity_col)),
+                         filename_part = paste(!!rlang::sym(node_col),
+                                               !!rlang::sym(activity_col),
+                                               sep = "__"))
     return(out)
 }
 
@@ -136,37 +160,35 @@ make_single_muts <- function(netw_variables, node_col = "name") {
 #' @export
 make_pair_muts <- function(netw_variables, node_col = "name") {
     genes <- dplyr::pull(netw_variables, dplyr::all_of(node_col))
-    
     if (length(genes) < 2) {
         stop("Need at least 2 nodes to create pairs")
     }
-
     netw_variables_short <- dplyr::select(netw_variables,
-                                   dplyr::all_of(node_col),
-                                   id,
-                                   range_from,
-                                   range_to) %>%
+                                          dplyr::all_of(node_col),
+                                          id,
+                                          range_from,
+                                          range_to) %>%
         dplyr::rename("inhibition" = range_from,
-               "activation" = range_to)
+                      "activation" = range_to)
 
-    pairs <- combn(genes, 2) %>%
-        t() %>%
-        tibble::as_tibble(.name_repair = "unique") %>%
-        dplyr::rename("a" = "...1", "b" = "...2") %>%
+    # Create pairs with explicit column names to avoid tibble warnings
+    pairs_matrix <- combn(genes, 2) %>% t()
+    colnames(pairs_matrix) <- c("a", "b")
+
+    pairs <- tibble::as_tibble(pairs_matrix) %>%
         dplyr::left_join(netw_variables_short, by = c("a" = {{node_col}})) %>%
         dplyr::rename("id_a" = "id") %>%
         tidyr::pivot_longer(cols = c("inhibition", "activation"),
-                     names_to = "type_a",
-                     values_to = "activity_a") %>%
+                            names_to = "type_a",
+                            values_to = "activity_a") %>%
         dplyr::left_join(netw_variables_short, by = c("b" = {{node_col}})) %>%
         dplyr::rename("id_b" = "id") %>%
         tidyr::pivot_longer(cols = c("inhibition", "activation"),
-                     names_to = "type_b",
-                     values_to = "activity_b") %>%
+                            names_to = "type_b",
+                            values_to = "activity_b") %>%
         dplyr::mutate(command_arg = paste("-ko", id_a, activity_a,
-                                   "-ko", id_b, activity_b),
-               filename_part = paste(a, activity_a, b, activity_b, sep = "__"))
-
+                                          "-ko", id_b, activity_b),
+                      filename_part = paste(a, activity_a, b, activity_b, sep = "__"))
     return(pairs)
 }
 
@@ -178,7 +200,7 @@ make_pair_muts <- function(netw_variables, node_col = "name") {
 ##' @param show_col_types Mutes printing of columns types using readr::read_csv
 ##' @return tibble of drugs with drug names sanitised
 ##' @export
-import_drugs_clean <- function(drug_path, show_col_types = TRUE) {
+import_drugs_clean <- function(drug_path, show_col_types = FALSE) {
     drugs <- readr::read_csv(drug_path,
                              show_col_types = show_col_types, lazy = FALSE) %>%
         dplyr::mutate(drug = purrr::map_chr(drug, janitor::make_clean_names))
@@ -279,9 +301,9 @@ get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
         ## unique, purr avoids this
         dplyr::mutate(drug_name_original = drug) %>%
         dplyr::mutate(drug = purrr::map_chr(drug_name_original, janitor::make_clean_names)) %>%
-        dplyr::left_join(netw_variables)
+        dplyr::left_join(netw_variables, by = node_col_name)
 
-    drugs_commands <- make_command_args(drugs_w_nodes, node_col = "node") %>%
+    drugs_commands <- make_command_args(drugs_w_nodes, node_col = rlang::sym(node_col_name)) %>%
         dplyr::rename("alt_filename_part" = "filename_part") %>%
         dplyr::mutate(filename_part = paste(drug, NA, sep = "__"))
 
@@ -343,15 +365,15 @@ make_single_drugs <- function(drugs_commands) {
 make_pair_drugs <- function(drugs_single) {
     drugs_pairs <- combn(dplyr::pull(drugs_single, drug), 2) %>%
         t() %>%
-        tibble::as_tibble(.name_repair = "unique") %>%
-        dplyr::rename("a" = "...1", "b" = "...2") %>%
+        tibble::as_tibble(.name_repair = "minimal") %>%
+        setNames(c("a", "b")) %>%
         dplyr::left_join(drugs_single, by = c("a" = "drug")) %>%
         dplyr::left_join(drugs_single, by = c("b" = "drug")) %>%
         dplyr::mutate(filename_part = paste(filename_part.x,
-                                     filename_part.y, sep = "__"),
-               alt_filename_part = paste(alt_filename_part.x,
-                                         alt_filename_part.y, sep = "__"),
-               command_arg = paste(command_arg.x, command_arg.y)) %>%
+                                            filename_part.y, sep = "__"),
+                      alt_filename_part = paste(alt_filename_part.x,
+                                                alt_filename_part.y, sep = "__"),
+                      command_arg = paste(command_arg.x, command_arg.y)) %>%
         dplyr::select(a, b, filename_part, alt_filename_part, command_arg)
     return(drugs_pairs)
 }

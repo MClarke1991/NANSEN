@@ -63,6 +63,11 @@ parse_biocheck_json <- function(filepath){
 parse_biocheck_dir <- function(dir, netw_variables, rec = FALSE) {
   files <- dir(dir, pattern = "\\.json$", recursive = rec) %>%
     purrr::discard(~stringr::str_detect(.x, "_cex.json")) # Remove CEX files
+
+  if (length(files) == 0) {
+    stop("No JSON files found in the specified directory.")
+  }
+
   pb <- progress::progress_bar$new(total = length(files),
                                    force = TRUE,
                                    clear = FALSE,
@@ -99,7 +104,7 @@ parse_biocheck_dir_apend <- function(existing_file, dir, netw_variables, rec = F
     files_all <- dir(dir, pattern = "\\.json$", recursive = rec) %>%
         purrr::discard(~stringr::str_detect(.x, "_cex.json")) # Remove CEX files
 
-    existing_results <- readr::read_csv(existing_file, col_types = cols(formula = "c"),
+    existing_results <- readr::read_csv(existing_file, col_types = readr::cols(formula = "c"),
                                         lazy = FALSE) %>%
         dplyr::mutate(formula = tidyr::replace_na(formula, ""))
     files_done <- dplyr::pull(existing_results, filename) %>%
@@ -134,7 +139,7 @@ parse_biocheck_dir_apend <- function(existing_file, dir, netw_variables, rec = F
             janitor::clean_names() %>%
             dplyr::left_join(netw_variables, by = "id") # get human readable gene names
 
-        parsed <- bind_rows(existing_results, data)
+        parsed <- dplyr::bind_rows(existing_results, data)
     } else {
         print("All files already parsed.")
         parsed <- existing_results
