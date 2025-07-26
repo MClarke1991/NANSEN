@@ -28,14 +28,6 @@ in addition to node perturbations (CSV)}
 
 \item{node_col_name}{name of the node column in the mutational
 background file and drug file}
-
-\item{calc_survival}{calculate survival meta-phenotype TRUE/FALSE
-where survival is \code{survPhenoA - survPhenoB}}
-
-\item{survPhenoA}{Postive phenotype for survival
-e.g. Proliferation}
-
-\item{survPhenoB}{Negative phenotype for survival e.g. Apoptosis}
 }
 \value{
 write the results, with survival if enabled, for node,

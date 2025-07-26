@@ -9,3 +9,7 @@
 ^debug_csv_output$
 ^tests\testthat\temp_test_outputs$
 ^.lintr$
+^examples$
+^out\.txt$
+^temp_.*\.r$
+^test_fix\.R$

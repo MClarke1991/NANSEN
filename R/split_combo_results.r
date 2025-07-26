@@ -6,11 +6,6 @@
 ##'
 ##' @title split_combo_results
 ##' @inheritParams combo
-##' @param calc_survival calculate survival meta-phenotype TRUE/FALSE
-##'     where survival is `survPhenoA - survPhenoB`
-##' @param survPhenoA Postive phenotype for survival
-##'     e.g. Proliferation
-##' @param survPhenoB Negative phenotype for survival e.g. Apoptosis
 ##' @return write the results, with survival if enabled, for node,
 ##'     druggable (only nodes for which there are drugs) and drug
 ##'     perturbations

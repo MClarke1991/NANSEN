@@ -34,7 +34,13 @@ processed results}
 \item{levs}{level of the mutations to visualise e.g. 0,
 c(1:max_level) or "" for drugs}
 
+\item{neg_col}{negative colour}
+
+\item{pos_col}{positive colour}
+
 \item{cluster_rows}{cluster_rows TRUE/FALSE}
+
+\item{cluster_cols}{cluster columns (TRUE/FALSE)}
 
 \item{results_dir}{results directory}
 

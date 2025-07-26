@@ -2,7 +2,7 @@
 % Please edit documentation in R/heatmaps.r
 \name{plot_diff_heatmaps}
 \alias{plot_diff_heatmaps}
-\title{plot_heatmaps}
+\title{plot_diff_heatmaps}
 \usage{
 plot_diff_heatmaps(
   results_file,
@@ -33,6 +33,8 @@ plot_diff_heatmaps(
 )
 }
 \arguments{
+\item{results_file}{filename of results file to read}
+
 \item{results_prefix}{prefix to results directory}
 
 \item{project_path}{project path for git SHA log, point to git
@@ -48,7 +50,19 @@ repo of the network and specification being tested}
 
 \item{type}{node, druggable or drug heatmaps}
 
+\item{neg_col}{negative colour}
+
+\item{pos_col}{positive colour}
+
 \item{cluster_rows}{cluster_rows TRUE/FALSE}
+
+\item{cluster_double_cols}{cluster columns for double heatmaps (TRUE/FALSE)}
+
+\item{background_order}{order of backgrounds for plotting}
+
+\item{background_order_neat}{neat order of backgrounds for plotting}
+
+\item{neaten_background}{whether to neaten background names}
 
 \item{single_fontsize}{fontsize for monotherapy node perturbation heatmaps}
 
@@ -61,6 +75,14 @@ repo of the network and specification being tested}
 \item{double_druggable_font_size}{fontsize for combination therapy druggable perturbation heatmaps}
 
 \item{double_drugs_font_size}{fontsize for combination therapy drug perturbation heatmaps}
+
+\item{h_s}{height of single heatmaps}
+
+\item{h_d}{height of double heatmaps}
+
+\item{w_s}{width of single heatmaps}
+
+\item{w_d}{width of double heatmaps}
 }
 \value{
 plot heatmaps and save to directory
