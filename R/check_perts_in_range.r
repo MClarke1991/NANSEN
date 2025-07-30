@@ -29,7 +29,6 @@ check_perts_in_range <- function(spec_levels) {
                 "There are perturbations that are outside the range the node can take: \n",
 
                 paste(utils::capture.output(dplyr::select(perturbation_out_range, -expectation_bma)), collapse = "\n"),
-                ## see https://stackoverflow.com/a/26083626
                 call. = FALSE
             ),
             name = log_file
@@ -41,7 +40,6 @@ check_perts_in_range <- function(spec_levels) {
             stop(
                 "There are perturbations that are outside the range the node can take: \n",
                 paste(utils::capture.output(dplyr::select(expectation_out_range, -perturbation_bma)), collapse = "\n"),
-                ## see https://stackoverflow.com/a/26083626
                 call. = FALSE
             ),
             name = log_file

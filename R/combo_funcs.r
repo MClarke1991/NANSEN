@@ -327,7 +327,6 @@ check_drugs_in_range <- function(drugs_commands) {
         stop(
             "There are perturbations that are outside the range the node can take: \n",
             paste(capture.output(activity_out_range), collapse = "\n"),
-            ## see https://stackoverflow.com/a/26083626
             call. = FALSE
         )
     } else {
