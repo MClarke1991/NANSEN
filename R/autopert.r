@@ -15,7 +15,6 @@
 ##'     which determines background mutations for the experiment),
 ##'     "experiment_particular" (details of the experiment
 ##'     e.g. "Application of cisplatin")
-##' @param bma_tools_path path for BMATools development repo
 ##' @param out_dir path where all output files should be stored
 ##' @param nosat option to run without passing to SAT solver in case
 ##'     of VMCAI not finding a fixed-point attractor.
@@ -39,7 +38,6 @@ autopert <- function(netw_file_path,
                      missing_nodes_perturbed_overide = FALSE,
                      missing_nodes_expected_overide = FALSE,
                      project_path = NA,
-                     bma_tools_path = NA,
                      group_vars = c(
                          "source", "cell_line",
                          "experiment_particular"

@@ -84,7 +84,6 @@ if (!config$skip_autopert) {
              missing_nodes_perturbed_overide = config$missing_nodes_perturbed_overide,
              missing_nodes_expected_overide = config$missing_nodes_expected_overide,
              project_path = config$project_path,
-             bma_tools_path = config$bma_tools_path
              )
 } else {
     print("Skipping specification testing")
@@ -103,7 +102,6 @@ if (!config$skip_combo_sim) {
           phenotypes = config$phenotypes,
           use_exclusions = config$use_exclusions,
           exclusions_path = config$combo_exclusions_path,
-          bma_tools_path = config$bma_tools_path,
           log_filename = config$log_filename,
           drug_conflict_overide = config$drug_conflict_overide,
           skip_all_pairs = config$skip_all_pairs,

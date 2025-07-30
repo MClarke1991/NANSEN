@@ -7,6 +7,5 @@
   "missing_nodes_perturbed_overide": false,
   "missing_nodes_expected_overide": false,
   "project_path": null,
-  "bma_tools_path": null,
   "group_vars": ["source", "cell_line", "experiment_particular"]
 }

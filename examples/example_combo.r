@@ -133,7 +133,6 @@ drug_heat_dir_uc <- "unclust_drug_heatmaps"
 ## path that the MSI installer from teh BMA website uses
 bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 ## BMA tools path (undefined variable fix)
-bma_tools_path <- NA
 ## Allow drug conflicts override
 drug_conflict_overide <- TRUE
 ## Name for directory for all results from a run
@@ -156,7 +155,6 @@ if (!skip_autopert) {
              missing_nodes_expected_overide =
                  missing_nodes_expected_overide,
              project_path = project_path,
-             bma_tools_path = bma_tools_path
              )
 } else {
     print("Skipping specification testing")
@@ -175,7 +173,6 @@ if (!skip_combo_sim) {
           phenotypes = phenotypes,
           use_exclusions = use_exclusions,
           exclusions_path = NA,
-          bma_tools_path = bma_tools_path, 
           log_filename = "Combo.log", 
           drug_conflict_overide = drug_conflict_overide,
           skip_all_pairs = skip_all_pairs,
