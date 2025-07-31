@@ -9,12 +9,6 @@
       missing_expected1,
       missing_expected2
 
-# stop_missing_nodes_expected issues warning with override enabled
-
-    Code
-      stop_missing_nodes_expected(spec = spec, missing_nodes_expected_overide = TRUE,
-        netw_variables = netw_variables, log_file = log_file)
-
 # stop_missing_nodes_expected handles mixed valid and invalid nodes
 
     Code

@@ -9,12 +9,6 @@
       missing_node1
       missing_node2
 
-# stop_missing_nodes_perturbed issues warning with override enabled
-
-    Code
-      stop_missing_nodes_perturbed(spec = spec, missing_nodes_perturbed_overide = TRUE,
-        netw_variables = netw_variables, log_file = log_file)
-
 # stop_missing_nodes_perturbed handles mixed valid and invalid nodes
 
     Code
