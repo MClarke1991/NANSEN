@@ -1,7 +1,7 @@
 # run_combo_config.r handles no arguments
 
     Code
-      source("examples/run_combo_config.r")
+      source(here::here("examples/run_combo_config.r"))
     Condition
       Error:
       ! Usage: Rscript run_combo_config.r <config_file_path>
@@ -17,7 +17,7 @@
 # run_combo_config.r handles nonexistent config file
 
     Code
-      source("examples/run_combo_config.r")
+      source(here::here("examples/run_combo_config.r"))
     Condition
       Error:
       ! Usage: Rscript run_combo_config.r <config_file_path>

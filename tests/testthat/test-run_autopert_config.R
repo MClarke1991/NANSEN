@@ -63,7 +63,7 @@ test_that("run_autopert_config.r handles no arguments", {
   on.exit(commandArgs <- old_commandArgs)
 
   # Test that script errors with usage message
-  expect_snapshot(source("examples/run_autopert_config.r"), error = TRUE)
+  expect_snapshot(source(here::here("examples/run_autopert_config.r")), error = TRUE)
 })
 
 test_that("run_autopert_config.r handles multiple arguments", {
@@ -83,7 +83,7 @@ test_that("run_autopert_config.r handles multiple arguments", {
   on.exit(commandArgs <- old_commandArgs)
 
   # Test that script errors with usage message
-  expect_snapshot(source("examples/run_autopert_config.r"), error = TRUE)
+  expect_snapshot(source(here::here("examples/run_autopert_config.r")), error = TRUE)
 })
 
 test_that("run_autopert_config.r handles nonexistent config file", {
@@ -103,5 +103,5 @@ test_that("run_autopert_config.r handles nonexistent config file", {
   on.exit(commandArgs <- old_commandArgs)
 
   # Test that script errors when config file doesn't exist
-  expect_snapshot(source("examples/run_autopert_config.r"), error = TRUE)
+  expect_snapshot(source(here::here("examples/run_autopert_config.r")), error = TRUE)
 })
