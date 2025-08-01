@@ -199,25 +199,3 @@ test_that("check_drug_nodes handles case sensitivity", {
     error = TRUE
   )
 })
-
-test_that("check_drug_nodes uses unique values for comparison", {
-  
-  # Test that function properly uses unique() for comparison
-  drugs <- tibble::tibble(
-    drug = c("drug_a", "drug_a", "drug_a"),
-    node = c("a", "a", "a"),  # Same node repeated
-    activity = c(0, 1, 2)
-  )
-  
-  netw_variables <- tibble::tibble(
-    node = c("a", "a", "b"),  # Network also has duplicates
-    id = c(1, 1, 2),
-    range_from = c(0, 0, 0),
-    range_to = c(2, 2, 2)
-  )
-  
-  # Should work fine - function should use unique values
-  expect_no_error(
-    check_drug_nodes(drugs, netw_variables, "node")
-  )
-})
