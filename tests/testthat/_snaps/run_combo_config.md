@@ -9,7 +9,7 @@
 # run_combo_config.r handles multiple arguments
 
     Code
-      source("examples/run_combo_config.r")
+      source(here::here("examples/run_combo_config.r"))
     Condition
       Error:
       ! Usage: Rscript run_combo_config.r <config_file_path>
