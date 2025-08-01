@@ -79,7 +79,6 @@ validate_combo_config <- function(config_path) {
         node_heat_dir_uc = "unclust_node_heatmaps",
         druggable_heat_dir_uc = "unclust_druggable_heatmaps",
         drug_heat_dir_uc = "unclust_drug_heatmaps",
-        bma_tools_path = NA,
         drug_conflict_overide = TRUE,
         pipe_dir = "combo_results",
         log_filename = "PipeLog.log"

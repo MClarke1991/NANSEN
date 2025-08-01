@@ -20,7 +20,6 @@ test_that("run_autopert_config.r works with valid config", {
     missing_nodes_perturbed_overide = FALSE,
     missing_nodes_expected_overide = FALSE,
     project_path = NULL,
-    bma_tools_path = NULL,
     group_vars = c("source", "cell_line", "experiment_particular")
   )
 

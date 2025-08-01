@@ -15,7 +15,6 @@
 ##'     which determines background mutations for the experiment),
 ##'     "experiment_particular" (details of the experiment
 ##'     e.g. "Application of cisplatin")
-##' @param bma_tools_path path for BMATools development repo
 ##' @param out_dir path where all output files should be stored
 ##' @param nosat option to run without passing to SAT solver in case
 ##'     of VMCAI not finding a fixed-point attractor.
@@ -39,7 +38,6 @@ autopert <- function(netw_file_path,
                      missing_nodes_perturbed_overide = FALSE,
                      missing_nodes_expected_overide = FALSE,
                      project_path = NA,
-                     bma_tools_path = NA,
                      group_vars = c(
                          "source", "cell_line",
                          "experiment_particular"
@@ -151,7 +149,6 @@ autopert <- function(netw_file_path,
     ## get command
     spec_commands <- spec_levels %>%
         dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
-        ## https://stackoverflow.com/a/66253244/10923234
         dplyr::filter(!is.na(perturbation_bma)) %>%
         dplyr::summarise(
             spec_command =
@@ -286,7 +283,6 @@ autopert <- function(netw_file_path,
                 "Results missing, did you try and get an output without specifying any
     inputs?\n See:\n ",
                 paste(utils::capture.output(print(missing_results)), collapse = "\n")
-                # https://stackoverflow.com/a/26083626
             ),
             name = log_file
         )
@@ -312,11 +308,7 @@ autopert <- function(netw_file_path,
 
     results_mismatch <- results %>%
         dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
-        ## https://stackoverflow.com/a/66253244/10923234
         dplyr::filter(any(diff != 0)) %>%
-        ## see https://stackoverflow.com/a/31027426/10923234, get
-        ## whole experiment when there is an error, not just the line
-        ## with the perturbed gene
         dplyr::filter(!is.na(perturbation) | !is.na(expectation_bma))
     ## remove rows of results where there was neither a perturbation
     ## nor an expected result, as makes harder to compare to original
@@ -459,7 +451,6 @@ autopert <- function(netw_file_path,
             ),
             position = ggplot2::position_dodge()
         ) +
-        ## See https://stackoverflow.com/a/44068137/10923234
         ggplot2::labs(
             title = "Mismatch between modelled and expected results",
             y = "Difference \n (mean model result - expected)",

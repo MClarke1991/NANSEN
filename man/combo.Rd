@@ -18,7 +18,6 @@ combo(
   phenotypes = NA,
   use_exclusions = FALSE,
   exclusions_path = NA,
-  bma_tools_path = NA,
   drug_conflict_overide = FALSE,
   skip_drugs_single = FALSE,
   skip_drugs_pairs = FALSE,
@@ -62,8 +61,6 @@ processing by skipping those nodes which are uninteresting to
 perturb e.g. phenotype nodes}
 
 \item{exclusions_path}{list of nodes in format \code{c("node_name_1", "node_name_2")} for use if use_exclusions is TRUE}
-
-\item{bma_tools_path}{path for BMATools development repo}
 
 \item{drug_conflict_overide}{allow overide of drug conflicts
 check, only used for testing}

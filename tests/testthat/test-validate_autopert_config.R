@@ -31,7 +31,6 @@ test_that("validate_autopert_config handles valid configuration", {
   expect_equal(result$missing_nodes_perturbed_overide, FALSE)
   expect_equal(result$missing_nodes_expected_overide, FALSE)
   expect_true(is.na(result$project_path))
-  expect_true(is.na(result$bma_tools_path))
   expect_equal(result$group_vars, c("source", "cell_line", "experiment_particular"))
 })
 
@@ -56,7 +55,6 @@ test_that("validate_autopert_config applies defaults correctly", {
   expect_equal(result$missing_nodes_perturbed_overide, FALSE)
   expect_equal(result$missing_nodes_expected_overide, FALSE)
   expect_true(is.na(result$project_path))
-  expect_true(is.na(result$bma_tools_path))
   expect_equal(result$group_vars, c("source", "cell_line", "experiment_particular"))
 })
 

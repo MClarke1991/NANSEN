@@ -16,7 +16,7 @@
 #' @export
 parse_biocheck_json <- function(filepath){
   df <- jsonlite::fromJSON(filepath) %>%
-    magrittr::extract2("Ticks") %>% # see https://stackoverflow.com/a/27100797/10923234
+    magrittr::extract2("Ticks") %>%
     dplyr::filter(.data$Time == max(.data$Time)) %>%
     tidyr::unnest(cols = c("Variables"))
   return(df)

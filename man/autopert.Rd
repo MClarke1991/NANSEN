@@ -14,7 +14,6 @@ autopert(
   missing_nodes_perturbed_overide = FALSE,
   missing_nodes_expected_overide = FALSE,
   project_path = NA,
-  bma_tools_path = NA,
   group_vars = c("source", "cell_line", "experiment_particular")
 )
 }
@@ -42,8 +41,6 @@ expected nodes that are missing from network}
 
 \item{project_path}{project path for git SHA log, point to git
 repo of the network and specification being tested}
-
-\item{bma_tools_path}{path for BMATools development repo}
 
 \item{group_vars}{variables used to group rows of the
 specification into a single experiment. Defaults to "source"

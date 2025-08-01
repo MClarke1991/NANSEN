@@ -21,7 +21,6 @@
 ##   - missing_nodes_perturbed_overide: override missing node checks (default: false)
 ##   - missing_nodes_expected_overide: override missing node checks (default: false)
 ##   - project_path: git repository path for logging (default: null)
-##   - bma_tools_path: BMATools development path (default: null)
 ##   - group_vars: variables for grouping experiments (default: ["source", "cell_line", "experiment_particular"])
 
 library(NANSEN)
@@ -51,7 +50,6 @@ autopert(
     missing_nodes_perturbed_overide = config$missing_nodes_perturbed_overide,
     missing_nodes_expected_overide = config$missing_nodes_expected_overide,
     project_path = config$project_path,
-    bma_tools_path = config$bma_tools_path,
     group_vars = config$group_vars
 )
 

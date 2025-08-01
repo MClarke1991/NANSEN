@@ -327,7 +327,6 @@ check_drugs_in_range <- function(drugs_commands) {
         stop(
             "There are perturbations that are outside the range the node can take: \n",
             paste(capture.output(activity_out_range), collapse = "\n"),
-            ## see https://stackoverflow.com/a/26083626
             call. = FALSE
         )
     } else {
@@ -770,7 +769,6 @@ get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_fi
 ##'     perturb e.g. phenotype nodes
 ##' @param exclusions_path list of nodes in format `c("node_name_1",
 ##'     "node_name_2")` for use if use_exclusions is TRUE
-##' @param bma_tools_path path for BMATools development repo
 ##' @param drug_conflict_overide allow overide of drug conflicts
 ##'     check, only used for testing
 ##' @param skip_drugs_single  skip drug perturbations
@@ -794,7 +792,6 @@ combo <- function(netw_file_path,
                   phenotypes = NA,
                   use_exclusions = FALSE,
                   exclusions_path = NA,
-                  bma_tools_path = NA,
                   drug_conflict_overide = FALSE,
                   skip_drugs_single = FALSE,
                   skip_drugs_pairs = FALSE,

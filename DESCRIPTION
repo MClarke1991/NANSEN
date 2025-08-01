@@ -1,6 +1,6 @@
 Package: NANSEN
 Title: NANSEN (Network Analysis aNd ScrEeNing)
-Version: 0.4.0
+Version: 1.0.0
 Authors@R: c(
     person(given = "Matthew",
            family = "Clarke",
