@@ -3,15 +3,15 @@
 ## Config-based AutoPert runner script
 ##
 ## This script runs the autopert function using parameters specified in a JSON
-## configuration file instead of hardcoded variables.
+## configuration file.
 ##
-## Usage: Rscript examples/run_autopert_config.r path/to/config.json
+## Usage: `Rscript examples/run_autopert_config.r path/to/config.json`
 ##
-## Example: Rscript examples/run_autopert_config.r examples/autopert_config_example.json
+## Example: `Rscript examples/run_autopert_config.r examples/autopert_config_example.json`
 ##
 ## Required config fields:
 ##   - netw_file_path: path to network JSON file
-##   - spec_path: path to specificli::cli_alert_infoion CSV file
+##   - spec_path: path to specification CSV file
 ##   - out_dir: directory for output files
 ##
 ## Optional config fields (with defaults):

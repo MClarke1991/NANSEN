@@ -187,8 +187,6 @@ test_that("check_drugs_in_range preserves error call behavior", {
     command_arg = c("-ko 1 10")
   )
   
-  # The function uses call. = FALSE, so error should not show the function call
-  # Test that error doesn't contain function name (due to call. = FALSE)
   error_result <- tryCatch(
     check_drugs_in_range(drugs_commands),
     error = function(e) e$message
