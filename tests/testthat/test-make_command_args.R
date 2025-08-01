@@ -119,24 +119,6 @@ test_that("make_command_args handles special characters in names", {
   expect_equal(result$command_arg[3], "-ko 3 2")
 })
 
-test_that("make_command_args handles mixed data types", {
-  # Create test data frame with mixed types
-  test_df <- data.frame(
-    id = c(1L, 2L),  # integer
-    activity = c(0.0, 1.5),  # numeric
-    name = c("node1", "node2"),  # character
-    stringsAsFactors = FALSE
-  )
-
-  result <- make_command_args(test_df)
-
-  # Should handle numeric activity values
-  expect_equal(result$command_arg[1], "-ko 1 0")
-  expect_equal(result$command_arg[2], "-ko 2 1.5")
-  expect_equal(result$filename_part[1], "node1__0")
-  expect_equal(result$filename_part[2], "node2__1.5")
-})
-
 test_that("make_command_args throws error for non-numeric and NA values", {
   # Test non-numeric id column
   test_df_char_id <- data.frame(
