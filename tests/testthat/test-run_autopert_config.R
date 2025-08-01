@@ -40,6 +40,7 @@ test_that("run_autopert_config.r works with valid config", {
         return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", args[-1]))
       }
     },
+    .package = "base",
     {
       suppressMessages(expect_no_error(source(here::here("examples/run_autopert_config.r"))))
     }
