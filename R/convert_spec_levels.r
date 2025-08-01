@@ -14,7 +14,7 @@
 ##'     BioCheckConsole
 ##' @export
 convert_spec_levels <- function(spec, log_file) {
-    if (is.character(dplyr::pull(spec, perturbation)) &
+    if (is.character(dplyr::pull(spec, perturbation)) ||
         is.character(dplyr::pull(spec, expected_result_bma))) {
         spec_levels <- spec %>%
             dplyr::mutate(perturbation_bma = dplyr::case_when(

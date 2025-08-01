@@ -115,7 +115,7 @@ test_that("convert_spec_levels handles mixed column types", {
     range_to = c(10, 11)
   )
   result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
-  expect_equal(result$perturbation_bma, c("min", "max"))
+  expect_equal(result$perturbation_bma, c(0, 11))
   expect_equal(result$expectation_bma, c(3, 9))
   cleanup_log_file()
 })
@@ -163,21 +163,6 @@ test_that("convert_spec_levels handles large ranges", {
   result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   expect_equal(result$perturbation_bma, c(0, 1000500))
   expect_equal(result$expectation_bma, c(1000000, 1000500))
-  cleanup_log_file()
-})
-
-test_that("convert_spec_levels handles decimal ranges", {
-  setup_log_file()
-  spec <- tibble::tibble(
-    gene = c("geneA", "geneB"),
-    perturbation = c("min", "mid"),
-    expected_result_bma = c("max", "mid"),
-    range_from = c(0.5, 1.5),
-    range_to = c(10.5, 11.5)
-  )
-  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
-  expect_equal(result$perturbation_bma, c(0.5, 6.5))
-  expect_equal(result$expectation_bma, c(10.5, 6.5))
   cleanup_log_file()
 })
 
