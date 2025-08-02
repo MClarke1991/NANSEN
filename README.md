@@ -19,7 +19,7 @@ remotes::install_github("jfisher-lab/nansen")
 
 ## Key Features
 
-NANSEN ("Network Analysis aNd ScrEeNing") is an open–source R package that wraps the **Bio Model Analyzer (BMA)** command-line tools in a tidy, reproducible workflow for verifying, perturbing and systematically screening discrete gene-regulatory network models.
+NANSEN ("Network Analysis aNd ScrEeNing") is an open–source R package that wraps the **[Bio Model Analyzer (BMA)](http://biomodelanalyzer.org/)** command-line tools in a tidy, reproducible workflow for verifying, perturbing and systematically screening discrete gene-regulatory network models.
 
 The package allows modellers and experimentalists to:
 
