@@ -1,8 +1,8 @@
 ## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
 
-##' Validate autopert configuration from JSON file
+##' Validate autopert configuration from TOML file
 ##' @title validate_autopert_config
-##' @param config_path path to JSON configuration file
+##' @param config_path path to TOML configuration file
 ##' @return list with validated configuration parameters
 ##' @export
 validate_autopert_config <- function(config_path) {
@@ -12,9 +12,9 @@ validate_autopert_config <- function(config_path) {
     }
     
     tryCatch({
-        config <- jsonlite::fromJSON(config_path)
+        config <- configr::read.config(config_path, file.type = "toml")
     }, error = function(e) {
-        stop(paste("Invalid JSON in config file:", e$message))
+        stop(paste("Invalid TOML in config file:", e$message))
     })
     
     required_fields <- c("netw_file_path", "spec_path", "out_dir")

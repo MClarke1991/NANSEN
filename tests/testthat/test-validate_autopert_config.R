@@ -15,8 +15,21 @@ test_that("validate_autopert_config handles valid configuration", {
     loserum = TRUE
   )
   
-  config_file <- file.path(temp_dir, "valid_config.json")
-  jsonlite::write_json(valid_config, config_file, auto_unbox = TRUE)
+  config_file <- file.path(temp_dir, "valid_config.toml")
+  toml_content <- sprintf('
+netw_file_path = "%s"
+spec_path = "%s"
+out_dir = "%s"
+nosat = %s
+loserum = %s
+',
+    gsub("\\\\", "/", valid_config$netw_file_path),
+    gsub("\\\\", "/", valid_config$spec_path),
+    valid_config$out_dir,
+    tolower(valid_config$nosat),
+    tolower(valid_config$loserum)
+  )
+  writeLines(toml_content, config_file)
   
   on.exit(unlink(config_file))
   
@@ -42,8 +55,17 @@ test_that("validate_autopert_config applies defaults correctly", {
     out_dir = "test_output"
   )
   
-  config_file <- file.path(temp_dir, "minimal_config.json")
-  jsonlite::write_json(minimal_config, config_file, auto_unbox = TRUE)
+  config_file <- file.path(temp_dir, "minimal_config.toml")
+  toml_content <- sprintf('
+netw_file_path = "%s"
+spec_path = "%s"
+out_dir = "%s"
+',
+    gsub("\\\\", "/", minimal_config$netw_file_path),
+    gsub("\\\\", "/", minimal_config$spec_path),
+    minimal_config$out_dir
+  )
+  writeLines(toml_content, config_file)
   
   on.exit(unlink(config_file))
   
@@ -60,19 +82,19 @@ test_that("validate_autopert_config applies defaults correctly", {
 
 test_that("validate_autopert_config errors on missing config file", {
   expect_snapshot(
-    validate_autopert_config("nonexistent_config.json"),
+    validate_autopert_config("nonexistent_config.toml"),
     error = TRUE
   )
 })
 
 test_that("validate_autopert_config errors on invalid JSON", {
-  invalid_json_file <- file.path(temp_dir, "invalid.json")
-  writeLines("{ invalid json", invalid_json_file)
+  invalid_toml_file <- file.path(temp_dir, "invalid.toml")
+  writeLines("invalid toml [", invalid_toml_file)
   
-  on.exit(unlink(invalid_json_file))
+  on.exit(unlink(invalid_toml_file))
   
   expect_snapshot(
-    validate_autopert_config(invalid_json_file),
+    validate_autopert_config(invalid_toml_file),
     error = TRUE
   )
 })
@@ -84,8 +106,15 @@ test_that("validate_autopert_config errors on missing required fields", {
     out_dir = "test_output"
   )
   
-  config_file <- file.path(temp_dir, "missing_netw.json")
-  jsonlite::write_json(config_missing_netw, config_file, auto_unbox = TRUE)
+  config_file <- file.path(temp_dir, "missing_netw.toml")
+  toml_content <- sprintf('
+spec_path = "%s"
+out_dir = "%s"
+',
+    gsub("\\\\", "/", config_missing_netw$spec_path),
+    config_missing_netw$out_dir
+  )
+  writeLines(toml_content, config_file)
   
   expect_snapshot(
     validate_autopert_config(config_file),
@@ -100,8 +129,15 @@ test_that("validate_autopert_config errors on missing required fields", {
     out_dir = "test_output"
   )
   
-  config_file <- file.path(temp_dir, "missing_spec.json")
-  jsonlite::write_json(config_missing_spec, config_file, auto_unbox = TRUE)
+  config_file <- file.path(temp_dir, "missing_spec.toml")
+  toml_content <- sprintf('
+netw_file_path = "%s"
+out_dir = "%s"
+',
+    gsub("\\\\", "/", config_missing_spec$netw_file_path),
+    config_missing_spec$out_dir
+  )
+  writeLines(toml_content, config_file)
   
   expect_snapshot(
     validate_autopert_config(config_file),
@@ -116,8 +152,15 @@ test_that("validate_autopert_config errors on missing required fields", {
     spec_path = here::here("examples", "autopert", "helper_spec_1.csv")
   )
   
-  config_file <- file.path(temp_dir, "missing_out.json")
-  jsonlite::write_json(config_missing_out, config_file, auto_unbox = TRUE)
+  config_file <- file.path(temp_dir, "missing_out.toml")
+  toml_content <- sprintf('
+netw_file_path = "%s"
+spec_path = "%s"
+',
+    gsub("\\\\", "/", config_missing_out$netw_file_path),
+    gsub("\\\\", "/", config_missing_out$spec_path)
+  )
+  writeLines(toml_content, config_file)
   
   expect_snapshot(
     validate_autopert_config(config_file),
@@ -135,8 +178,17 @@ test_that("validate_autopert_config errors on missing referenced files", {
     out_dir = "test_output"
   )
   
-  config_file <- file.path(temp_dir, "missing_netw_file.json")
-  jsonlite::write_json(config_missing_netw_file, config_file, auto_unbox = TRUE)
+  config_file <- file.path(temp_dir, "missing_netw_file.toml")
+  toml_content <- sprintf('
+netw_file_path = "%s"
+spec_path = "%s"
+out_dir = "%s"
+',
+    config_missing_netw_file$netw_file_path,
+    gsub("\\\\", "/", config_missing_netw_file$spec_path),
+    config_missing_netw_file$out_dir
+  )
+  writeLines(toml_content, config_file)
   
   expect_snapshot(
     validate_autopert_config(config_file),
@@ -152,8 +204,17 @@ test_that("validate_autopert_config errors on missing referenced files", {
     out_dir = "test_output"
   )
   
-  config_file <- file.path(temp_dir, "missing_spec_file.json")
-  jsonlite::write_json(config_missing_spec_file, config_file, auto_unbox = TRUE)
+  config_file <- file.path(temp_dir, "missing_spec_file.toml")
+  toml_content <- sprintf('
+netw_file_path = "%s"
+spec_path = "%s"
+out_dir = "%s"
+',
+    gsub("\\\\", "/", config_missing_spec_file$netw_file_path),
+    config_missing_spec_file$spec_path,
+    config_missing_spec_file$out_dir
+  )
+  writeLines(toml_content, config_file)
   
   expect_snapshot(
     validate_autopert_config(config_file),

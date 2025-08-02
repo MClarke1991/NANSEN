@@ -2,12 +2,12 @@
 
 ## Config-based Combo runner script
 ##
-## This script runs the combo function using parameters specified in a JSON
+## This script runs the combo function using parameters specified in a TOML
 ## configuration file instead of hardcoded variables.
 ##
-## Usage: `Rscript examples/run_combo_config.r path/to/config.json`
+## Usage: `Rscript examples/run_combo_config.r path/to/config.toml`
 ##
-## Example: `Rscript examples/run_combo_config.r examples/combo_config_example.json`
+## Example: `Rscript examples/run_combo_config.r examples/combo_config_example.toml`
 ##
 ## Required config fields:
 ##   - netw_file_path: path to network JSON file

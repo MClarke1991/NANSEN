@@ -7,11 +7,11 @@
 validate_autopert_config(config_path)
 }
 \arguments{
-\item{config_path}{path to JSON configuration file}
+\item{config_path}{path to TOML configuration file}
 }
 \value{
 list with validated configuration parameters
 }
 \description{
-Validate autopert configuration from JSON file
+Validate autopert configuration from TOML file
 }
