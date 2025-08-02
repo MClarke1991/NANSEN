@@ -1,4 +1,4 @@
-## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2022 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Stop if there is an experiment that does not perturb the network
 #' at all as usually this indicates a user error in the formating of

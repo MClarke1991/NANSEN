@@ -1,4 +1,4 @@
-## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2022 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Stop if there are nodes which are perturbed in the specification
 #' that are not in the network

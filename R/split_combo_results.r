@@ -1,4 +1,4 @@
-## Copyright 2023 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2023 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Split combination results into node, druggable and drug
 #' perturbations and optionally calculate the difference between one

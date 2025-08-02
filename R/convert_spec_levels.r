@@ -1,4 +1,4 @@
-## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2022 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Allow the conversion of a specification written with relative
 #' terms (min, mid, max) for the perturbation and expectation to be

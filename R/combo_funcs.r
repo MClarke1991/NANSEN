@@ -1,4 +1,4 @@
-## Copyright 2021 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2021 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Check if numeric values are integers with informative error messages
 #'

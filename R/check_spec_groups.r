@@ -1,4 +1,4 @@
-## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2022 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Test whether separate experiments have the same grouping factor,
 #' and so would be run together in spec testing and possibly give

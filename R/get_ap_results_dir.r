@@ -1,4 +1,4 @@
-## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2022 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Generate results directory for specification check in a standardised way,
 #' so that visualisation scripts can generate one that lines up with

@@ -9,7 +9,7 @@
 A package for verification and analysis of biological gene regulatory network models built with Bio Model Analyzer.
 }
 \author{
-\strong{Maintainer}: Matthew Clarke \email{matthewaclarke1991@gmail.com} (\href{https://orcid.org/0000-0002-2582-9689}{ORCID})
+\strong{Maintainer}: Matthew Clarke \email{matthew.clarke@ucl.ac.uk} (\href{https://orcid.org/0000-0002-2582-9689}{ORCID})
 
 Authors:
 \itemize{

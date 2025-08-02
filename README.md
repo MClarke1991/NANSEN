@@ -69,7 +69,7 @@ autopert(
 Command line usage:
 
 ```bash
-Rscript run_autopert_config.r examples/autopert/helper_autopert_1.toml
+Rscript examples/run_autopert_config.r examples/autopert_config_example.toml 
 ```
 
 
@@ -100,10 +100,8 @@ combo(
 Command line usage:
 
 ```bash
-Rscript run_combo_config.r examples/combo/helper_combo_1.toml
+Rscript examples/run_combo_config.r examples/combo_config_example.toml
 ```
-
-
 
 If you use NANSEN in your research, please cite:
 
