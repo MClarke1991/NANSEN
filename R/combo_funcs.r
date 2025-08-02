@@ -1,5 +1,54 @@
 ## Copyright 2021 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
 
+#' Check if numeric values are integers with informative error messages
+#'
+#' @param values numeric vector to check
+#' @param column_name name of the column being checked (for error messages)
+#' @param data_source description of data source (e.g., "spec file", "drug file")
+#' @return TRUE if all values are integers, otherwise stops with error
+#' @keywords internal
+check_integer_values <- function(values, column_name, data_source = "file") {
+    # Define floating-point tolerance constant
+    FLOAT_TOLERANCE <- .Machine$double.eps^0.5
+
+    # Skip NA values for this check
+    if (all(is.na(values))) {
+        return(TRUE)  # All values are NA, which is handled elsewhere
+    }
+
+    # Check if values are integers (whole numbers), excluding NAs
+    non_integer_mask <- abs(values - round(values)) > FLOAT_TOLERANCE & !is.na(values)
+    non_integer_positions <- which(non_integer_mask)
+    non_integer_values <- values[non_integer_positions]
+
+    if (length(non_integer_values) > 0) {
+        # Create detailed error message
+        unique_non_integer <- unique(non_integer_values)
+        n_total_errors <- length(non_integer_values)
+        n_unique_errors <- length(unique_non_integer)
+
+        error_msg <- paste0(
+            "Column '", column_name, "' in ", data_source, " contains non-integer values. ",
+            "Gene/node activity levels must be integers. ",
+            "Consider using round() or as.integer() to convert values. ",
+            "Found ", n_total_errors, " non-integer value(s) with ", n_unique_errors, " unique value(s): ",
+            paste(head(unique_non_integer, 5), collapse = ", "),
+            if (n_unique_errors > 5) " (showing first 5)" else "",
+            " at position(s): ",
+            paste(head(non_integer_positions, 5), collapse = ", "),
+            if (length(non_integer_positions) > 5) " (showing first 5)" else ""
+        )
+
+        if (exists("log_file") && !is.null(log_file)) {
+            futile.logger::flog.error(stop(error_msg,call. = FALSE), name = log_file)
+        } else {
+            stop(error_msg, call. = FALSE)
+        }
+    }
+
+    return(TRUE)
+}
+
 #' Take a df of nodes from json file, annotated with level of activity
 #' and annotate all with filename prefix and BioCheckConsole command
 #' argument needed to change it's value
@@ -48,6 +97,9 @@ make_command_args <- function(df,
                    paste(head(na_positions, 5), collapse = ", ")))
     }
 
+    # Check if activity values are integers
+    check_integer_values(activity_values, activity_col, "activity data")
+
     out <- dplyr::mutate(df,
                          command_arg = paste("-ko",
                                              !!rlang::sym(id_col),
@@ -84,6 +136,14 @@ make_bkg_commands_combo <- function(backgrounds,
     if (!((node_col %in% colnames(backgrounds)) &
          (node_col %in% colnames(netw_variables)))) {
         stop("Error: It looks like the name of the column with node names, set as `node_col`, is not present in 'backgrounds' or 'netw_variables'. If you have renamed it make sure it is consistent between the two arguments and that you supply it with the `node_col` argument")
+    }
+
+    # Validate that activity column in backgrounds contains only integers
+    if ("activity" %in% colnames(backgrounds)) {
+        activity_values <- backgrounds$activity
+        if (is.numeric(activity_values)) {
+            check_integer_values(activity_values, "activity", "background file")
+        }
     }
 
     ## make a dataframe with the command argument and corresponding
@@ -204,6 +264,15 @@ import_drugs_clean <- function(drug_path, show_col_types = FALSE) {
     drugs <- readr::read_csv(drug_path,
                              show_col_types = show_col_types, lazy = FALSE) %>%
         dplyr::mutate(drug = purrr::map_chr(drug, janitor::make_clean_names))
+
+    # Validate that activity column contains only integers
+    if ("activity" %in% colnames(drugs)) {
+        activity_values <- drugs$activity
+        if (is.numeric(activity_values)) {
+            check_integer_values(activity_values, "activity", "drug file")
+        }
+    }
+
     return(drugs)
 }
 

@@ -251,7 +251,7 @@ test_that("get_drugs_commands command_arg format is correct", {
   drugs <- tibble::tibble(
     drug = c("test_drug"),
     node = c("test_node"),
-    activity = c(1.5)
+    activity = c(2)
   )
 
   netw_variables <- tibble::tibble(
@@ -265,7 +265,7 @@ test_that("get_drugs_commands command_arg format is correct", {
   result <- get_drugs_commands(drugs, netw_variables, "node")
 
   # Command should be "-ko [id] [activity]"
-  expect_equal(result$command_arg[1], "-ko 42 1.5")
+  expect_equal(result$command_arg[1], "-ko 42 2")
 })
 
 test_that("get_drugs_commands filename_part format is correct", {

@@ -86,7 +86,7 @@ test_that("convert_spec_levels handles negative ranges", {
   )
   result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   expect_equal(result$perturbation_bma, c(-10, 5))
-  expect_equal(result$expectation_bma, c(-5.5, -5))
+  expect_equal(result$expectation_bma, c(-6, -5))
   cleanup_log_file()
 })
 
@@ -178,7 +178,7 @@ test_that("convert_spec_levels preserves original columns", {
     experiment_particular = c("exp1", "exp2")
   )
   result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
-  expect_true(all(c("gene", "source", "perturbation", "expected_result_bma", 
+  expect_true(all(c("gene", "source", "perturbation", "expected_result_bma",
                    "range_from", "range_to", "experiment_particular") %in% names(result)))
   expect_equal(result$gene, c("geneA", "geneB"))
   expect_equal(result$source, c("source1", "source2"))
@@ -213,5 +213,46 @@ test_that("convert_spec_levels handles partial matches", {
   result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
   expect_equal(result$perturbation_bma, c(0, 6, 12))
   expect_equal(result$expectation_bma, c(0, 6, 12))
+  cleanup_log_file()
+})
+
+
+
+test_that("convert_spec_levels throws error when numeric input contains non-integers", {
+  setup_log_file()
+
+  # Create spec with non-integer numeric values (not character)
+  spec <- tibble::tibble(
+    gene = c("a", "b"),
+    source = c("test", "test"),
+    perturbation = c(1.5, 2.7),  # non-integer numeric values
+    expected_result_bma = c(1, 2),
+    range_from = c(0, 0),
+    range_to = c(3, 3)
+  )
+
+  expect_snapshot(
+    convert_spec_levels(spec, log_file),
+    error = TRUE
+  )
+  cleanup_log_file()
+})
+
+test_that("convert_spec_levels works with integer ranges that produce integer mid values", {
+  setup_log_file()
+
+  # Create spec where mid calculation results in integers (even range difference)
+  spec <- tibble::tibble(
+    gene = c("a", "b", "c"),
+    source = c("test", "test", "test"),
+    perturbation = c("min", "mid", "max"),
+    expected_result_bma = c("min", "mid", "max"),
+    range_from = c(0, 0, 0),
+    range_to = c(4, 4, 4)  # mid = 2, which is integer
+  )
+
+  result <- suppressMessages(suppressWarnings(convert_spec_levels(spec, log_file)))
+  expect_equal(result$perturbation_bma, c(0, 2, 4))
+  expect_equal(result$expectation_bma, c(0, 2, 4))
   cleanup_log_file()
 })

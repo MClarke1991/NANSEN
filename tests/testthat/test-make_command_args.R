@@ -123,7 +123,7 @@ test_that("make_command_args handles mixed data types", {
   # Create test data frame with mixed types
   test_df <- data.frame(
     id = c(1L, 2L),  # integer
-    activity = c(0.0, 1.5),  # numeric
+    activity = c(0.0, 2.0),  # numeric
     name = c("node1", "node2"),  # character
     stringsAsFactors = FALSE
   )
@@ -132,9 +132,9 @@ test_that("make_command_args handles mixed data types", {
 
   # Should handle numeric activity values
   expect_equal(result$command_arg[1], "-ko 1 0")
-  expect_equal(result$command_arg[2], "-ko 2 1.5")
+  expect_equal(result$command_arg[2], "-ko 2 2")
   expect_equal(result$filename_part[1], "node1__0")
-  expect_equal(result$filename_part[2], "node2__1.5")
+  expect_equal(result$filename_part[2], "node2__2")
 })
 
 test_that("make_command_args throws error for non-numeric and NA values", {
@@ -204,4 +204,66 @@ test_that("make_command_args throws error for non-numeric and NA values", {
   result <- make_command_args(test_df_valid)
   expect_equal(nrow(result), 3)
   expect_true(all(c("command_arg", "filename_part") %in% names(result)))
+})
+
+test_that("make_command_args throws error for non-integer activity values", {
+  source("testing_utils.r")
+  setup_log_file()
+  on.exit(cleanup_log_file())
+
+  # Test non-integer activity values
+  test_df_non_integer <- data.frame(
+    id = c(1, 2, 3),
+    activity = c(0.5, 1.2, 2.7),  # non-integer values
+    name = c("node1", "node2", "node3"),
+    stringsAsFactors = FALSE
+  )
+
+  expect_snapshot(
+    make_command_args(test_df_non_integer),
+    error = TRUE
+  )
+})
+
+test_that("make_command_args works with integer activity values including edge cases", {
+  source("testing_utils.r")
+  setup_log_file()
+  on.exit(cleanup_log_file())
+
+  # Test valid integer values including zero and negative
+  test_df_valid_integers <- data.frame(
+    id = c(1, 2, 3, 4),
+    activity = c(0, 1, -1, 100),  # valid integer values
+    name = c("node1", "node2", "node3", "node4"),
+    stringsAsFactors = FALSE
+  )
+
+  result <- make_command_args(test_df_valid_integers)
+  expect_equal(nrow(result), 4)
+  expect_true(all(c("command_arg", "filename_part") %in% names(result)))
+
+  # Check that values are preserved
+  expect_equal(result$command_arg[1], "-ko 1 0")
+  expect_equal(result$command_arg[2], "-ko 2 1")
+  expect_equal(result$command_arg[3], "-ko 3 -1")
+  expect_equal(result$command_arg[4], "-ko 4 100")
+})
+
+test_that("make_command_args handles mix of valid and invalid activity values", {
+  source("testing_utils.r")
+  setup_log_file()
+  on.exit(cleanup_log_file())
+
+  # Test mix of integer and non-integer values
+  test_df_mixed <- data.frame(
+    id = c(1, 2, 3),
+    activity = c(1, 2.5, 3),  # one non-integer value
+    name = c("node1", "node2", "node3"),
+    stringsAsFactors = FALSE
+  )
+
+  expect_snapshot(
+    make_command_args(test_df_mixed),
+    error = TRUE
+  )
 })

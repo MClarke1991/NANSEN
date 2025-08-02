@@ -206,3 +206,110 @@ test_that("import_spec joins network variables correctly", {
     expect_true(all(is.na(non_network_genes$id)))
   }
 })
+
+test_that("import_spec throws error for non-integer perturbation values", {
+  setup_log_file()
+  on.exit(cleanup_log_file())
+
+  # Create test data with non-integer perturbation values
+  temp_spec <- tempfile(fileext = ".csv")
+  spec_data <- tibble::tibble(
+    cell_line = c("a", "a", "a"),
+    paper_title = c("a", "a", "a"),
+    `Paper DOI` = c("a", "a", "a"),
+    source = c("a", "a", "a"),
+    experiment_overview = c("a", "a", "a"),
+    experiment_particular = c("a", "a", "a"),
+    gene = c("in", "b", "c"),
+    perturbation = c(1.5, 0.7, 2.3),  # non-integer values
+    expected_result_bma = c(1, 0, 1),
+    notes = c("", "", ""),
+    check.names = FALSE
+  )
+  readr::write_csv(spec_data, temp_spec)
+  on.exit(file.remove(temp_spec), add = TRUE)
+
+  netw_variables <- get_netw_variables(here::here("examples", "autopert", "helper_autopert_1.json"))
+
+  expect_snapshot(
+    import_spec(
+      spec_path = temp_spec,
+      loserum = FALSE,
+      clean_underscores = FALSE,
+      netw_variables = netw_variables
+    ),
+    error = TRUE
+  )
+})
+
+test_that("import_spec throws error for non-integer expected_result_bma values", {
+  setup_log_file()
+  on.exit(cleanup_log_file())
+
+  # Create test data with non-integer expected_result_bma values
+  temp_spec <- tempfile(fileext = ".csv")
+  spec_data <- tibble::tibble(
+    cell_line = c("a", "a", "a"),
+    paper_title = c("a", "a", "a"),
+    `Paper DOI` = c("a", "a", "a"),
+    source = c("a", "a", "a"),
+    experiment_overview = c("a", "a", "a"),
+    experiment_particular = c("a", "a", "a"),
+    gene = c("in", "b", "c"),
+    perturbation = c(1, 0, 1),
+    expected_result_bma = c(1.5, 0.7, 2.3),  # non-integer values
+    notes = c("", "", ""),
+    check.names = FALSE
+  )
+  readr::write_csv(spec_data, temp_spec)
+  on.exit(file.remove(temp_spec), add = TRUE)
+
+  netw_variables <- get_netw_variables(here::here("examples", "autopert", "helper_autopert_1.json"))
+
+  expect_snapshot(
+    import_spec(
+      spec_path = temp_spec,
+      loserum = FALSE,
+      clean_underscores = FALSE,
+      netw_variables = netw_variables
+    ),
+    error = TRUE
+  )
+})
+
+test_that("import_spec works with integer perturbation and expected values", {
+  setup_log_file()
+  on.exit(cleanup_log_file())
+
+  # Create test data with valid integer values
+  temp_spec <- tempfile(fileext = ".csv")
+  spec_data <- tibble::tibble(
+    cell_line = c("a", "a", "a"),
+    paper_title = c("a", "a", "a"),
+    `Paper DOI` = c("a", "a", "a"),
+    source = c("a", "a", "a"),
+    experiment_overview = c("a", "a", "a"),
+    experiment_particular = c("a", "a", "a"),
+    gene = c("in", "b", "c"),
+    perturbation = c(1, 0, 2),  # valid integer values
+    expected_result_bma = c(1, 0, 1),  # valid integer values
+    notes = c("", "", ""),
+    check.names = FALSE
+  )
+  readr::write_csv(spec_data, temp_spec)
+  on.exit(file.remove(temp_spec), add = TRUE)
+
+  netw_variables <- get_netw_variables(here::here("examples", "autopert", "helper_autopert_1.json"))
+
+  result <- import_spec(
+    spec_path = temp_spec,
+    loserum = FALSE,
+    clean_underscores = FALSE,
+    netw_variables = netw_variables
+  )
+
+  expect_equal(nrow(result), 3)
+  expect_true(all(c("perturbation", "expected_result_bma") %in% colnames(result)))
+  expect_equal(result$perturbation, c(1, 0, 2))
+  expect_equal(result$expected_result_bma, c(1, 0, 1))
+})
