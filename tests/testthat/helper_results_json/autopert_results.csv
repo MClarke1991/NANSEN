@@ -1,0 +1,25 @@
+cell_line,paper_title,Paper DOI,source,experiment_overview,experiment_particular,gene,perturbation,expectation_bma,lo,hi,mean_result,diff
+a,a,a,a,a,a,growth_factor,1,NA,1,1,1,NA
+a,a,a,a,a,a,b,0,NA,0,0,0,NA
+a,a,a,a,a,a,c,NA,1,0,0,0,-1
+a,a,a,a,a,a,output_a,NA,1,0,0,0,-1
+a,a,a,a,a,b,growth_factor,1,NA,1,1,1,NA
+a,a,a,a,a,b,b,1,NA,1,1,1,NA
+a,a,a,a,a,b,c,NA,0,0,0,0,0
+a,a,a,a,a,b,output_a,NA,0,0,0,0,0
+c,c,c,c,c,c,growth_factor,1,NA,1,1,1,NA
+c,c,c,c,c,c,c,0,NA,0,0,0,NA
+c,c,c,c,c,c,b,NA,1,2,2,2,1
+c,c,c,c,c,c,output_a,NA,0,0,0,0,0
+a,NA,NA,a,NA,a,a,NA,NA,1,1,1,NA
+a,NA,NA,a,NA,a,output_b,NA,NA,2,2,2,NA
+a,NA,NA,a,NA,a,d,NA,NA,2,2,2,NA
+a,NA,NA,a,NA,a,e,NA,NA,1,1,1,NA
+a,NA,NA,a,NA,b,a,NA,NA,1,1,1,NA
+a,NA,NA,a,NA,b,output_b,NA,NA,2,2,2,NA
+a,NA,NA,a,NA,b,d,NA,NA,2,2,2,NA
+a,NA,NA,a,NA,b,e,NA,NA,1,1,1,NA
+c,NA,NA,c,NA,c,a,NA,NA,1,1,1,NA
+c,NA,NA,c,NA,c,output_b,NA,NA,2,2,2,NA
+c,NA,NA,c,NA,c,d,NA,NA,2,2,2,NA
+c,NA,NA,c,NA,c,e,NA,NA,1,1,1,NA
