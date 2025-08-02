@@ -252,14 +252,14 @@ make_pair_muts <- function(netw_variables, node_col = "name") {
     return(pairs)
 }
 
-##' Import drugs and sanitise drug names so they cannot cause problems
-##' when converted to file names
-##'
-##' @title import_drugs_clean
-##' @param drug_path path to drugs CSV
-##' @param show_col_types Mutes printing of columns types using readr::read_csv
-##' @return tibble of drugs with drug names sanitised
-##' @export
+#' Import drugs and sanitise drug names so they cannot cause problems
+#' when converted to file names
+#'
+#' @title import_drugs_clean
+#' @param drug_path path to drugs CSV
+#' @param show_col_types Mutes printing of columns types using readr::read_csv
+#' @return tibble of drugs with drug names sanitised
+#' @export
 import_drugs_clean <- function(drug_path, show_col_types = FALSE) {
     drugs <- readr::read_csv(drug_path,
                              show_col_types = show_col_types, lazy = FALSE) %>%
@@ -779,18 +779,18 @@ check_conflicts <- function(results, backgrounds, node_col = "name", drugs = NUL
     return(conflicts)
 }
 
-##' Generate results directory for combinations in a standardised way,
-##' so that visualisation scripts can generate one that lines up with
-##' \code{\link{combo}} without combo having to pass it on
+#' Generate results directory for combinations in a standardised way,
+#' so that visualisation scripts can generate one that lines up with
+#' \code{\link{combo}} without combo having to pass it on
 
-##' @title get_combo_results_dir
-##' @param results_prefix prefix to results directory
-##' @param project_path project path for git SHA log, point to git
-##'     repo of the network and specification being tested
-##' @param out_dir directory where all output files should be stored
-##' @param netw_file_path path to network JSON file
-##' @return string with path to results directory
-##' @export
+#' @title get_combo_results_dir
+#' @param results_prefix prefix to results directory
+#' @param project_path project path for git SHA log, point to git
+#'     repo of the network and specification being tested
+#' @param out_dir directory where all output files should be stored
+#' @param netw_file_path path to network JSON file
+#' @return string with path to results directory
+#' @export
 get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_file_path) {
     run_dir <- paste(results_prefix,
                                        stringr::str_remove(
@@ -809,43 +809,43 @@ get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_fi
 }
 
 
-##' Run all node and drug combinations (separately) for a given
-##' network on a set of mutational backgrounds
-##'
-##' @title combo
-##' @param netw_file_path path to network JSON file
-##' @param backgrounds_path path to backgrounds (CSV)
-##' @param drug_path path to list of drug perturbations to be applied
-##'     in addition to node perturbations (CSV)
-##' @param bma_path path to BMA command line installation, defaults to
-##'     the path produced by the one click installer (.msi). The path
-##'     is automatically normalized for cross-platform compatibility.
-##' @param results_prefix prefix to results directory
-##' @param out_dir output directory
-##' @param project_path project path for git SHA log, point to git
-##'     repo of the network and specification being tested
-##' @param node_col_name name of the node column in the mutational
-##'     background file and drug file
-##' @param use_vmcai Use VMCAI mode
-##' @param pheno_only Only evaluate the level of phenotype nodes
-##'     supplied by the phenotypes argument. Speeds up processing step
-##'     and reduces size of final processed_data file
-##' @param phenotypes list of phenotypes in format `c("node_name_1",
-##'     "node_name_2")` for use if pheno_only is TRUE
-##' @param use_exclusions exclude perturbation of a set of nodes
-##'     supplied to the `exclusions_path` argument. Speeds up
-##'     processing by skipping those nodes which are uninteresting to
-##'     perturb e.g. phenotype nodes
-##' @param exclusions_path list of nodes in format `c("node_name_1",
-##'     "node_name_2")` for use if use_exclusions is TRUE
-##' @param drug_conflict_overide allow overide of drug conflicts
-##'     check, only used for testing
-##' @param skip_drugs_single  skip drug perturbations
-##' @param skip_drugs_pairs skip drug perturbations
-##' @param skip_all_pairs skip pairwise combinations of nodes
-##' @param log_filename filename for log file
-##' @return write a `parsed_results.csv` and `processed_results.csv`
-##' @export
+#' Run all node and drug combinations (separately) for a given
+#' network on a set of mutational backgrounds
+#'
+#' @title combo
+#' @param netw_file_path path to network JSON file
+#' @param backgrounds_path path to backgrounds (CSV)
+#' @param drug_path path to list of drug perturbations to be applied
+#'     in addition to node perturbations (CSV)
+#' @param bma_path path to BMA command line installation, defaults to
+#'     the path produced by the one click installer (.msi). The path
+#'     is automatically normalized for cross-platform compatibility.
+#' @param results_prefix prefix to results directory
+#' @param out_dir output directory
+#' @param project_path project path for git SHA log, point to git
+#'     repo of the network and specification being tested
+#' @param node_col_name name of the node column in the mutational
+#'     background file and drug file
+#' @param use_vmcai Use VMCAI mode
+#' @param pheno_only Only evaluate the level of phenotype nodes
+#'     supplied by the phenotypes argument. Speeds up processing step
+#'     and reduces size of final processed_data file
+#' @param phenotypes list of phenotypes in format `c("node_name_1",
+#'     "node_name_2")` for use if pheno_only is TRUE
+#' @param use_exclusions exclude perturbation of a set of nodes
+#'     supplied to the `exclusions_path` argument. Speeds up
+#'     processing by skipping those nodes which are uninteresting to
+#'     perturb e.g. phenotype nodes
+#' @param exclusions_path list of nodes in format `c("node_name_1",
+#'     "node_name_2")` for use if use_exclusions is TRUE
+#' @param drug_conflict_overide allow overide of drug conflicts
+#'     check, only used for testing
+#' @param skip_drugs_single  skip drug perturbations
+#' @param skip_drugs_pairs skip drug perturbations
+#' @param skip_all_pairs skip pairwise combinations of nodes
+#' @param log_filename filename for log file
+#' @return write a `parsed_results.csv` and `processed_results.csv`
+#' @export
 combo <- function(netw_file_path,
                   backgrounds_path,
                   drug_path,
@@ -893,8 +893,6 @@ combo <- function(netw_file_path,
     futile.logger::flog.appender(
                        futile.logger::appender.file(log_file),
                        name = log_file)
-    ## Capture all unflogged warnings and errors in flogger
-    ## https://github.com/zatonovo/futile.logger/issues/36
     options(error = function()
         futile.logger::flog.warn(geterrmessage(), name = log_file))
     futile.logger::flog.info("Start", name = log_file)
@@ -915,9 +913,6 @@ combo <- function(netw_file_path,
     }
     netw_variables <- get_netw_variables(netw_file_path = netw_file_path) %>%
         dplyr::rename("node" = "name")
-    ## dplyr::mutate(node = janitor::make_clean_names(node)) #TEMP
-
-    ## TEMP get rid of weird character encoding of RangeTo in json
     netw_variables <- netw_variables %>%
         dplyr::mutate(range_to = as.integer(range_to))
 

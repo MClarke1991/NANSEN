@@ -2,28 +2,28 @@
 
 ## Functions to plot heatmaps for combinations
 
-##' Plot monotherapy heatmap
-##'
-##' @title plot_single
-##' @param df dataframe of processed combination results
-##' @param filename filename to save heatmap
-##' @param results_dir results directory
-##' @param vis_dir subdirectory for heatmaps
-##' @param palette colour palette for heatmaps to be provided to
-##'     RColorBrewer::brewer.pal
-##' @param cluster_rows cluster_rows TRUE/FALSE
-##' @param pheno phenotype to visualise. Selects from `node` column of
-##'     processed results
-##' @param levs level of the mutations to visualise e.g. 0,
-##'     c(1:max_level) or "" for drugs
-##' @param h height of heatmap
-##' @param w width of heatmap
-##' @param fontsize fontsize of heatmap
-##' @param node_col node column name in imported data
-##' @param na_col set colour for na
-##' @return heatmap saved to drive, and a ggplot object for further
-##'     processing e.g. with patchwork
-##' @export
+#' Plot monotherapy heatmap
+#'
+#' @title plot_single
+#' @param df dataframe of processed combination results
+#' @param filename filename to save heatmap
+#' @param results_dir results directory
+#' @param vis_dir subdirectory for heatmaps
+#' @param palette colour palette for heatmaps to be provided to
+#'     RColorBrewer::brewer.pal
+#' @param cluster_rows cluster_rows TRUE/FALSE
+#' @param pheno phenotype to visualise. Selects from `node` column of
+#'     processed results
+#' @param levs level of the mutations to visualise e.g. 0,
+#'     c(1:max_level) or "" for drugs
+#' @param h height of heatmap
+#' @param w width of heatmap
+#' @param fontsize fontsize of heatmap
+#' @param node_col node column name in imported data
+#' @param na_col set colour for na
+#' @return heatmap saved to drive, and a ggplot object for further
+#'     processing e.g. with patchwork
+#' @export
 plot_single <- function(df, filename, results_dir, vis_dir, palette,
                         cluster_rows = TRUE, pheno, levs, h = 20,
                         w = 6, fontsize = 10, node_col = "node", na_col = "black") {
@@ -107,7 +107,7 @@ plot_single <- function(df, filename, results_dir, vis_dir, palette,
         tibble::column_to_rownames("background")
 
     ## Need to feed only the range of colours needed by baseline or
-    ## else pheatmap rescales, factor of 2 is because I double the
+    ## else pheatmap rescales, factor of 2 is because we double the
     ## number of colours to allow difference in shade for a .5 change
     ## in phenotype level
     colour_range_baseline <- colours_full[(2 * min(dplyr::pull(baseline_annotation, baseline)) + 1):
@@ -174,15 +174,15 @@ plot_single <- function(df, filename, results_dir, vis_dir, palette,
     p
     return(ggplotify::as.ggplot(p))
 }
-##' Plot pair therapy heatmap
-##'
-##' @title plot_double
-##' @inheritParams plot_single
-##' @param cluster_cols cluster columns (TRUE/FALSE)
-##' @param bkg background to plot
-##' @return heatmap saved to drive, and a ggplot object for further
-##'     processing e.g. with patchwork
-##' @export
+#' Plot pair therapy heatmap
+#'
+#' @title plot_double
+#' @inheritParams plot_single
+#' @param cluster_cols cluster columns (TRUE/FALSE)
+#' @param bkg background to plot
+#' @return heatmap saved to drive, and a ggplot object for further
+#'     processing e.g. with patchwork
+#' @export
 plot_double <- function(df, filename, results_dir, vis_dir, palette,
                         pheno, cluster_rows = TRUE,
                         cluster_cols = TRUE, levs, bkg, h = 25,
@@ -305,17 +305,17 @@ plot_double <- function(df, filename, results_dir, vis_dir, palette,
     return(ggplotify::as.ggplot(p))
 }
 
-##' Plot a monotherapy heatmap with a colourscheme optimised for
-##' positive and negative data e.g. for relative levels rather than
-##' absolute
-##'
-##' @title plot_diff_single
-##' @inheritParams plot_single
-##' @param neg_col negative colour
-##' @param pos_col positive colour
-##' @return heatmap saved to drive, and a ggplot object for further
-##'     processing e.g. with patchwork
-##' @export
+#' Plot a monotherapy heatmap with a colourscheme optimised for
+#' positive and negative data e.g. for relative levels rather than
+#' absolute
+#'
+#' @title plot_diff_single
+#' @inheritParams plot_single
+#' @param neg_col negative colour
+#' @param pos_col positive colour
+#' @return heatmap saved to drive, and a ggplot object for further
+#'     processing e.g. with patchwork
+#' @export
 plot_diff_single <- function(df, filename, results_dir, vis_dir,
                              neg_col = "Reds", pos_col = "Blues",
                              cluster_rows = TRUE, pheno, levs, h = 20,
@@ -468,23 +468,23 @@ plot_diff_single <- function(df, filename, results_dir, vis_dir,
     return(ggplotify::as.ggplot(p))
 }
 
-##' Plot a combination heatmap with a colourscheme optimised for
-##' positive and negative data e.g. for relative levels rather than
-##' absolute
-##'
-##' @title plot_diff_double
-##' @inheritParams plot_double
-##' @param cluster_rows cluster rows (TRUE/FALSE)
-##' @param cluster_cols cluster columns (TRUE/FALSE)
-##' @param neg_col negative colour
-##' @param pos_col positive colour
-##' @param mirror Usually data is not mirrored in muta and mutb, and
-##'     so to plot a heatmap we do this within the function. For diff
-##'     plots it is useful to sometimes feed pre-mirrored data, so
-##'     this turns off this step
-##' @return heatmap saved to drive, and a ggplot object for further
-##'     processing e.g. with patchwork
-##' @export
+#' Plot a combination heatmap with a colourscheme optimised for
+#' positive and negative data e.g. for relative levels rather than
+#' absolute
+#'
+#' @title plot_diff_double
+#' @inheritParams plot_double
+#' @param cluster_rows cluster rows (TRUE/FALSE)
+#' @param cluster_cols cluster columns (TRUE/FALSE)
+#' @param neg_col negative colour
+#' @param pos_col positive colour
+#' @param mirror Usually data is not mirrored in muta and mutb, and
+#'     so to plot a heatmap we do this within the function. For diff
+#'     plots it is useful to sometimes feed pre-mirrored data, so
+#'     this turns off this step
+#' @return heatmap saved to drive, and a ggplot object for further
+#'     processing e.g. with patchwork
+#' @export
 plot_diff_double <- function(df, filename, results_dir, vis_dir,
                              neg_col, pos_col,
                              pheno, cluster_rows = FALSE,
@@ -628,18 +628,18 @@ plot_diff_double <- function(df, filename, results_dir, vis_dir,
     return(ggplotify::as.ggplot(p))
 }
 
-##' Loop over plotting of double heatmaps
-##' @title loop_plot_double
-##' @inheritParams plot_double
-##' @param phenos phenotypes to visualise. Selects from `node` column of
-##'     processed results
-##' @param pals colour palettes for heatmaps to be provided to
-##'     RColorBrewer::brewer.pal
-##' @param suffix suffix for filenames
-##' @param drug_type encoded in filename
-##' @param cluster_cols cluster columns (TRUE/FALSE)
-##' @return write heatmaps to file
-##' @export
+#' Loop over plotting of double heatmaps
+#' @title loop_plot_double
+#' @inheritParams plot_double
+#' @param phenos phenotypes to visualise. Selects from `node` column of
+#'     processed results
+#' @param pals colour palettes for heatmaps to be provided to
+#'     RColorBrewer::brewer.pal
+#' @param suffix suffix for filenames
+#' @param drug_type encoded in filename
+#' @param cluster_cols cluster columns (TRUE/FALSE)
+#' @return write heatmaps to file
+#' @export
 loop_plot_double <- function(bkg,
                              df,
                              phenos,
@@ -676,14 +676,14 @@ loop_plot_double <- function(bkg,
                  ))
 }
 
-##' Loop over plotting of double diff heatmaps
-##' @title loop_plot_diff_double
-##' @inheritParams loop_plot_double
-##' @param neg_col negative colour
-##' @param pos_col positive colour
-##' @param cluster_cols cluster columns (TRUE/FALSE)
-##' @return write heatmaps to file
-##' @export
+#' Loop over plotting of double diff heatmaps
+#' @title loop_plot_diff_double
+#' @inheritParams loop_plot_double
+#' @param neg_col negative colour
+#' @param pos_col positive colour
+#' @param cluster_cols cluster columns (TRUE/FALSE)
+#' @return write heatmaps to file
+#' @export
 loop_plot_diff_double <- function(bkg,
                            df,
                            phenos,
@@ -722,33 +722,33 @@ loop_plot_diff_double <- function(bkg,
                               ))
 }
 
-##' plot all heatmaps of a particular type, node, druggable or drug
-##'
-##' @title plot_heatmaps
-##' @inheritParams combo
-##' @inheritParams plot_single
-##' @inheritParams plot_double
-##' @inheritParams combo
-##' @inheritParams get_combo_results_dir
-##' @inheritParams get_netw_variables
-##' @param results_file filename of results file to read
-##' @param cluster_double_cols cluster columns for double heatmaps (TRUE/FALSE)
-##' @param type node, druggable or drug heatmaps
-##' @param background_order order of backgrounds for plotting
-##' @param background_order_neat neat order of backgrounds for plotting
-##' @param neaten_background whether to neaten background names
-##' @param single_fontsize fontsize for monotherapy node perturbation heatmaps
-##' @param single_druggable_fontsize fontsize for monotherapy druggable perturbation heatmaps
-##' @param single_drugs_fontsize fontsize for monotherapy drug perturbation heatmaps
-##' @param double_fontsize fontsize for combination therapy node perturbation heatmaps
-##' @param double_druggable_font_size fontsize for combination therapy druggable perturbation heatmaps
-##' @param double_drugs_font_size fontsize for combination therapy drug perturbation heatmaps
-##' @param h_s height of single heatmaps
-##' @param h_d height of double heatmaps
-##' @param w_s width of single heatmaps
-##' @param w_d width of double heatmaps
-##' @return plot heatmaps and save to directory
-##' @export
+#' plot all heatmaps of a particular type, node, druggable or drug
+#'
+#' @title plot_heatmaps
+#' @inheritParams combo
+#' @inheritParams plot_single
+#' @inheritParams plot_double
+#' @inheritParams combo
+#' @inheritParams get_combo_results_dir
+#' @inheritParams get_netw_variables
+#' @param results_file filename of results file to read
+#' @param cluster_double_cols cluster columns for double heatmaps (TRUE/FALSE)
+#' @param type node, druggable or drug heatmaps
+#' @param background_order order of backgrounds for plotting
+#' @param background_order_neat neat order of backgrounds for plotting
+#' @param neaten_background whether to neaten background names
+#' @param single_fontsize fontsize for monotherapy node perturbation heatmaps
+#' @param single_druggable_fontsize fontsize for monotherapy druggable perturbation heatmaps
+#' @param single_drugs_fontsize fontsize for monotherapy drug perturbation heatmaps
+#' @param double_fontsize fontsize for combination therapy node perturbation heatmaps
+#' @param double_druggable_font_size fontsize for combination therapy druggable perturbation heatmaps
+#' @param double_drugs_font_size fontsize for combination therapy drug perturbation heatmaps
+#' @param h_s height of single heatmaps
+#' @param h_d height of double heatmaps
+#' @param w_s width of single heatmaps
+#' @param w_d width of double heatmaps
+#' @return plot heatmaps and save to directory
+#' @export
 plot_heatmaps <- function(results_file,
                           results_prefix,
                           project_path,
@@ -1015,33 +1015,33 @@ plot_heatmaps <- function(results_file,
            )
 }
 
-##' plot all heatmaps of a particular type, node, druggable or drug
-##'
-##' @title plot_diff_heatmaps
-##' @inheritParams combo
-##' @inheritParams plot_single
-##' @inheritParams plot_double
-##' @param results_file filename of results file to read
-##' @param neg_col negative colour
-##' @param pos_col positive colour
-##' @param cluster_double_cols cluster columns for double heatmaps (TRUE/FALSE)
-##' @param phenotypes list of phenotypes in format `c("node_name_1", "node_name_2")` for use if pheno_only is TRUE
-##' @param type node, druggable or drug heatmaps
-##' @param background_order order of backgrounds for plotting
-##' @param background_order_neat neat order of backgrounds for plotting
-##' @param neaten_background whether to neaten background names
-##' @param single_fontsize fontsize for monotherapy node perturbation heatmaps
-##' @param single_druggable_fontsize fontsize for monotherapy druggable perturbation heatmaps
-##' @param single_drugs_fontsize fontsize for monotherapy drug perturbation heatmaps
-##' @param double_fontsize fontsize for combination therapy node perturbation heatmaps
-##' @param double_druggable_font_size fontsize for combination therapy druggable perturbation heatmaps
-##' @param double_drugs_font_size fontsize for combination therapy drug perturbation heatmaps
-##' @param h_s height of single heatmaps
-##' @param h_d height of double heatmaps
-##' @param w_s width of single heatmaps
-##' @param w_d width of double heatmaps
-##' @return plot heatmaps and save to directory
-##' @export
+#' plot all heatmaps of a particular type, node, druggable or drug
+#'
+#' @title plot_diff_heatmaps
+#' @inheritParams combo
+#' @inheritParams plot_single
+#' @inheritParams plot_double
+#' @param results_file filename of results file to read
+#' @param neg_col negative colour
+#' @param pos_col positive colour
+#' @param cluster_double_cols cluster columns for double heatmaps (TRUE/FALSE)
+#' @param phenotypes list of phenotypes in format `c("node_name_1", "node_name_2")` for use if pheno_only is TRUE
+#' @param type node, druggable or drug heatmaps
+#' @param background_order order of backgrounds for plotting
+#' @param background_order_neat neat order of backgrounds for plotting
+#' @param neaten_background whether to neaten background names
+#' @param single_fontsize fontsize for monotherapy node perturbation heatmaps
+#' @param single_druggable_fontsize fontsize for monotherapy druggable perturbation heatmaps
+#' @param single_drugs_fontsize fontsize for monotherapy drug perturbation heatmaps
+#' @param double_fontsize fontsize for combination therapy node perturbation heatmaps
+#' @param double_druggable_font_size fontsize for combination therapy druggable perturbation heatmaps
+#' @param double_drugs_font_size fontsize for combination therapy drug perturbation heatmaps
+#' @param h_s height of single heatmaps
+#' @param h_d height of double heatmaps
+#' @param w_s width of single heatmaps
+#' @param w_d width of double heatmaps
+#' @return plot heatmaps and save to directory
+#' @export
 plot_diff_heatmaps <- function(results_file,
                                results_prefix,
                                project_path,

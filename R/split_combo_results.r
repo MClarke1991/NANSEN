@@ -1,15 +1,15 @@
 ## Copyright 2023 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
 
-##' Split combination results into node, druggable and drug
-##' perturbations and optionally calculate the difference between one
-##' positive and one negative characteristic e.g. survival
-##'
-##' @title split_combo_results
-##' @inheritParams combo
-##' @return write the results, with survival if enabled, for node,
-##'     druggable (only nodes for which there are drugs) and drug
-##'     perturbations
-##' @export
+#' Split combination results into node, druggable and drug
+#' perturbations and optionally calculate the difference between one
+#' positive and one negative characteristic e.g. survival
+#'
+#' @title split_combo_results
+#' @inheritParams combo
+#' @return write the results, with survival if enabled, for node,
+#'     druggable (only nodes for which there are drugs) and drug
+#'     perturbations
+#' @export
 split_combo_results <- function(results_prefix,
                                 project_path,
                                 out_dir,

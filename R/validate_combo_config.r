@@ -1,10 +1,10 @@
 ## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
 
-##' Validate combo configuration from TOML file
-##' @title validate_combo_config
-##' @param config_path path to TOML configuration file
-##' @return list with validated configuration parameters
-##' @export
+#' Validate combo configuration from TOML file
+#' @title validate_combo_config
+#' @param config_path path to TOML configuration file
+#' @return list with validated configuration parameters
+#' @export
 validate_combo_config <- function(config_path) {
     
     if (!file.exists(config_path)) {

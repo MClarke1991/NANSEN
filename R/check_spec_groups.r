@@ -1,28 +1,28 @@
 ## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
 
-##' Test whether separate experiments have the same grouping factor,
-##' and so would be run together in spec testing and possibly give
-##' misleading results
-##'
-##' All rows of an experiment are expected to be together. Therefore the
-##' group index for each row should appear all in a group, and at most
-##' once. First remove all consecutive duplicates, but not
-##' non-consecutive duplicates i.e. 3 3 3 4 4 4 3 3 3 becomes 3 4
-##' 3. If there is a non-consecutive duplication, this suggests two
-##' seperate experiments share a group key, and the spec should be
-##' ammended either a) to put all experimental specification for a
-##' single experiment on consecutive rows, or b to change the
-##' experiment_particular to make clear the difference between the two
-##' experiments. Remove consecutive dupes, find the remaining
-##' dupes, match this to the group keys to give a descriptive error
-##' message of where the duplications are, and throw and error to
-##' force this to be fixed.
-##'
-##' @title check_spec_groups
-##' @param spec specification loaded through \code{\link{import_spec}}
-##' @param group_vars columns of specification used to group experiments
-##' @return Stop if specification grouping likely to misgroup experiments
-##' @export
+#' Test whether separate experiments have the same grouping factor,
+#' and so would be run together in spec testing and possibly give
+#' misleading results
+#'
+#' All rows of an experiment are expected to be together. Therefore the
+#' group index for each row should appear all in a group, and at most
+#' once. First remove all consecutive duplicates, but not
+#' non-consecutive duplicates i.e. 3 3 3 4 4 4 3 3 3 becomes 3 4
+#' 3. If there is a non-consecutive duplication, this suggests two
+#' seperate experiments share a group key, and the spec should be
+#' ammended either a) to put all experimental specification for a
+#' single experiment on consecutive rows, or b to change the
+#' experiment_particular to make clear the difference between the two
+#' experiments. Remove consecutive dupes, find the remaining
+#' dupes, match this to the group keys to give a descriptive error
+#' message of where the duplications are, and throw and error to
+#' force this to be fixed.
+#'
+#' @title check_spec_groups
+#' @param spec specification loaded through \code{\link{import_spec}}
+#' @param group_vars columns of specification used to group experiments
+#' @return Stop if specification grouping likely to misgroup experiments
+#' @export
 check_spec_groups <- function(spec, group_vars) {
 
     gspec <- spec %>%

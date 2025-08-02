@@ -1,32 +1,32 @@
 ## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
 
 
-##' Run autoperturbation test on a given network and specification
-##' @title autopert
-##' @param netw_file_path path to network JSON file
-##' @param spec_path path to specification csv file
-##' @param bma_path path to BMA command line installation, defaults to
-##'     the path produced by the one click installer (.msi). The path
-##'     is automatically normalized for cross-platform compatibility.
-##' @param group_vars variables used to group rows of the
-##'     specification into a single experiment. Defaults to "source"
-##'     (citation key or other unique identifier of source of
-##'     experimental data), "cell_line" (cell line or tissue used,
-##'     which determines background mutations for the experiment),
-##'     "experiment_particular" (details of the experiment
-##'     e.g. "Application of cisplatin")
-##' @param out_dir path where all output files should be stored
-##' @param nosat option to run without passing to SAT solver in case
-##'     of VMCAI not finding a fixed-point attractor.
-##' @param loserum EXPERIMENTAL option to set serum nodes to 1
-##' @param missing_nodes_perturbed_overide option to override check
-##'     for pertrubred nodes that are missing from network
-##' @param missing_nodes_expected_overide option to override check for
-##'     expected nodes that are missing from network
-##' @param project_path project path for git SHA log, point to git
-##'     repo of the network and specification being tested
-##' @return Writes out results as JSON, CSV and PNG
-##' @export
+#' Run autoperturbation test on a given network and specification
+#' @title autopert
+#' @param netw_file_path path to network JSON file
+#' @param spec_path path to specification csv file
+#' @param bma_path path to BMA command line installation, defaults to
+#'     the path produced by the one click installer (.msi). The path
+#'     is automatically normalized for cross-platform compatibility.
+#' @param group_vars variables used to group rows of the
+#'     specification into a single experiment. Defaults to "source"
+#'     (citation key or other unique identifier of source of
+#'     experimental data), "cell_line" (cell line or tissue used,
+#'     which determines background mutations for the experiment),
+#'     "experiment_particular" (details of the experiment
+#'     e.g. "Application of cisplatin")
+#' @param out_dir path where all output files should be stored
+#' @param nosat option to run without passing to SAT solver in case
+#'     of VMCAI not finding a fixed-point attractor.
+#' @param loserum EXPERIMENTAL option to set serum nodes to 1
+#' @param missing_nodes_perturbed_overide option to override check
+#'     for pertrubred nodes that are missing from network
+#' @param missing_nodes_expected_overide option to override check for
+#'     expected nodes that are missing from network
+#' @param project_path project path for git SHA log, point to git
+#'     repo of the network and specification being tested
+#' @return Writes out results as JSON, CSV and PNG
+#' @export
 autopert <- function(netw_file_path,
                      spec_path,
                      bma_path =
@@ -71,8 +71,6 @@ autopert <- function(netw_file_path,
         name = log_file
     )
     futile.logger::flog.threshold(futile.logger::flog.threshold(), name = log_file)
-    ## Capture all unflogged warnings and errors in flogger
-    ## https://github.com/zatonovo/futile.logger/issues/36
     options(error = function() {
         futile.logger::flog.warn(
             geterrmessage(),
@@ -93,23 +91,9 @@ autopert <- function(netw_file_path,
         name = log_file
     )
 
-
-    ## Functions ----
-
-    ## TODO Better column name for expectation_bma as confusing with
-    ## existing expected_result_bma
-
-    ## TODO Improve this check, do I need to mke new columns (especially in
-    ## else block)
-
-
-
-
-
     ## ----- Import Data -------
 
     netw_variables <- NANSEN::get_netw_variables(netw_file_path)
-    ## TEMP get rid of weird character encoding of RangeTo in json
     netw_variables <- netw_variables %>%
         dplyr::mutate(range_to = as.integer(range_to))
 
@@ -166,8 +150,6 @@ autopert <- function(netw_file_path,
             num_exp_perts = dplyr::n()
         )
 
-    ## PoC get background
-    ## TODO Add warning if there is background missing for a cell line in spec
     commands <- spec_commands %>%
         dplyr::mutate(
             command = paste0(spec_command),
@@ -186,7 +168,6 @@ autopert <- function(netw_file_path,
             format =
                 " [:bar] :percent eta: :eta elapsed: :elapsedfull"
         ) # Initialise progress bar
-        ## for (i in 1:nrow(commands_short)) {
         for (i in seq_len(nrow(commands_short))) {
             shell(paste0(
                 bma_path,
@@ -293,10 +274,7 @@ autopert <- function(netw_file_path,
 
 
     results_score <- results %>%
-        dplyr::summarise(score = sum(abs(diff), na.rm = TRUE)) # TODO Do we want
-    # na.rm to be here,
-    # is this likely to
-    # cause problems?
+        dplyr::summarise(score = sum(abs(diff), na.rm = TRUE)) 
 
     futile.logger::flog.info(
         paste0(
@@ -313,11 +291,6 @@ autopert <- function(netw_file_path,
     ## remove rows of results where there was neither a perturbation
     ## nor an expected result, as makes harder to compare to original
     ## spec
-
-    ## TODO Write out a full results, results only with genes I meant to
-    ## pert included, and only errors. And print score somewhere for long
-    ## term plotting. And write out metadata e.g. time run, network version
-    ## etc.
 
     results_short_node_summary <- results_short %>%
         dplyr::select(gene, diff) %>%

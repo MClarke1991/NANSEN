@@ -82,9 +82,6 @@ parse_biocheck_dir <- function(dir, netw_variables, rec = FALSE) {
                                .f = function(x) {
                                    pb$tick()
                                    parse_biocheck_json(file.path(dir, x))
-                                 # Note that covr throws error here, but I think
-                                 # new version of rlang is breaking it
-                                 # see https://github.com/r-lib/covr/issues/377
                                }
                     )
     ) %>%
@@ -94,12 +91,12 @@ parse_biocheck_dir <- function(dir, netw_variables, rec = FALSE) {
   return(data)
 }
 
-##' @title parse_biocheck_dir_apend
-##' @export
-##' @param existing_file filename of existing file to apend to
-##' @param dir directory of results JSON files
-##' @param netw_variables network variables from `get_netw_variables`
-##' @param rec apply recursively over a directory over directories
+#' @title parse_biocheck_dir_apend
+#' @export
+#' @param existing_file filename of existing file to apend to
+#' @param dir directory of results JSON files
+#' @param netw_variables network variables from `get_netw_variables`
+#' @param rec apply recursively over a directory over directories
 parse_biocheck_dir_apend <- function(existing_file, dir, netw_variables, rec = FALSE) {
     files_all <- dir(dir, pattern = "\\.json$", recursive = rec) %>%
         purrr::discard(~stringr::str_detect(.x, "_cex.json")) # Remove CEX files
@@ -129,9 +126,6 @@ parse_biocheck_dir_apend <- function(existing_file, dir, netw_variables, rec = F
                                          .f = function(x) {
                                              pb$tick()
                                              parse_biocheck_json(file.path(dir, x))
-                                        # Note that covr throws error here, but I think
-                                        # new version of rlang is breaking it
-                                        # see https://github.com/r-lib/covr/issues/377
                                          }
                                          )
                           ) %>%
