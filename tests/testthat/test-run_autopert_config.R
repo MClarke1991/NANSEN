@@ -24,7 +24,30 @@ test_that("run_autopert_config.r works with valid config", {
   )
 
   config_file <- file.path(temp_dir, "test_config.toml")
-  configr::write.config(valid_config, config_file, file.type = "toml")
+  
+  # Write TOML directly to avoid configr NULL handling issues
+  toml_content <- sprintf('
+netw_file_path = "%s"
+spec_path = "%s" 
+out_dir = "%s"
+nosat = %s
+loserum = %s
+missing_nodes_perturbed_overide = %s
+missing_nodes_expected_overide = %s
+project_path = ""
+group_vars = [%s]
+',
+    gsub("\\\\", "/", valid_config$netw_file_path),
+    gsub("\\\\", "/", valid_config$spec_path),
+    valid_config$out_dir,
+    tolower(valid_config$nosat),
+    tolower(valid_config$loserum), 
+    tolower(valid_config$missing_nodes_perturbed_overide),
+    tolower(valid_config$missing_nodes_expected_overide),
+    paste0('"', valid_config$group_vars, '"', collapse = ", ")
+  )
+  
+  writeLines(toml_content, config_file)
 
   # Clean up on exit
   on.exit(if (file.exists(config_file)) file.remove(config_file))

@@ -1,20 +1,18 @@
 # validate_autopert_config errors on missing config file
 
     Code
-      validate_autopert_config("nonexistent_config.json")
+      validate_autopert_config("nonexistent_config.toml")
     Condition
       Error in `validate_autopert_config()`:
-      ! Config file not found: nonexistent_config.json
+      ! Config file not found: nonexistent_config.toml
 
 # validate_autopert_config errors on invalid JSON
 
     Code
-      validate_autopert_config(invalid_json_file)
+      validate_autopert_config(invalid_toml_file)
     Condition
-      Error in `value[[3L]]()`:
-      ! Invalid JSON in config file: lexical error: invalid char in json text.
-                                           { invalid json  
-                           (right here) ------^
+      Error in `validate_autopert_config()`:
+      ! Missing required config fields: netw_file_path, spec_path, out_dir
 
 # validate_autopert_config errors on missing required fields
 

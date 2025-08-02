@@ -27,7 +27,37 @@ test_that("run_combo_config.r works with valid config", {
   )
 
   config_file <- file.path(temp_dir, "test_combo_config.toml")
-  configr::write.config(valid_config, config_file, file.type = "toml")
+  
+  # Write TOML directly to avoid configr issues with complex lists
+  toml_content <- sprintf('
+netw_file_path = "%s"
+backgrounds_path = "%s"
+out_dir = "%s"
+skip_autopert = %s
+skip_combo_sim = %s
+skip_heatmaps = %s
+skip_heatmaps_uc = %s
+pheno_only = %s
+phenotypes = [%s]
+project_path = "%s"
+node_col_name = "%s"
+use_vmcai = %s
+',
+    gsub("\\\\", "/", valid_config$netw_file_path),
+    gsub("\\\\", "/", valid_config$backgrounds_path),
+    valid_config$out_dir,
+    tolower(valid_config$skip_autopert),
+    tolower(valid_config$skip_combo_sim),
+    tolower(valid_config$skip_heatmaps),
+    tolower(valid_config$skip_heatmaps_uc),
+    tolower(valid_config$pheno_only),
+    paste0('"', valid_config$phenotypes, '"', collapse = ", "),
+    valid_config$project_path,
+    valid_config$node_col_name,
+    tolower(valid_config$use_vmcai)
+  )
+  
+  writeLines(toml_content, config_file)
 
   # Clean up on exit
   on.exit(if (file.exists(config_file)) file.remove(config_file))
