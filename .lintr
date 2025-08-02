@@ -1,1 +1,5 @@
-linters: linters_with_defaults(indentation_linter = NULL, object_usage_linter = object_usage_linter(skip_with = c("%>%"))) 
+linters: linters_with_defaults(
+  indentation_linter = NULL,
+  object_usage_linter = NULL,
+  line_length_linter = line_length_linter(120)
+)
