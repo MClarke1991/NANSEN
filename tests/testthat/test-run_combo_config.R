@@ -26,8 +26,8 @@ test_that("run_combo_config.r works with valid config", {
     use_vmcai = TRUE
   )
 
-  config_file <- file.path(temp_dir, "test_combo_config.json")
-  jsonlite::write_json(valid_config, config_file, auto_unbox = TRUE)
+  config_file <- file.path(temp_dir, "test_combo_config.toml")
+  configr::write.config(valid_config, config_file, file.type = "toml")
 
   # Clean up on exit
   on.exit(if (file.exists(config_file)) file.remove(config_file))
@@ -76,9 +76,9 @@ test_that("run_combo_config.r handles multiple arguments", {
   # Mock commandArgs to return multiple arguments
   commandArgs <- function(trailingOnly = FALSE) {
     if (trailingOnly) {
-      return(c("config1.json", "config2.json"))
+      return(c("config1.toml", "config2.toml"))
     } else {
-      return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", "config1.json", "config2.json"))
+      return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", "config1.toml", "config2.toml"))
     }
   }
 
@@ -96,9 +96,9 @@ test_that("run_combo_config.r handles nonexistent config file", {
   # Mock commandArgs to return nonexistent file
   commandArgs <- function(trailingOnly = FALSE) {
     if (trailingOnly) {
-      return("nonexistent_combo_config.json")
+      return("nonexistent_combo_config.toml")
     } else {
-      return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", "nonexistent_combo_config.json"))
+      return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", "nonexistent_combo_config.toml"))
     }
   }
 

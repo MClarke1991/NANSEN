@@ -7,11 +7,11 @@
 validate_combo_config(config_path)
 }
 \arguments{
-\item{config_path}{path to JSON configuration file}
+\item{config_path}{path to TOML configuration file}
 }
 \value{
 list with validated configuration parameters
 }
 \description{
-Validate combo configuration from JSON file
+Validate combo configuration from TOML file
 }

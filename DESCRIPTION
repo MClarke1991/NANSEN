@@ -39,7 +39,8 @@ Imports:
     tictoc,
     RColorBrewer,
     pheatmap,
-    ggplotify
+    ggplotify,
+    configr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
