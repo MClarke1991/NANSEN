@@ -183,3 +183,67 @@ test_that("make_bkg_commands_combo throws error for nodes not in network", {
   expect_error(make_bkg_commands_combo(backgrounds, netw_variables),
                "Column id contains NA values at positions: 1")
 })
+
+test_that("make_bkg_commands_combo throws error for non-integer activity values", {
+
+  backgrounds <- tibble::tibble(
+    background = c("test", "test", "test"),
+    name = c("a", "b", "c"),
+    activity = c(0.5, 1.2, 2.7)  # non-integer values
+  )
+
+  netw_variables <- tibble::tibble(
+    name = c("a", "b", "c"),
+    id = c(1, 2, 3),
+    range_from = c(0, 0, 0),
+    range_to = c(2, 2, 2)
+  )
+
+  expect_snapshot(
+    make_bkg_commands_combo(backgrounds, netw_variables),
+    error = TRUE
+  )
+})
+
+test_that("make_bkg_commands_combo works with integer activity values", {
+
+  backgrounds <- tibble::tibble(
+    background = c("test", "test", "test"),
+    name = c("a", "b", "c"),
+    activity = c(0, 1, 2)  # valid integer values
+  )
+
+  netw_variables <- tibble::tibble(
+    name = c("a", "b", "c"),
+    id = c(1, 2, 3),
+    range_from = c(0, 0, 0),
+    range_to = c(2, 2, 2)
+  )
+
+  result <- make_bkg_commands_combo(backgrounds, netw_variables)
+  
+  expect_equal(nrow(result), 1)
+  expect_true(all(c("background", "filename_prefix", "command_arg") %in% colnames(result)))
+  expect_equal(result$background, "test")
+})
+
+test_that("make_bkg_commands_combo handles mix of valid and invalid activity values", {
+
+  backgrounds <- tibble::tibble(
+    background = c("test", "test", "test"),
+    name = c("a", "b", "c"),
+    activity = c(1, 2.5, 3)  # one non-integer value
+  )
+
+  netw_variables <- tibble::tibble(
+    name = c("a", "b", "c"),
+    id = c(1, 2, 3),
+    range_from = c(0, 0, 0),
+    range_to = c(2, 2, 2)
+  )
+
+  expect_snapshot(
+    make_bkg_commands_combo(backgrounds, netw_variables),
+    error = TRUE
+  )
+})

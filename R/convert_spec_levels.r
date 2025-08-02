@@ -33,14 +33,14 @@ convert_spec_levels <- function(spec, log_file) {
                        stringr::str_detect(expected_result_bma, stringr::regex("max", ignore_case = TRUE)) ~
                            as.numeric(range_to),
                        stringr::str_detect(expected_result_bma, stringr::regex("mid", ignore_case = TRUE)) ~
-                           as.numeric((range_to + range_from) / 2),
+                           as.numeric(floor((range_to + range_from) / 2)),
                        stringr::str_detect(expected_result_bma, "[[:digit:]]") ~
                            as.numeric(expected_result_bma),
                        is.na(expected_result_bma)             ~ as.numeric(NA)
                    )
                    )
         futile.logger::flog.info(
-                           message("Converted 'min', 'max','mid' levels to numeric in specification",
+                           message("Converted 'min', 'max','mid' levels to numeric in specification (rounding down)",
                                          call. = FALSE),
                                  name = log_file
                                  )
@@ -56,5 +56,21 @@ name = log_file
             dplyr::mutate(perturbation_bma = perturbation) %>%
             dplyr::mutate(expectation_bma = expected_result_bma)
     }
+
+    # Validate that converted perturbation_bma and expectation_bma columns contain only integers
+    if ("perturbation_bma" %in% colnames(spec_levels)) {
+        perturbation_bma_values <- spec_levels$perturbation_bma
+        if (is.numeric(perturbation_bma_values)) {
+            check_integer_values(perturbation_bma_values, "perturbation_bma", "converted spec values")
+        }
+    }
+
+    if ("expectation_bma" %in% colnames(spec_levels)) {
+        expectation_bma_values <- spec_levels$expectation_bma
+        if (is.numeric(expectation_bma_values)) {
+            check_integer_values(expectation_bma_values, "expectation_bma", "converted spec values")
+        }
+    }
+
     return(spec_levels)
 }

@@ -45,5 +45,21 @@ import_spec <- function(spec_path,
     spec <- dplyr::left_join(spec, netw_variables, by = c("gene" = "name")) %>%
         dplyr::mutate(range_from = as.integer(range_from),
                       range_to = as.integer(range_to))
+    
+    # Validate that perturbation and expected_result_bma columns contain only integers
+    if ("perturbation" %in% colnames(spec)) {
+        perturbation_values <- spec$perturbation
+        if (is.numeric(perturbation_values)) {
+            check_integer_values(perturbation_values, "perturbation", "spec file")
+        }
+    }
+    
+    if ("expected_result_bma" %in% colnames(spec)) {
+        expected_values <- spec$expected_result_bma
+        if (is.numeric(expected_values)) {
+            check_integer_values(expected_values, "expected_result_bma", "spec file")
+        }
+    }
+    
     return(spec)
 }

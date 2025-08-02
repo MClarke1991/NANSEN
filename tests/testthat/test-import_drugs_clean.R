@@ -62,7 +62,7 @@ test_that("import_drugs_clean preserves all original data types", {
   test_drugs <- tibble::tibble(
     drug = c("Test Drug"),
     node = c("test_node"),
-    activity = c(1.5),
+    activity = c(2.0),
     extra_col = c("extra_data")
   )
 
@@ -76,7 +76,7 @@ test_that("import_drugs_clean preserves all original data types", {
   expect_equal(result$extra_col, "extra_data")
 
   # Should preserve numeric types
-  expect_equal(result$activity, 1.5)
+  expect_equal(result$activity, 2.0)
   expect_true(is.numeric(result$activity))
 })
 
@@ -201,4 +201,81 @@ test_that("import_drugs_clean handles missing drug column", {
     import_drugs_clean(temp_file, show_col_types = FALSE),
     "drug"
   )
+})
+
+test_that("import_drugs_clean throws error for non-integer activity values", {
+  temp_file <- tempfile(fileext = ".csv")
+  on.exit(unlink(temp_file))
+
+  # Create test data with non-integer activity values
+  test_drugs <- tibble::tibble(
+    drug = c("Drug1", "Drug2", "Drug3"),
+    node = c("node1", "node2", "node3"),
+    activity = c(0.5, 1.2, 2.8)  # non-integer values
+  )
+
+  readr::write_csv(test_drugs, temp_file)
+
+  expect_snapshot(
+    import_drugs_clean(temp_file, show_col_types = FALSE),
+    error = TRUE
+  )
+})
+
+test_that("import_drugs_clean works with integer activity values", {
+  temp_file <- tempfile(fileext = ".csv")
+  on.exit(unlink(temp_file))
+
+  # Create test data with valid integer activity values
+  test_drugs <- tibble::tibble(
+    drug = c("Drug1", "Drug2", "Drug3", "Drug4"),
+    node = c("node1", "node2", "node3", "node4"),
+    activity = c(0, 1, -1, 100)  # valid integer values
+  )
+
+  readr::write_csv(test_drugs, temp_file)
+
+  result <- import_drugs_clean(temp_file, show_col_types = FALSE)
+
+  expect_equal(nrow(result), 4)
+  expect_true(all(c("drug", "node", "activity") %in% colnames(result)))
+  expect_equal(result$activity, c(0, 1, -1, 100))
+})
+
+test_that("import_drugs_clean handles mix of valid and invalid activity values", {
+  temp_file <- tempfile(fileext = ".csv")
+  on.exit(unlink(temp_file))
+
+  # Create test data with mix of integer and non-integer values
+  test_drugs <- tibble::tibble(
+    drug = c("Drug1", "Drug2", "Drug3"),
+    node = c("node1", "node2", "node3"),
+    activity = c(1, 2.5, 3)  # one non-integer value
+  )
+
+  readr::write_csv(test_drugs, temp_file)
+
+  expect_snapshot(
+    import_drugs_clean(temp_file, show_col_types = FALSE),
+    error = TRUE
+  )
+})
+
+test_that("import_drugs_clean ignores validation when activity column is missing", {
+  temp_file <- tempfile(fileext = ".csv")
+  on.exit(unlink(temp_file))
+
+  # Create test data without activity column
+  test_drugs <- tibble::tibble(
+    drug = c("Drug1", "Drug2"),
+    node = c("node1", "node2"),
+    dosage = c(10.5, 20.7)  # no activity column
+  )
+
+  readr::write_csv(test_drugs, temp_file)
+
+  # Should not error since there's no activity column to validate
+  result <- import_drugs_clean(temp_file, show_col_types = FALSE)
+  expect_equal(nrow(result), 2)
+  expect_true(all(c("drug", "node", "dosage") %in% colnames(result)))
 })
