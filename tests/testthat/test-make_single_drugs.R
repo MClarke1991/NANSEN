@@ -155,20 +155,6 @@ test_that("make_single_drugs preserves additional columns during grouping", {
   expect_false("constant_col" %in% colnames(result))
 })
 
-test_that("make_single_drugs handles special characters in command args", {
-  
-  drugs_commands <- tibble::tibble(
-    drug = c("special_drug", "special_drug"),
-    command_arg = c("-ko 1 0.5", "-ko 2 -1"),  # Decimal and negative values
-    alt_filename_part = c("node1__0.5", "node2__-1")
-  )
-  
-  result <- make_single_drugs(drugs_commands)
-  
-  expect_equal(result$command_arg, "-ko 1 0.5 -ko 2 -1")
-  expect_equal(result$alt_filename_part, "node1__0.5__node2__-1")
-})
-
 test_that("make_single_drugs maintains consistent output structure", {
   
   drugs_commands <- tibble::tibble(

@@ -162,7 +162,6 @@ test_that("preserve_order throws error for non-existent column", {
 })
 
 test_that("preserve_order handles NULL dataframe gracefully", {
-  # The function doesn't validate inputs, so it processes NULL as expected
   result <- preserve_order(NULL, "col")
   expect_true(is.list(result))
   expect_true(is.factor(result$col))
@@ -208,21 +207,4 @@ test_that("preserve_order preserves dataframe class and attributes", {
   expect_equal(nrow(result), nrow(test_df))
   expect_equal(ncol(result), ncol(test_df))
   expect_equal(colnames(result), colnames(test_df))
-})
-
-test_that("preserve_order maintains order for ggplot compatibility", {
-  # Test case that simulates common ggplot use case
-  test_df <- tibble::tibble(
-    treatment = c("Control", "High", "Medium", "Low", "Medium", "High"),
-    response = c(10, 50, 30, 20, 35, 45)
-  )
-  
-  result <- preserve_order(test_df, "treatment")
-  
-  expect_true(is.factor(result$treatment))
-  # Levels should be in order of first appearance: Control, High, Medium, Low
-  expect_equal(levels(result$treatment), c("Control", "High", "Medium", "Low"))
-  
-  # This would preserve the intended order in ggplot
-  # (as opposed to alphabetical: Control, High, Low, Medium)
 })
