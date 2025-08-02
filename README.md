@@ -1,5 +1,5 @@
-# NANSEN
-Repository for NANSEN (Network Analysis aNd ScrEeNing)
+# NANSEN: (Network Analysis aNd ScrEeNing)
+Repository for NANSEN, a package for verification and analysis of biological network models built with [Bio Model Analyzer](http://biomodelanalyzer.org/).
 
 _[Matthew A. Clarke](https://mclarke1991.github.io/), [Pedro Victori](https://www.linkedin.com/in/pedro-victori/), [Jasmin Fisher](https://www.ucl.ac.uk/medical-sciences/divisions/cancer/our-research/computational-cancer-biology)._
 
