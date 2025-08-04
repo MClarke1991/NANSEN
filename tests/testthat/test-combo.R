@@ -10,7 +10,7 @@ if (!dir.exists(temp_dir)) {
 
 bma_path = 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 test_that("combo integration test - Windows only", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   # Create temporary directory for test outputs
   out_dir <- file.path(temp_dir, "combo_test_output")
@@ -88,7 +88,7 @@ test_that("combo integration test - Windows only", {
 })
 
 test_that("combo handles missing network file", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "combo_error_test")
 
@@ -112,7 +112,7 @@ test_that("combo handles missing network file", {
 })
 
 test_that("combo handles missing backgrounds file", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "combo_error_test2")
 
@@ -136,7 +136,7 @@ test_that("combo handles missing backgrounds file", {
 })
 
 test_that("combo handles missing drugs file", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "combo_error_test3")
 
@@ -160,7 +160,7 @@ test_that("combo handles missing drugs file", {
 })
 
 test_that("combo creates expected directory structure", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "combo_structure_test")
 
@@ -209,7 +209,7 @@ test_that("combo creates expected directory structure", {
 })
 
 test_that("combo detects drug conflicts when override is FALSE", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "combo_conflict_test")
 
@@ -237,7 +237,7 @@ test_that("combo detects drug conflicts when override is FALSE", {
 })
 
 test_that("combo runs successfully with non-conflicting drugs", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "combo_no_conflict_test")
 

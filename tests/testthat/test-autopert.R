@@ -8,7 +8,7 @@ if (!dir.exists(temp_dir)) {
 
 bma_path = 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 test_that("autopert integration test - Windows only", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   # Check if BMA executable exists
   # bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
@@ -88,7 +88,7 @@ test_that("autopert integration test - Windows only", {
 })
 
 test_that("autopert handles missing network file", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "autopert_error_test")
 
@@ -110,7 +110,7 @@ test_that("autopert handles missing network file", {
 })
 
 test_that("autopert handles missing specification file", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "autopert_error_test2")
 
@@ -132,7 +132,7 @@ test_that("autopert handles missing specification file", {
 })
 
 test_that("autopert creates expected directory structure", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   out_dir <- file.path(temp_dir, "autopert_structure_test")
 

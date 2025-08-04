@@ -6,8 +6,7 @@
 #' @param netw_file_path path to network JSON file
 #' @param spec_path path to specification csv file
 #' @param bma_path path to BMA command line installation, defaults to
-#'     the path produced by the one click installer (.msi). The path
-#'     is automatically normalized for cross-platform compatibility.
+#'     the path produced by the one click installer (.msi).
 #' @param group_vars variables used to group rows of the
 #'     specification into a single experiment. Defaults to "source"
 #'     (citation key or other unique identifier of source of

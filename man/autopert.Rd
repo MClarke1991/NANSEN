@@ -23,8 +23,7 @@ autopert(
 \item{spec_path}{path to specification csv file}
 
 \item{bma_path}{path to BMA command line installation, defaults to
-the path produced by the one click installer (.msi). The path
-is automatically normalized for cross-platform compatibility.}
+the path produced by the one click installer (.msi).}
 
 \item{out_dir}{path where all output files should be stored}
 

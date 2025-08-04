@@ -8,7 +8,7 @@ if (!dir.exists(temp_dir)) {
 }
 
 test_that("run_autopert_config.r works with valid config", {
-  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA tools")
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA command line tools (BioCheckConsole.exe)")
 
   # Create temporary valid config with absolute paths
   valid_config <- list(
