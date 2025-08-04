@@ -1,15 +1,25 @@
-# NANSEN
-Repository for NANSEN (Network Analysis aNd ScrEeNing)
+# NANSEN: (Network Analysis aNd ScrEeNing)
+Repository for NANSEN, a package for verification and analysis of biological network models built with [Bio Model Analyzer](http://biomodelanalyzer.org/).
 
 _[Matthew A. Clarke](https://mclarke1991.github.io/), [Pedro Victori](https://www.linkedin.com/in/pedro-victori/), [Jasmin Fisher](https://www.ucl.ac.uk/medical-sciences/divisions/cancer/our-research/computational-cancer-biology)._
+
+![NANSEN workflow overview](docs/figure.png)
 
 To use, please install Bio Model Analyzer command line tools from [here](http://biomodelanalyzer.org/#:~:text=View%20Source-,Get%20Standalone,-Alumni), the package will automatically point to the default path for this installation on Windows. 
 
 Use on UNIX systems is experimental, and requires installing the full command-line tools from [here](https://github.com/hallba/BioModelAnalyzer/issues/68). 
 
+Then install NANSEN from GitHub:
+
+```r
+remotes::install_github("jfisher-lab/nansen")
+```
+
+
+
 ## Key Features
 
-NANSEN ("Network Analysis aNd ScrEeNing") is an open–source R package that wraps the **Bio Model Analyzer (BMA)** command-line tools in a tidy, reproducible workflow for verifying, perturbing and systematically screening discrete gene-regulatory network models.
+NANSEN ("Network Analysis aNd ScrEeNing") is an open–source R package that wraps the **[Bio Model Analyzer (BMA)](http://biomodelanalyzer.org/)** command-line tools in a tidy, reproducible workflow for verifying, perturbing and systematically screening discrete gene-regulatory network models.
 
 The package allows modellers and experimentalists to:
 
@@ -24,9 +34,14 @@ The package allows modellers and experimentalists to:
 | -------- | ----------- | ------- |
 | Specification testing | `autopert()` | Runs a full single-node perturbation screen using a network `.json` file and a specification `.csv`.  Automatically writes BMA commands, executes them and parses JSON output back into tidy data frames. |
 | Combination testing | `combo()` + helpers (`make_bkg_commands_combo()`, `make_pair_drugs()`, …) | Screens all pairwise perturbations (node×node, druggable×druggable or drug×drug) across multiple genetic backgrounds. |
+Configuration runners | run_autopert_config.r, run_combo_config.r | One-liner wrappers that read a TOML file and execute an entire workflow.
 | Data import | `import_spec()`, `import_drugs_clean()`, `get_netw_variables()` | Read and sanitise network variables, perturbation sheets and drug mapping files. |
 | Quality control | `check_spec_groups()`, `check_perts_in_range()`, `stop_missing_*()` | Early-exit guards that stop a run when inputs are malformed or biologically impossible. |
 | Visualisation | `plot_*`, `heatmaps.R` | Utility functions for clustered/un-clustered heat-maps and difference plots (single vs double perturbations). |
+Biocheck log parsing | parse_biocheck_json(), parse_biocheck_dir(), parse_biocheck_dir_apend() | Turn raw BMA biocheck logs into tidy tibbles.
+Configuration validators | validate_autopert_config(), validate_combo_config() | Fail if a TOML file is malformed or paths are missing before any simulation starts.
+Result post-processing | process_results() | Summarises combo screens, computes metrics and ranks perturbations.
+
 
 Most functions follow tidyverse conventions and return `tibble` objects for easy downstream manipulation.
 
@@ -51,6 +66,15 @@ autopert(
 )
 ```
 
+Command line usage:
+
+```bash
+Rscript examples/run_autopert_config.r examples/autopert_config_example.toml 
+```
+
+
+
+
 ### 2. Combination perturbation screening – `combo()` & helpers in `combo_funcs.r`
 
 The functions defined in `R/combo_funcs.r` allow exhaustive screening of single and pairwise perturbations—including drug-like interventions—across multiple genetic backgrounds.
@@ -73,6 +97,12 @@ combo(
 )
 ```
 
+Command line usage:
+
+```bash
+Rscript examples/run_combo_config.r examples/combo_config_example.toml
+```
+
 If you use NANSEN in your research, please cite:
 
 ```bibtex
@@ -84,3 +114,4 @@ If you use NANSEN in your research, please cite:
   version = {1.0.0},
   note = {A R package for verification and analysis of biological gene regulatory network models built with Bio Model Analyzer}.
 }
+```

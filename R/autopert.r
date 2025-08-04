@@ -1,32 +1,31 @@
-## Copyright 2022 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2022 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 
-##' Run autoperturbation test on a given network and specification
-##' @title autopert
-##' @param netw_file_path path to network JSON file
-##' @param spec_path path to specification csv file
-##' @param bma_path path to BMA command line installation, defaults to
-##'     the path produced by the one click installer (.msi)
-##' @param group_vars variables used to group rows of the
-##'     specification into a single experiment. Defaults to "source"
-##'     (citation key or other unique identifier of source of
-##'     experimental data), "cell_line" (cell line or tissue used,
-##'     which determines background mutations for the experiment),
-##'     "experiment_particular" (details of the experiment
-##'     e.g. "Application of cisplatin")
-##' @param bma_tools_path path for BMATools development repo
-##' @param out_dir path where all output files should be stored
-##' @param nosat option to run without passing to SAT solver in case
-##'     of VMCAI not finding a fixed-point attractor.
-##' @param loserum EXPERIMENTAL option to set serum nodes to 1
-##' @param missing_nodes_perturbed_overide option to override check
-##'     for pertrubred nodes that are missing from network
-##' @param missing_nodes_expected_overide option to override check for
-##'     expected nodes that are missing from network
-##' @param project_path project path for git SHA log, point to git
-##'     repo of the network and specification being tested
-##' @return Writes out results as JSON, CSV and PNG
-##' @export
+#' Run autoperturbation test on a given network and specification
+#' @title autopert
+#' @param netw_file_path path to network JSON file
+#' @param spec_path path to specification csv file
+#' @param bma_path path to BMA command line installation, defaults to
+#'     the path produced by the one click installer (.msi).
+#' @param group_vars variables used to group rows of the
+#'     specification into a single experiment. Defaults to "source"
+#'     (citation key or other unique identifier of source of
+#'     experimental data), "cell_line" (cell line or tissue used,
+#'     which determines background mutations for the experiment),
+#'     "experiment_particular" (details of the experiment
+#'     e.g. "Application of cisplatin")
+#' @param out_dir path where all output files should be stored
+#' @param nosat option to run without passing to SAT solver in case
+#'     of VMCAI not finding a fixed-point attractor.
+#' @param loserum EXPERIMENTAL option to set serum nodes to 1
+#' @param missing_nodes_perturbed_overide option to override check
+#'     for pertrubred nodes that are missing from network
+#' @param missing_nodes_expected_overide option to override check for
+#'     expected nodes that are missing from network
+#' @param project_path project path for git SHA log, point to git
+#'     repo of the network and specification being tested
+#' @return Writes out results as JSON, CSV and PNG
+#' @export
 autopert <- function(netw_file_path,
                      spec_path,
                      bma_path =
@@ -38,11 +37,11 @@ autopert <- function(netw_file_path,
                      missing_nodes_perturbed_overide = FALSE,
                      missing_nodes_expected_overide = FALSE,
                      project_path = NA,
-                     bma_tools_path = NA,
                      group_vars = c(
                          "source", "cell_line",
                          "experiment_particular"
                      )) {
+
     ## Output files
 
     autopert_dir <- here::here(out_dir, paste("AP_RUN",
@@ -70,8 +69,7 @@ autopert <- function(netw_file_path,
         futile.logger::appender.file(log_file),
         name = log_file
     )
-    ## Capture all unflogged warnings and errors in flogger
-    ## https://github.com/zatonovo/futile.logger/issues/36
+    futile.logger::flog.threshold(futile.logger::flog.threshold(), name = log_file)
     options(error = function() {
         futile.logger::flog.warn(
             geterrmessage(),
@@ -92,23 +90,9 @@ autopert <- function(netw_file_path,
         name = log_file
     )
 
-
-    ## Functions ----
-
-    ## TODO Better column name for expectation_bma as confusing with
-    ## existing expected_result_bma
-
-    ## TODO Improve this check, do I need to mke new columns (especially in
-    ## else block)
-
-
-
-
-
     ## ----- Import Data -------
 
     netw_variables <- NANSEN::get_netw_variables(netw_file_path)
-    ## TEMP get rid of weird character encoding of RangeTo in json
     netw_variables <- netw_variables %>%
         dplyr::mutate(range_to = as.integer(range_to))
 
@@ -148,7 +132,6 @@ autopert <- function(netw_file_path,
     ## get command
     spec_commands <- spec_levels %>%
         dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
-        ## https://stackoverflow.com/a/66253244/10923234
         dplyr::filter(!is.na(perturbation_bma)) %>%
         dplyr::summarise(
             spec_command =
@@ -166,8 +149,6 @@ autopert <- function(netw_file_path,
             num_exp_perts = dplyr::n()
         )
 
-    ## PoC get background
-    ## TODO Add warning if there is background missing for a cell line in spec
     commands <- spec_commands %>%
         dplyr::mutate(
             command = paste0(spec_command),
@@ -186,7 +167,6 @@ autopert <- function(netw_file_path,
             format =
                 " [:bar] :percent eta: :eta elapsed: :elapsedfull"
         ) # Initialise progress bar
-        ## for (i in 1:nrow(commands_short)) {
         for (i in seq_len(nrow(commands_short))) {
             shell(paste0(
                 bma_path,
@@ -283,7 +263,6 @@ autopert <- function(netw_file_path,
                 "Results missing, did you try and get an output without specifying any
     inputs?\n See:\n ",
                 paste(utils::capture.output(print(missing_results)), collapse = "\n")
-                # https://stackoverflow.com/a/26083626
             ),
             name = log_file
         )
@@ -294,10 +273,7 @@ autopert <- function(netw_file_path,
 
 
     results_score <- results %>%
-        dplyr::summarise(score = sum(abs(diff), na.rm = TRUE)) # TODO Do we want
-    # na.rm to be here,
-    # is this likely to
-    # cause problems?
+        dplyr::summarise(score = sum(abs(diff), na.rm = TRUE)) 
 
     futile.logger::flog.info(
         paste0(
@@ -309,20 +285,11 @@ autopert <- function(netw_file_path,
 
     results_mismatch <- results %>%
         dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
-        ## https://stackoverflow.com/a/66253244/10923234
         dplyr::filter(any(diff != 0)) %>%
-        ## see https://stackoverflow.com/a/31027426/10923234, get
-        ## whole experiment when there is an error, not just the line
-        ## with the perturbed gene
         dplyr::filter(!is.na(perturbation) | !is.na(expectation_bma))
     ## remove rows of results where there was neither a perturbation
     ## nor an expected result, as makes harder to compare to original
     ## spec
-
-    ## TODO Write out a full results, results only with genes I meant to
-    ## pert included, and only errors. And print score somewhere for long
-    ## term plotting. And write out metadata e.g. time run, network version
-    ## etc.
 
     results_short_node_summary <- results_short %>%
         dplyr::select(gene, diff) %>%
@@ -359,7 +326,7 @@ autopert <- function(netw_file_path,
     ## Plot ----
     results_plot <- results_short %>%
         dplyr::filter(!is.na(expectation_bma)) %>%
-        tidyr::unite(label, group_vars, gene, sep = "_")
+        tidyr::unite(label, dplyr::all_of(group_vars), gene, sep = "_")
 
     results_plot$label <- factor(results_plot$label,
         levels = results_plot$label
@@ -403,7 +370,9 @@ autopert <- function(netw_file_path,
         ) +
         ggplot2::theme_bw()
     ggplot2::ggsave("results_short_node_summary.png",
-        device = "png"
+        device = "png",
+        height = 7,
+        width = 7,
         # , height = 1500
         # , width = 297
         # , units = "mm"
@@ -428,6 +397,8 @@ autopert <- function(netw_file_path,
         ggplot2::theme_bw()
     ggplot2::ggsave("results_short_node_summary_abs_and_diff.png",
         device = "png"
+        , height = 7
+        , width = 7
         # , height = 1500
         # , width = 297
         # , units = "mm"
@@ -437,7 +408,7 @@ autopert <- function(netw_file_path,
 
 
     results_short %>%
-        tidyr::unite(label, group_vars, sep = "_") %>%
+        tidyr::unite(label, dplyr::all_of(group_vars), sep = "_") %>%
         ## need label to be able to seperate bars, otherwise ggplot groups
         ## automatically and only get one bar per gene
         dplyr::select(label, gene, diff) %>%
@@ -452,7 +423,6 @@ autopert <- function(netw_file_path,
             ),
             position = ggplot2::position_dodge()
         ) +
-        ## See https://stackoverflow.com/a/44068137/10923234
         ggplot2::labs(
             title = "Mismatch between modelled and expected results",
             y = "Difference \n (mean model result - expected)",
@@ -463,6 +433,8 @@ autopert <- function(netw_file_path,
         ggplot2::theme(legend.position = "none")
     ggplot2::ggsave("results_per_pert_per_gene.png",
         device = "png"
+        , height = 7
+        , width = 7
         # , height = 1500
         # , width = 297
         # , units = "mm"

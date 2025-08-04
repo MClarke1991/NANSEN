@@ -14,7 +14,6 @@ autopert(
   missing_nodes_perturbed_overide = FALSE,
   missing_nodes_expected_overide = FALSE,
   project_path = NA,
-  bma_tools_path = NA,
   group_vars = c("source", "cell_line", "experiment_particular")
 )
 }
@@ -24,7 +23,7 @@ autopert(
 \item{spec_path}{path to specification csv file}
 
 \item{bma_path}{path to BMA command line installation, defaults to
-the path produced by the one click installer (.msi)}
+the path produced by the one click installer (.msi).}
 
 \item{out_dir}{path where all output files should be stored}
 
@@ -41,8 +40,6 @@ expected nodes that are missing from network}
 
 \item{project_path}{project path for git SHA log, point to git
 repo of the network and specification being tested}
-
-\item{bma_tools_path}{path for BMATools development repo}
 
 \item{group_vars}{variables used to group rows of the
 specification into a single experiment. Defaults to "source"

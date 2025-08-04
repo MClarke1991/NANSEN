@@ -1,4 +1,4 @@
-## Copyright 2019 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2019 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Get attractor from BioCheck VMCAI results json file
 #'
@@ -16,7 +16,7 @@
 #' @export
 parse_biocheck_json <- function(filepath){
   df <- jsonlite::fromJSON(filepath) %>%
-    magrittr::extract2("Ticks") %>% # see https://stackoverflow.com/a/27100797/10923234
+    magrittr::extract2("Ticks") %>%
     dplyr::filter(.data$Time == max(.data$Time)) %>%
     tidyr::unnest(cols = c("Variables"))
   return(df)
@@ -63,6 +63,11 @@ parse_biocheck_json <- function(filepath){
 parse_biocheck_dir <- function(dir, netw_variables, rec = FALSE) {
   files <- dir(dir, pattern = "\\.json$", recursive = rec) %>%
     purrr::discard(~stringr::str_detect(.x, "_cex.json")) # Remove CEX files
+
+  if (length(files) == 0) {
+    stop("No JSON files found in the specified directory.")
+  }
+
   pb <- progress::progress_bar$new(total = length(files),
                                    force = TRUE,
                                    clear = FALSE,
@@ -77,9 +82,6 @@ parse_biocheck_dir <- function(dir, netw_variables, rec = FALSE) {
                                .f = function(x) {
                                    pb$tick()
                                    parse_biocheck_json(file.path(dir, x))
-                                 # Note that covr throws error here, but I think
-                                 # new version of rlang is breaking it
-                                 # see https://github.com/r-lib/covr/issues/377
                                }
                     )
     ) %>%
@@ -89,17 +91,17 @@ parse_biocheck_dir <- function(dir, netw_variables, rec = FALSE) {
   return(data)
 }
 
-##' @title parse_biocheck_dir_apend
-##' @export
-##' @param existing_file filename of existing file to apend to
-##' @param dir directory of results JSON files
-##' @param netw_variables network variables from `get_netw_variables`
-##' @param rec apply recursively over a directory over directories
+#' @title parse_biocheck_dir_apend
+#' @export
+#' @param existing_file filename of existing file to apend to
+#' @param dir directory of results JSON files
+#' @param netw_variables network variables from `get_netw_variables`
+#' @param rec apply recursively over a directory over directories
 parse_biocheck_dir_apend <- function(existing_file, dir, netw_variables, rec = FALSE) {
     files_all <- dir(dir, pattern = "\\.json$", recursive = rec) %>%
         purrr::discard(~stringr::str_detect(.x, "_cex.json")) # Remove CEX files
 
-    existing_results <- readr::read_csv(existing_file, col_types = cols(formula = "c"),
+    existing_results <- readr::read_csv(existing_file, col_types = readr::cols(formula = "c"),
                                         lazy = FALSE) %>%
         dplyr::mutate(formula = tidyr::replace_na(formula, ""))
     files_done <- dplyr::pull(existing_results, filename) %>%
@@ -124,9 +126,6 @@ parse_biocheck_dir_apend <- function(existing_file, dir, netw_variables, rec = F
                                          .f = function(x) {
                                              pb$tick()
                                              parse_biocheck_json(file.path(dir, x))
-                                        # Note that covr throws error here, but I think
-                                        # new version of rlang is breaking it
-                                        # see https://github.com/r-lib/covr/issues/377
                                          }
                                          )
                           ) %>%
@@ -134,7 +133,7 @@ parse_biocheck_dir_apend <- function(existing_file, dir, netw_variables, rec = F
             janitor::clean_names() %>%
             dplyr::left_join(netw_variables, by = "id") # get human readable gene names
 
-        parsed <- bind_rows(existing_results, data)
+        parsed <- dplyr::bind_rows(existing_results, data)
     } else {
         print("All files already parsed.")
         parsed <- existing_results

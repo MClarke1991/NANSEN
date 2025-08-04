@@ -1,0 +1,9 @@
+netw_file_path = "examples/autopert/helper_autopert_1.json"
+spec_path = "examples/autopert/helper_spec_1.csv"
+out_dir = "auto_pert_results"
+nosat = true
+loserum = false
+missing_nodes_perturbed_overide = false
+missing_nodes_expected_overide = false
+project_path = ""
+group_vars = ["source", "cell_line", "experiment_particular"]

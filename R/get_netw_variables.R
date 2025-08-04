@@ -1,4 +1,4 @@
-## Copyright 2019 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2019 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
 #' Get BMA network variables
 #'
@@ -35,7 +35,7 @@ get_netw_variables <- function(netw_file_path){
 
   netw_variables %>% # check for disallowed characters in node names
     dplyr::pull("name") %>%
-      purrr::walk(node_name_check)
+      purrr::walk(NANSEN::node_name_check)
   ## check if there a duplicate nodes with the same name
   if (any(duplicated(netw_variables$name))) {
       stop("Node names must be unique")
@@ -56,7 +56,7 @@ get_netw_variables <- function(netw_file_path){
   {
 
       netw_variables <- netw_variables %>%
-          mutate(range_from = as.integer(range_from),
+          dplyr::mutate(range_from = as.integer(range_from),
                  range_to = as.integer(range_to),
                  id = as.integer(id))
       ## warning("Values in JSON which are expected to be numeric

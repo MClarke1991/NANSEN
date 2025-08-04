@@ -9,7 +9,8 @@ split_combo_results(
   project_path,
   out_dir,
   netw_file_path,
-  drug_path = NA
+  drug_path = NA,
+  node_col_name = "node"
 )
 }
 \arguments{
@@ -25,13 +26,8 @@ repo of the network and specification being tested}
 \item{drug_path}{path to list of drug perturbations to be applied
 in addition to node perturbations (CSV)}
 
-\item{calc_survival}{calculate survival meta-phenotype TRUE/FALSE
-where survival is \code{survPhenoA - survPhenoB}}
-
-\item{survPhenoA}{Postive phenotype for survival
-e.g. Proliferation}
-
-\item{survPhenoB}{Negative phenotype for survival e.g. Apoptosis}
+\item{node_col_name}{name of the node column in the mutational
+background file and drug file}
 }
 \value{
 write the results, with survival if enabled, for node,

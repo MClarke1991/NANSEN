@@ -1,11 +1,11 @@
 Package: NANSEN
 Title: NANSEN (Network Analysis aNd ScrEeNing)
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: c(
     person(given = "Matthew",
            family = "Clarke",
            role = c("aut", "cre"),
-           email = "matthewaclarke1991@gmail.com",
+           email = "matthew.clarke@ucl.ac.uk",
            comment = c(ORCID = "0000-0002-2582-9689")),
     person(given = "Pedro",
            family = "Victori",
@@ -18,11 +18,13 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Depends: R (>= 4.2.0)
 Imports: 
     dplyr,
     ggplot2,
     magrittr,
     readr,
+    rlang,
     stats,
     tibble,
     tidyr,
@@ -33,7 +35,12 @@ Imports:
     progress,
     purrr,
     stringr,
-    utils
+    utils,
+    tictoc,
+    RColorBrewer,
+    pheatmap,
+    ggplotify,
+    configr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

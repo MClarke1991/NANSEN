@@ -1,4 +1,53 @@
-## Copyright 2021 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2021 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
+
+#' Check if numeric values are integers with informative error messages
+#'
+#' @param values numeric vector to check
+#' @param column_name name of the column being checked (for error messages)
+#' @param data_source description of data source (e.g., "spec file", "drug file")
+#' @return TRUE if all values are integers, otherwise stops with error
+#' @keywords internal
+check_integer_values <- function(values, column_name, data_source = "file") {
+    # Define floating-point tolerance constant
+    FLOAT_TOLERANCE <- .Machine$double.eps^0.5
+
+    # Skip NA values for this check
+    if (all(is.na(values))) {
+        return(TRUE)  # All values are NA, which is handled elsewhere
+    }
+
+    # Check if values are integers (whole numbers), excluding NAs
+    non_integer_mask <- abs(values - round(values)) > FLOAT_TOLERANCE & !is.na(values)
+    non_integer_positions <- which(non_integer_mask)
+    non_integer_values <- values[non_integer_positions]
+
+    if (length(non_integer_values) > 0) {
+        # Create detailed error message
+        unique_non_integer <- unique(non_integer_values)
+        n_total_errors <- length(non_integer_values)
+        n_unique_errors <- length(unique_non_integer)
+
+        error_msg <- paste0(
+            "Column '", column_name, "' in ", data_source, " contains non-integer values. ",
+            "Gene/node activity levels must be integers. ",
+            "Consider using round() or as.integer() to convert values. ",
+            "Found ", n_total_errors, " non-integer value(s) with ", n_unique_errors, " unique value(s): ",
+            paste(head(unique_non_integer, 5), collapse = ", "),
+            if (n_unique_errors > 5) " (showing first 5)" else "",
+            " at position(s): ",
+            paste(head(non_integer_positions, 5), collapse = ", "),
+            if (length(non_integer_positions) > 5) " (showing first 5)" else ""
+        )
+
+        if (exists("log_file") && !is.null(log_file)) {
+            futile.logger::flog.error(stop(error_msg,call. = FALSE), name = log_file)
+        } else {
+            stop(error_msg, call. = FALSE)
+        }
+    }
+
+    return(TRUE)
+}
 
 #' Take a df of nodes from json file, annotated with level of activity
 #' and annotate all with filename prefix and BioCheckConsole command
@@ -19,18 +68,45 @@
 #' @family combination_therapy
 #' @seealso \code{\link{get_netw_variables}}
 #' @export
+
 make_command_args <- function(df,
                               id_col = "id",
                               activity_col = "activity",
                               node_col = "name") {
+    # Check if id column contains non-numeric values or NA
+    id_values <- df[[id_col]]
+    if (!is.numeric(id_values)) {
+        stop(paste("Column", id_col, "must be numeric. Found values:",
+                   paste(head(unique(id_values), 5), collapse = ", ")))
+    }
+    if (any(is.na(id_values))) {
+        na_positions <- which(is.na(id_values))
+        stop(paste("Column", id_col, "contains NA values at positions:",
+                   paste(head(na_positions, 5), collapse = ", ")))
+    }
+
+    # Check if activity column contains non-numeric values or NA
+    activity_values <- df[[activity_col]]
+    if (!is.numeric(activity_values)) {
+        stop(paste("Column", activity_col, "must be numeric. Found values:",
+                   paste(head(unique(activity_values), 5), collapse = ", ")))
+    }
+    if (any(is.na(activity_values))) {
+        na_positions <- which(is.na(activity_values))
+        stop(paste("Column", activity_col, "contains NA values at positions:",
+                   paste(head(na_positions, 5), collapse = ", ")))
+    }
+
+    # Check if activity values are integers
+    check_integer_values(activity_values, activity_col, "activity data")
 
     out <- dplyr::mutate(df,
-                  command_arg = paste("-ko",
-                                      .data[[id_col]],
-                                      .data[[activity_col]]),
-                  filename_part = paste(.data[[node_col]],
-                                        .data[[activity_col]],
-                                        sep = "__"))
+                         command_arg = paste("-ko",
+                                             !!rlang::sym(id_col),
+                                             !!rlang::sym(activity_col)),
+                         filename_part = paste(!!rlang::sym(node_col),
+                                               !!rlang::sym(activity_col),
+                                               sep = "__"))
     return(out)
 }
 
@@ -62,12 +138,20 @@ make_bkg_commands_combo <- function(backgrounds,
         stop("Error: It looks like the name of the column with node names, set as `node_col`, is not present in 'backgrounds' or 'netw_variables'. If you have renamed it make sure it is consistent between the two arguments and that you supply it with the `node_col` argument")
     }
 
+    # Validate that activity column in backgrounds contains only integers
+    if ("activity" %in% colnames(backgrounds)) {
+        activity_values <- backgrounds$activity
+        if (is.numeric(activity_values)) {
+            check_integer_values(activity_values, "activity", "background file")
+        }
+    }
+
     ## make a dataframe with the command argument and corresponding
     ## part of a filename for a node per row by joining backgrounds
     ## and netw variables by gene/nodename
     background_args <- dplyr::left_join(backgrounds, netw_variables,
                                  by = node_col) %>%
-        dplyr::select(background, sym(node_col), id, activity) %>%
+        dplyr::select(background, rlang::sym(node_col), id, activity) %>%
         make_command_args(node_col = node_col)
 
     ## group rows of the same background together and combine commands
@@ -101,7 +185,7 @@ make_single_muts <- function(netw_variables, node_col = "name") {
     }
 
     s_muts <- netw_variables %>%
-        dplyr::select(.data[[node_col]], id, range_from, range_to) %>%
+        dplyr::select(dplyr::all_of(node_col), id, range_from, range_to) %>%
         dplyr::rename("inhibition" = range_from,
                       "activation" = range_to) %>%
         tidyr::pivot_longer(cols = c("activation", "inhibition"),
@@ -135,49 +219,60 @@ make_single_muts <- function(netw_variables, node_col = "name") {
 #' @family combination_therapy
 #' @export
 make_pair_muts <- function(netw_variables, node_col = "name") {
-    genes <- dplyr::pull(netw_variables, .data[[node_col]])
-
+    genes <- dplyr::pull(netw_variables, dplyr::all_of(node_col))
+    if (length(genes) < 2) {
+        stop("Need at least 2 nodes to create pairs")
+    }
     netw_variables_short <- dplyr::select(netw_variables,
-                                   .data[[node_col]],
-                                   id,
-                                   range_from,
-                                   range_to) %>%
+                                          dplyr::all_of(node_col),
+                                          id,
+                                          range_from,
+                                          range_to) %>%
         dplyr::rename("inhibition" = range_from,
-               "activation" = range_to)
+                      "activation" = range_to)
 
-    pairs <- combn(genes, 2) %>%
-        t() %>%
-        tibble::as_tibble(.name_repair = "unique") %>%
-        dplyr::rename("a" = "...1", "b" = "...2") %>%
+    # Create pairs with explicit column names to avoid tibble warnings
+    pairs_matrix <- combn(genes, 2) %>% t()
+    colnames(pairs_matrix) <- c("a", "b")
+
+    pairs <- tibble::as_tibble(pairs_matrix) %>%
         dplyr::left_join(netw_variables_short, by = c("a" = {{node_col}})) %>%
         dplyr::rename("id_a" = "id") %>%
         tidyr::pivot_longer(cols = c("inhibition", "activation"),
-                     names_to = "type_a",
-                     values_to = "activity_a") %>%
+                            names_to = "type_a",
+                            values_to = "activity_a") %>%
         dplyr::left_join(netw_variables_short, by = c("b" = {{node_col}})) %>%
         dplyr::rename("id_b" = "id") %>%
         tidyr::pivot_longer(cols = c("inhibition", "activation"),
-                     names_to = "type_b",
-                     values_to = "activity_b") %>%
+                            names_to = "type_b",
+                            values_to = "activity_b") %>%
         dplyr::mutate(command_arg = paste("-ko", id_a, activity_a,
-                                   "-ko", id_b, activity_b),
-               filename_part = paste(a, activity_a, b, activity_b, sep = "__"))
-
+                                          "-ko", id_b, activity_b),
+                      filename_part = paste(a, activity_a, b, activity_b, sep = "__"))
     return(pairs)
 }
 
-##' Import drugs and sanitise drug names so they cannot cause problems
-##' when converted to file names
-##'
-##' @title import_drugs_clean
-##' @param drug_path path to drugs CSV
-##' @param show_col_types Mutes printing of columns types using readr::read_csv
-##' @return tibble of drugs with drug names sanitised
-##' @export
-import_drugs_clean <- function(drug_path, show_col_types = TRUE) {
+#' Import drugs and sanitise drug names so they cannot cause problems
+#' when converted to file names
+#'
+#' @title import_drugs_clean
+#' @param drug_path path to drugs CSV
+#' @param show_col_types Mutes printing of columns types using readr::read_csv
+#' @return tibble of drugs with drug names sanitised
+#' @export
+import_drugs_clean <- function(drug_path, show_col_types = FALSE) {
     drugs <- readr::read_csv(drug_path,
                              show_col_types = show_col_types, lazy = FALSE) %>%
         dplyr::mutate(drug = purrr::map_chr(drug, janitor::make_clean_names))
+
+    # Validate that activity column contains only integers
+    if ("activity" %in% colnames(drugs)) {
+        activity_values <- drugs$activity
+        if (is.numeric(activity_values)) {
+            check_integer_values(activity_values, "activity", "drug file")
+        }
+    }
+
     return(drugs)
 }
 
@@ -203,13 +298,13 @@ check_drug_nodes <- function(drugs,
                              netw_variables,
                              node_col_name) {
     ## Check if all nodes drugged are in network
-    if (!all(unique(dplyr::pull(drugs, .data[[node_col_name]])) %in%
-             unique(dplyr::pull(netw_variables, .data[[node_col_name]])))) {
+    if (!all(unique(dplyr::pull(drugs, dplyr::all_of(node_col_name))) %in%
+             unique(dplyr::pull(netw_variables, dplyr::all_of(node_col_name))))) {
         stop(paste(
             "Nodes in drug list not in network: ",
             capture.output(
-                setdiff(unique(dplyr::pull(drugs, .data[[node_col_name]])),
-                        unique(dplyr::pull(netw_variables, .data[[node_col_name]]))))))
+                setdiff(unique(dplyr::pull(drugs, dplyr::all_of(node_col_name))),
+                        unique(dplyr::pull(netw_variables, dplyr::all_of(node_col_name)))))))
     }
 }
 
@@ -224,14 +319,15 @@ check_drug_nodes <- function(drugs,
 #' @param node_col_name name of the columns specifying nodes
 #' @return Stop if there are conflicts
 #' @family combination_therapy
+#' @importFrom rlang .data
 #' @export
 check_drug_conflicts <- function(drugs, node_col_name) {
     d_conflicts <- drugs %>%
-        select(.data[[node_col_name]], activity) %>%
-        distinct() %>%
-        group_by(.data[[node_col_name]]) %>%
-        summarise(n_unique = n()) %>%
-        filter(n_unique > 1)
+        dplyr::select(dplyr::all_of(node_col_name), activity) %>%
+        dplyr::distinct() %>%
+        dplyr::group_by(.data[[node_col_name]]) %>%
+        dplyr::summarise(n_unique = dplyr::n()) %>%
+        dplyr::filter(n_unique > 1)
     if (nrow(d_conflicts) > 0) {
         stop("Drug combinations have conflicting effects on the same node")
     } else {
@@ -269,14 +365,14 @@ check_drug_conflicts <- function(drugs, node_col_name) {
 get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
     ## Get ids etcs
     drugs_w_nodes <- drugs %>%
-        select(drug, .data[[node_col_name]], activity) %>%
+        dplyr::select(drug, dplyr::all_of(node_col_name), activity) %>%
         ## Cannot do normal mutate as make_clean_names will make dups
         ## unique, purr avoids this
         dplyr::mutate(drug_name_original = drug) %>%
         dplyr::mutate(drug = purrr::map_chr(drug_name_original, janitor::make_clean_names)) %>%
-        dplyr::left_join(netw_variables)
+        dplyr::left_join(netw_variables, by = node_col_name)
 
-    drugs_commands <- make_command_args(drugs_w_nodes, node_col = "node") %>%
+    drugs_commands <- make_command_args(drugs_w_nodes, node_col = rlang::sym(node_col_name)) %>%
         dplyr::rename("alt_filename_part" = "filename_part") %>%
         dplyr::mutate(filename_part = paste(drug, NA, sep = "__"))
 
@@ -293,14 +389,13 @@ get_drugs_commands <- function(drugs, netw_variables, node_col_name) {
 #' @family combination_therapy
 #' @export
 check_drugs_in_range <- function(drugs_commands) {
-    activity_out_range <- filter(drugs_commands,
+    activity_out_range <- dplyr::filter(drugs_commands,
                                  activity < range_from |
                                  activity > range_to)
     if (nrow(activity_out_range) > 0) {
         stop(
             "There are perturbations that are outside the range the node can take: \n",
             paste(capture.output(activity_out_range), collapse = "\n"),
-            ## see https://stackoverflow.com/a/26083626
             call. = FALSE
         )
     } else {
@@ -318,7 +413,7 @@ check_drugs_in_range <- function(drugs_commands) {
 #' @export
 make_single_drugs <- function(drugs_commands) {
     drugs_single <- drugs_commands %>%
-        group_by(drug) %>%
+        dplyr::group_by(drug) %>%
         dplyr::summarise(command_arg = paste(command_arg,
                                              collapse = " "),
                          alt_filename_part = paste(alt_filename_part,
@@ -338,15 +433,15 @@ make_single_drugs <- function(drugs_commands) {
 make_pair_drugs <- function(drugs_single) {
     drugs_pairs <- combn(dplyr::pull(drugs_single, drug), 2) %>%
         t() %>%
-        tibble::as_tibble(.name_repair = "unique") %>%
-        dplyr::rename("a" = "...1", "b" = "...2") %>%
+        tibble::as_tibble(.name_repair = "minimal") %>%
+        setNames(c("a", "b")) %>%
         dplyr::left_join(drugs_single, by = c("a" = "drug")) %>%
         dplyr::left_join(drugs_single, by = c("b" = "drug")) %>%
         dplyr::mutate(filename_part = paste(filename_part.x,
-                                     filename_part.y, sep = "__"),
-               alt_filename_part = paste(alt_filename_part.x,
-                                         alt_filename_part.y, sep = "__"),
-               command_arg = paste(command_arg.x, command_arg.y)) %>%
+                                            filename_part.y, sep = "__"),
+                      alt_filename_part = paste(alt_filename_part.x,
+                                                alt_filename_part.y, sep = "__"),
+                      command_arg = paste(command_arg.x, command_arg.y)) %>%
         dplyr::select(a, b, filename_part, alt_filename_part, command_arg)
     return(drugs_pairs)
 }
@@ -358,6 +453,8 @@ make_pair_drugs <- function(drugs_single) {
 #'
 #' @param background_commands data frame of backgrounds generated by
 #'     \code{\link{make_bkg_commands_combo}}
+#' @param netw_file_path path to network JSON file
+#' @param bma_path path to BMA command line installation. 
 #' @param perts data frame of pertubations e.g. generated by
 #'     \code{\link{make_single_muts}} or \code{\link{make_pair_muts}}
 #' @param combo_type e.g. "single" or "double":used to label output
@@ -385,6 +482,8 @@ run_all_backgrounds <- function(background_commands,
                                 results_dir,
                                 log_file,
                                 precedence = "perturbation") {
+    ## Normalize BMA path for cross-platform compatibility
+    # bma_path <- normalize_bma_path(bma_path)
 
     ## Log and report in console what type of command is being run as
     ## these can take a long time
@@ -528,6 +627,7 @@ run_all_backgrounds <- function(background_commands,
 #' @param pheno_only Boolean. If TRUE, only return measurements for
 #'     those nodes listed in \code{phenotypes}.
 #' @family combination_therapy
+#' @importFrom rlang .data
 #' @export
 process_results <- function(parsed_results,
                             phenotypes,
@@ -562,6 +662,7 @@ process_results <- function(parsed_results,
                uncertainty = (hi - lo) / (range_to - range_from)) %>%
         tidyr::separate(pert, "__", into = c("muta", "leva", "mutb", "levb"),
                  fill = "right")
+    return(processed_results)
 }
 
 
@@ -571,8 +672,10 @@ process_results <- function(parsed_results,
 #' @param results Results from \code{\link{process_results}}
 #' @param backgrounds Backgrounds
 #' @param node_col node column name in backgrounds
+#' @param drugs optional drugs data frame
+#' @importFrom rlang .data
 #' @export
-check_conflicts <- function(results, backgrounds, node_col = "name") {
+check_conflicts <- function(results, backgrounds, node_col = "name", drugs = NULL) {
 
     check_conflict_row <- function(pert,
                                    lev,
@@ -675,67 +778,73 @@ check_conflicts <- function(results, backgrounds, node_col = "name") {
     return(conflicts)
 }
 
-##' Generate results directory for combinations in a standardised way,
-##' so that visualisation scripts can generate one that lines up with
-##' \code{\link{combo}} without combo having to pass it on
+#' Generate results directory for combinations in a standardised way,
+#' so that visualisation scripts can generate one that lines up with
+#' \code{\link{combo}} without combo having to pass it on
 
-##' @title get_combo_results_dir
-##' @param results_prefix prefix to results directory
-##' @param project_path project path for git SHA log, point to git
-##'     repo of the network and specification being tested
-##' @param out_dir directory where all output files should be stored
-##' @param netw_file_path path to network JSON file
-##' @return string with path to results directory
-##' @export
+#' @title get_combo_results_dir
+#' @param results_prefix prefix to results directory
+#' @param project_path project path for git SHA log, point to git
+#'     repo of the network and specification being tested
+#' @param out_dir directory where all output files should be stored
+#' @param netw_file_path path to network JSON file
+#' @return string with path to results directory
+#' @export
 get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_file_path) {
-    results_dir <- here(project_path,
-                             out_dir,
-                             paste(results_prefix,
-                                   stringr::str_remove(
-                                                basename(netw_file_path),
-                                                ".json"),
-                                   sep = "_"))
+    run_dir <- paste(results_prefix,
+                                       stringr::str_remove(
+                                                    basename(netw_file_path),
+                                                    ".json"),
+                                       sep = "_")
+    if (project_path == "" || is.null(project_path)) {
+        results_dir <- here::here(out_dir,
+                                 run_dir)
+    } else {
+        results_dir <- here::here(project_path,
+                                 out_dir,
+                                 run_dir)
+    }
     results_dir
 }
 
 
-##' Run all node and drug combinations (separately) for a given
-##' network on a set of mutational backgrounds
-##'
-##' @title combo
-##' @param netw_file_path path to network JSON file
-##' @param backgrounds_path path to backgrounds (CSV)
-##' @param drug_path path to list of drug perturbations to be applied
-##'     in addition to node perturbations (CSV)
-##' @param bma_path path to BMA command line installation, defaults to
-##'     the path produced by the one click installer (.msi)
-##' @param results_prefix prefix to results directory
-##' @param out_dir output directory
-##' @param project_path project path for git SHA log, point to git
-##'     repo of the network and specification being tested
-##' @param node_col_name name of the node column in the mutational
-##'     background file and drug file
-##' @param use_vmcai Use VMCAI mode
-##' @param pheno_only Only evaluate the level of phenotype nodes
-##'     supplied by the phenotypes argument. Speeds up processing step
-##'     and reduces size of final processed_data file
-##' @param phenotypes list of phenotypes in format `c("node_name_1",
-##'     "node_name_2")` for use if pheno_only is TRUE
-##' @param use_exclusions exclude perturbation of a set of nodes
-##'     supplied to the `exclusions_path` argument. Speeds up
-##'     processing by skipping those nodes which are uninteresting to
-##'     perturb e.g. phenotype nodes
-##' @param exclusions_path list of nodes in format `c("node_name_1",
-##'     "node_name_2")` for use if use_exclusions is TRUE
-##' @param bma_tools_path path for BMATools development repo
-##' @param drug_conflict_overide allow overide of drug conflicts
-##'     check, only used for testing
-##' @param skip_drugs_single  skip drug perturbations
-##' @param skip_drugs_pairs skip drug perturbations
-##' @param skip_all_pairs skip pairwise combinations of nodes
-##' @param log_filename filename for log file
-##' @return write a `parsed_results.csv` and `processed_results.csv`
-##' @export
+#' Run all node and drug combinations (separately) for a given
+#' network on a set of mutational backgrounds
+#'
+#' @title combo
+#' @param netw_file_path path to network JSON file
+#' @param backgrounds_path path to backgrounds (CSV)
+#' @param drug_path path to list of drug perturbations to be applied
+#'     in addition to node perturbations (CSV)
+#' @param bma_path path to BMA command line installation, defaults to
+#'     the path produced by the one click installer (.msi). The path
+#'     is automatically normalized for cross-platform compatibility.
+#' @param results_prefix prefix to results directory
+#' @param out_dir output directory
+#' @param project_path project path for git SHA log, point to git
+#'     repo of the network and specification being tested
+#' @param node_col_name name of the node column in the mutational
+#'     background file and drug file
+#' @param use_vmcai Use VMCAI mode
+#' @param pheno_only Only evaluate the level of phenotype nodes
+#'     supplied by the phenotypes argument. Speeds up processing step
+#'     and reduces size of final processed_data file
+#' @param phenotypes list of phenotypes in format `c("node_name_1",
+#'     "node_name_2")` for use if pheno_only is TRUE
+#' @param use_exclusions exclude perturbation of a set of nodes
+#'     supplied to the `exclusions_path` argument. Speeds up
+#'     processing by skipping those nodes which are uninteresting to
+#'     perturb e.g. phenotype nodes
+#' @param exclusions_path list of nodes in format `c("node_name_1",
+#'     "node_name_2")` for use if use_exclusions is TRUE
+#' @param drug_conflict_overide allow overide of drug conflicts
+#'     check, only used for testing
+#' @param skip_drugs_single  skip drug perturbations
+#' @param skip_drugs_pairs skip drug perturbations
+#' @param skip_all_pairs skip pairwise combinations of nodes
+#' @param log_filename filename for log file
+#' @return write a `parsed_results.csv` and `processed_results.csv`
+#' @export
 combo <- function(netw_file_path,
                   backgrounds_path,
                   drug_path,
@@ -751,7 +860,6 @@ combo <- function(netw_file_path,
                   phenotypes = NA,
                   use_exclusions = FALSE,
                   exclusions_path = NA,
-                  bma_tools_path = NA,
                   drug_conflict_overide = FALSE,
                   skip_drugs_single = FALSE,
                   skip_drugs_pairs = FALSE,
@@ -765,8 +873,15 @@ combo <- function(netw_file_path,
 
     print(paste("Using results directory:", results_dir))
 
-    if (!dir.exists(here(project_path, out_dir))) {
-        dir.create(here(project_path, out_dir))
+    # Handle empty project_path for directory creation
+    base_out_dir <- if (project_path == "" || is.null(project_path)) {
+        here::here(out_dir)
+    } else {
+        here::here(project_path, out_dir)
+    }
+
+    if (!dir.exists(base_out_dir)) {
+        dir.create(base_out_dir)
     }
 
     if (!dir.exists(file.path(results_dir))) {
@@ -777,12 +892,10 @@ combo <- function(netw_file_path,
     futile.logger::flog.appender(
                        futile.logger::appender.file(log_file),
                        name = log_file)
-    ## Capture all unflogged warnings and errors in flogger
-    ## https://github.com/zatonovo/futile.logger/issues/36
     options(error = function()
         futile.logger::flog.warn(geterrmessage(), name = log_file))
     futile.logger::flog.info("Start", name = log_file)
-    
+
     futile.logger::flog.info(paste("Running Combo on model:",
                                    netw_file_path,
                                    "with backgrounds",
@@ -799,17 +912,14 @@ combo <- function(netw_file_path,
     }
     netw_variables <- get_netw_variables(netw_file_path = netw_file_path) %>%
         dplyr::rename("node" = "name")
-    ## dplyr::mutate(node = janitor::make_clean_names(node)) #TEMP
-
-    ## TEMP get rid of weird character encoding of RangeTo in json
     netw_variables <- netw_variables %>%
         dplyr::mutate(range_to = as.integer(range_to))
 
     backgrounds <- backgrounds %>%
         dplyr::mutate(background =
                    purrr::map_chr(background, janitor::make_clean_names))
-    if (!all(unique(dplyr::pull(backgrounds, .data[[node_col_name]])) %in%
-             unique(dplyr::pull(netw_variables, .data[[node_col_name]])))) {
+    if (!all(unique(dplyr::pull(backgrounds, dplyr::all_of(node_col_name))) %in%
+             unique(dplyr::pull(netw_variables, dplyr::all_of(node_col_name))))) {
         stop("Nodes in background not in network")
     }
 
@@ -832,11 +942,11 @@ combo <- function(netw_file_path,
     }
 
     s_muts <- make_single_muts(netw_variables = netw_variables %>%
-                 filter(!(.data[[node_col_name]] %in% exclusions)),
+                 dplyr::filter(!(.data[[node_col_name]] %in% exclusions)),
                                node_col = "node")
 
     pairs <- make_pair_muts(netw_variables = netw_variables %>%
-                 filter(!(.data[[node_col_name]] %in% exclusions)),
+                 dplyr::filter(!(.data[[node_col_name]] %in% exclusions)),
                             node_col = "node")
 
 
@@ -934,7 +1044,7 @@ combo <- function(netw_file_path,
                                              rec = TRUE)
     }
 
-    write_csv(parsed_results,
+    readr::write_csv(parsed_results,
               file = parsed_results_file)
     futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
 
@@ -953,16 +1063,16 @@ combo <- function(netw_file_path,
         if ((!skip_drugs_single) | (!skip_drugs_pairs)) {
             tictoc::tic("Conflicts")
             conflicts <- check_conflicts(results = results,
-                                         node_col = node_col_name,
                                          backgrounds = backgrounds,
+                                         node_col = node_col_name,
                                          drugs = drugs)
             readr::write_csv(conflicts, file.path(results_dir, "conflicts.csv"))
             futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
         } else {
             tictoc::tic("Conflicts")
             conflicts <- check_conflicts(results = results,
-                                         node_col = node_col_name,
-                                         backgrounds = backgrounds)
+                                         backgrounds = backgrounds,
+                                         node_col = node_col_name)
             readr::write_csv(conflicts, file.path(results_dir, "conflicts.csv"))
             futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
         }

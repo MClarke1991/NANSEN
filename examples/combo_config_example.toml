@@ -1,0 +1,12 @@
+netw_file_path = "examples/combo/helper_combo_1.json"
+backgrounds_path = "examples/combo/helper_combo_bkg_1.csv"
+out_dir = "combo_results"
+skip_autopert = true
+skip_combo_sim = true
+skip_heatmaps = true
+skip_heatmaps_uc = true
+pheno_only = true
+phenotypes = ["output_a", "output_b"]
+project_path = ""
+node_col_name = "node"
+use_vmcai = true

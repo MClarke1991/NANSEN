@@ -1,6 +1,6 @@
-## Copyright 2023 Matthew A. Clarke, Fisher Lab <matthewaclarke1991@gmail.com>
+## Copyright 2023 Matthew A. Clarke, Fisher Lab, UCL <matthew.clarke@ucl.ac.uk>
 
-## Test of combination script
+## Example of combination script
 ## Created 2023-02-23
 
 
@@ -132,6 +132,9 @@ drug_heat_dir_uc <- "unclust_drug_heatmaps"
 ## Path to BMA install. Note exact format needed. By default is the
 ## path that the MSI installer from teh BMA website uses
 bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
+
+## Allow drug conflicts override
+drug_conflict_overide <- TRUE
 ## Name for directory for all results from a run
 out_dir <- file.path(pipe_dir, "results")
 ## Filename for log of any errors
@@ -152,7 +155,6 @@ if (!skip_autopert) {
              missing_nodes_expected_overide =
                  missing_nodes_expected_overide,
              project_path = project_path,
-             bma_tools_path = bma_tools_path
              )
 } else {
     print("Skipping specification testing")
@@ -171,7 +173,6 @@ if (!skip_combo_sim) {
           phenotypes = phenotypes,
           use_exclusions = use_exclusions,
           exclusions_path = NA,
-          bma_tools_path = bma_tools_path, 
           log_filename = "Combo.log", 
           drug_conflict_overide = drug_conflict_overide,
           skip_all_pairs = skip_all_pairs,
@@ -189,7 +190,8 @@ split_combo_results(
     project_path = project_path,
     out_dir = out_dir,
     netw_file_path = netw_file_path,
-    drug_path = combo_drug_path
+    drug_path = combo_drug_path, 
+    node_col_name = node_col_name
 )
 
 ## Visualisation ------------
