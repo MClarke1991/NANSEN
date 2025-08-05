@@ -1,4 +1,10 @@
 # NANSEN: (Network Analysis aNd ScrEeNing)
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/MClarke1991/NANSEN/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MClarke1991/NANSEN/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/MClarke1991/NANSEN/branch/main/graph/badge.svg)](https://app.codecov.io/gh/MClarke1991/NANSEN?branch=main)
+<!-- badges: end -->
+
 Repository for NANSEN, a package for verification and analysis of biological network models built with [Bio Model Analyzer](http://biomodelanalyzer.org/).
 
 _[Matthew A. Clarke](https://mclarke1991.github.io/), [Pedro Victori](https://www.linkedin.com/in/pedro-victori/), [Jasmin Fisher](https://www.ucl.ac.uk/medical-sciences/divisions/cancer/our-research/computational-cancer-biology)._
