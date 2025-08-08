@@ -4,23 +4,28 @@
 ##' @param file_hashtable_dir directory for hashtables
 ##' @param log_file log filename
 ##' @return all hashes in a single table
-##' @author Matthew A. Clarke \email{matthewaclarke1991@gmail.com}
 get_all_hashtables <- function(file_hashtable_dir, log_file) {
     ## read all csv in file_hashtable_dir and bind together using tidyverse
-    all_hashtables <- list.files(file_hashtable_dir, pattern = "*.csv", full.names = TRUE) %>%
-        map_df(read_csv, .id = "file", lazy = FALSE, show_col_types = FALSE)
+    csv_files <- list.files(file_hashtable_dir, pattern = "*.csv", full.names = TRUE)
+    
+    # Handle empty directory case
+    if (length(csv_files) == 0) {
+        stop("Expected location for hashtables (", file_hashtable_dir, ") is empty")
+    }
+    
+    all_hashtables <- csv_files %>%
+        purrr::map_df(readr::read_csv, .id = "file", lazy = FALSE, show_col_types = FALSE)
 
     all_unique_perts <- all_hashtables %>%
-        pull(unhash_full_filename) %>%
+        dplyr::pull(unhash_full_filename) %>%
         unique()
 
     all_unique_hash <- all_hashtables %>%
-        pull(full_filename) %>%
+        dplyr::pull(full_filename) %>%
         unique()
 
     if (length(all_unique_perts) != length(all_unique_hash)) {
-        log_danger(text = "Not all perturbations have been assigned a unique hash, please use the full length filenames.",
-                   name = log_file)
+        stop("Not all perturbations have been assigned a unique hash, please use the full length filenames.")
     }
 
     return(all_hashtables)
