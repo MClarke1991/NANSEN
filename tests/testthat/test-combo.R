@@ -315,63 +315,63 @@ test_that("combo integration test with short filenames - Windows only", {
   expect_true(dir.exists(run_dir))
   expect_true(file.exists(file.path(run_dir, "parsed_results.csv")))
   expect_true(file.exists(file.path(run_dir, "processed_results.csv")))
-  
+
   # Verify file_hashtables directory was created
   hashtable_dir <- file.path(run_dir, "file_hashtables")
   expect_true(dir.exists(hashtable_dir))
-  
+
   # Verify hashtable CSV files were created
   hashtable_files <- list.files(hashtable_dir, pattern = "^file_hashtable_.*\.csv$")
   expect_true(length(hashtable_files) > 0)
-  
+
   # Check hashtable structure
   for (hashtable_file in hashtable_files) {
     hashtable <- readr::read_csv(file.path(hashtable_dir, hashtable_file), show_col_types = FALSE)
     expect_true(all(c("unhash_full_filename", "unhash_alt_full_filename", "full_filename", "alt_full_filename") %in% colnames(hashtable)))
-    
+
     # Verify hash format (32-char MD5)
     for (hash in hashtable$full_filename) {
       hash_without_ext <- tools::file_path_sans_ext(hash)
-      expect_true(nchar(hash_without_ext) == 32, 
+      expect_true(nchar(hash_without_ext) == 32,
                  info = paste("Expected 32-char hash, got:", nchar(hash_without_ext)))
-      expect_match(hash_without_ext, "^[a-f0-9]{32}$", 
+      expect_match(hash_without_ext, "^[a-f0-9]{32}$",
                  info = paste("Expected MD5 hash format for:", hash))
     }
   }
-  
+
   # Verify RAW output directories contain hashed files
   raw_dirs <- list.dirs(run_dir, pattern = "RAW__", recursive = FALSE)
   expect_true(length(raw_dirs) > 0)
-  
+
   for (raw_dir in raw_dirs) {
-    json_files <- list.files(raw_dir, pattern = "\.json$")
+    json_files <- list.files(raw_dir, pattern = "\\.json$")
     if (length(json_files) > 0) {
       # Check that filenames are hashed
       for (json_file in json_files) {
         filename_without_ext <- tools::file_path_sans_ext(json_file)
-        expect_true(nchar(filename_without_ext) == 32, 
+        expect_true(nchar(filename_without_ext) == 32,
                    info = paste("Expected 32-char hash in RAW dir, got:", nchar(filename_without_ext), "for file:", json_file))
-        expect_match(filename_without_ext, "^[a-f0-9]{32}$", 
+        expect_match(filename_without_ext, "^[a-f0-9]{32}$",
                    info = paste("Expected MD5 hash format in RAW dir for file:", json_file))
       }
     }
   }
-  
+
   # Verify processed results still work correctly with hashed filenames
   processed_results <- readr::read_csv(file.path(run_dir, "processed_results.csv"), show_col_types = FALSE)
   expect_true(nrow(processed_results) > 0)
   expect_true(all(c("name", "lo", "hi") %in% colnames(processed_results)))
-  
+
   # Verify parsed results contain properly mapped filenames
   parsed_results <- readr::read_csv(file.path(run_dir, "parsed_results.csv"), show_col_types = FALSE, col_types = readr::cols(formula = "c"))
   expect_true(nrow(parsed_results) > 0)
   expect_true(all(c("filename", "time", "id", "lo", "hi", "name") %in% colnames(parsed_results)))
-  
+
   # The parsed results should contain the original (unhashed) filenames due to mapping
   # This verifies that get_all_hashtables() worked correctly
   for (filename in unique(parsed_results$filename)) {
     # Should contain meaningful parts like "PERT" rather than being just a hash
-    expect_true(grepl("PERT|__", filename), 
+    expect_true(grepl("PERT|__", filename),
                info = paste("Expected unhashed filename format, got:", filename))
   }
 })

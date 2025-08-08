@@ -220,7 +220,7 @@ short_filenames = %s
   expect_true(dir.exists(hashtable_dir))
   
   # Verify hashtable files exist
-  hashtable_files <- list.files(hashtable_dir, pattern = "^file_hashtable_.*\.csv$")
+  hashtable_files <- list.files(hashtable_dir, pattern = "^file_hashtable_.*\\.csv$")
   expect_true(length(hashtable_files) > 0)
   
   # Verify results files exist

@@ -220,15 +220,15 @@ test_that("autopert integration test with short filenames - Windows only", {
   expect_true(dir.exists(file.path(run_dir, "results")))
 
   # Verify BioCheck output files exist and are hashed (should be 32-char MD5)
-  biocheck_files <- list.files(file.path(run_dir, "BioCheck_output"), pattern = "\.json$")
+  biocheck_files <- list.files(file.path(run_dir, "BioCheck_output"), pattern = "\\.json$")
   expect_true(length(biocheck_files) > 0)
-  
+
   # Check that filenames are hashed (32 character MD5 + .json extension)
   for (json_file in biocheck_files) {
     filename_without_ext <- tools::file_path_sans_ext(json_file)
-    expect_true(nchar(filename_without_ext) == 32, 
+    expect_true(nchar(filename_without_ext) == 32,
                info = paste("Expected 32-char hash, got:", nchar(filename_without_ext), "for file:", json_file))
-    expect_match(filename_without_ext, "^[a-f0-9]{32}$", 
+    expect_match(filename_without_ext, "^[a-f0-9]{32}$",
                info = paste("Expected MD5 hash format for file:", json_file))
   }
 
@@ -248,11 +248,11 @@ test_that("autopert integration test with short filenames - Windows only", {
   parse_results <- readr::read_csv(file.path(run_dir, "results", "parse_results.csv"), show_col_types = FALSE, col_types = readr::cols(formula = "c"))
   expect_true(nrow(parse_results) > 0)
   expect_true(all(c("filename", "time", "id", "lo", "hi", "name", "range_from", "range_to", "formula") %in% colnames(parse_results)))
-  
+
   # Verify that parse_results contains hashed filenames
   for (filename in parse_results$filename) {
     filename_without_ext <- tools::file_path_sans_ext(filename)
-    expect_true(nchar(filename_without_ext) == 32, 
+    expect_true(nchar(filename_without_ext) == 32,
                info = paste("Expected 32-char hash in parse_results, got:", nchar(filename_without_ext)))
   }
 

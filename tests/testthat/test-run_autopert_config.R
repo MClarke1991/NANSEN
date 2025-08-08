@@ -24,11 +24,11 @@ test_that("run_autopert_config.r works with valid config", {
   )
 
   config_file <- file.path(temp_dir, "test_config.toml")
-  
+
   # Write TOML directly to avoid configr NULL handling issues
   toml_content <- sprintf('
 netw_file_path = "%s"
-spec_path = "%s" 
+spec_path = "%s"
 out_dir = "%s"
 nosat = %s
 loserum = %s
@@ -41,12 +41,12 @@ group_vars = [%s]
     gsub("\\\\", "/", valid_config$spec_path),
     valid_config$out_dir,
     tolower(valid_config$nosat),
-    tolower(valid_config$loserum), 
+    tolower(valid_config$loserum),
     tolower(valid_config$missing_nodes_perturbed_overide),
     tolower(valid_config$missing_nodes_expected_overide),
     paste0('"', valid_config$group_vars, '"', collapse = ", ")
   )
-  
+
   writeLines(toml_content, config_file)
 
   # Clean up on exit
@@ -136,7 +136,7 @@ test_that("run_autopert_config.r works with short_filenames configuration - Wind
   config_file <- file.path(temp_dir, "short_filenames_config.toml")
   toml_content <- sprintf("
 netw_file_path = \"%s\"
-spec_path = \"%s\" 
+spec_path = \"%s\"
 out_dir = \"%s\"
 nosat = %s
 loserum = %s
@@ -157,7 +157,7 @@ short_filenames = %s
     "true"
   )
   writeLines(toml_content, config_file)
-  
+
   on.exit({
     unlink(config_file)
     if (dir.exists(file.path(temp_dir, "short_filenames_autopert_test"))) {
@@ -192,21 +192,21 @@ short_filenames = %s
   # Verify that the output directory contains results with hashed filenames
   out_dir <- file.path(temp_dir, "short_filenames_autopert_test")
   expect_true(dir.exists(out_dir))
-  
+
   # Find AP_RUN directory
   ap_dirs <- list.dirs(out_dir, full.names = FALSE, recursive = FALSE)
   run_dir_name <- ap_dirs[grepl("^AP_RUN_", ap_dirs)]
   expect_true(length(run_dir_name) == 1)
   run_dir <- file.path(out_dir, run_dir_name)
-  
+
   # Verify hashed files exist
-  biocheck_files <- list.files(file.path(run_dir, "BioCheck_output"), pattern = "\.json$")
+  biocheck_files <- list.files(file.path(run_dir, "BioCheck_output"), pattern = "\\.json$")
   expect_true(length(biocheck_files) > 0)
-  
+
   # Verify files are hashed
   for (json_file in biocheck_files) {
     filename_without_ext <- tools::file_path_sans_ext(json_file)
-    expect_true(nchar(filename_without_ext) == 32, 
+    expect_true(nchar(filename_without_ext) == 32,
                info = paste("Expected 32-char hash, got:", nchar(filename_without_ext)))
   }
 })
