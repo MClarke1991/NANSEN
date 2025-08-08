@@ -163,7 +163,7 @@ autopert <- function(netw_file_path,
         commands <- commands %>%
             dplyr::rename("full_file_name" = "file_name") %>%
             dplyr::rowwise() %>%
-            dplyr::mutate(file_name = digest_filename(full_file_name))
+            dplyr::mutate(file_name = digest_filename(full_file_name, append_json = TRUE))
     }
 
     commands_short <- commands %>%

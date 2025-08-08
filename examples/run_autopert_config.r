@@ -50,7 +50,8 @@ autopert(
     missing_nodes_perturbed_overide = config$missing_nodes_perturbed_overide,
     missing_nodes_expected_overide = config$missing_nodes_expected_overide,
     project_path = config$project_path,
-    group_vars = config$group_vars
+    group_vars = config$group_vars,
+    short_filenames = config$short_filenames
 )
 
 cli::cli_alert_info("AutoPert run completed.\n")

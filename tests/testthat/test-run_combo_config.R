@@ -147,7 +147,8 @@ test_that("run_combo_config.r works with short_filenames configuration - Windows
   toml_content <- sprintf("
 netw_file_path = \"%s\"
 backgrounds_path = \"%s\"
-out_dir = \"%s\"
+out_dir = \"dummy\"
+pipe_dir = \"%s\"
 skip_autopert = %s
 skip_combo_sim = %s
 skip_heatmaps = %s
@@ -161,9 +162,9 @@ short_filenames = %s
 ",
     gsub("\\\\", "/", here::here("examples", "combo", "helper_combo_1.json")),
     gsub("\\\\", "/", here::here("examples", "combo", "helper_combo_bkg_1.csv")),
-    "short_filenames_combo_test",
+    file.path(temp_dir, "short_filenames_combo_test"),
     "true",
-    "true",
+    "false",
     "true", 
     "true",
     "true",
@@ -176,37 +177,31 @@ short_filenames = %s
   
   on.exit({
     unlink(config_file)
-    if (dir.exists(file.path(temp_dir, "short_filenames_combo_test"))) {
-      unlink(file.path(temp_dir, "short_filenames_combo_test"), recursive = TRUE)
+    pipe_dir <- file.path(temp_dir, "short_filenames_combo_test")
+    if (dir.exists(pipe_dir)) {
+      unlink(pipe_dir, recursive = TRUE)
     }
   })
 
-  # Mock commandArgs to return our config file
-  old_commandArgs <- commandArgs
-  commandArgs <- function(trailingOnly = FALSE) {
-    if (trailingOnly) {
-      return(config_file)
-    } else {
-      return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", config_file))
-    }
-  }
+  args <- c(here::here("examples/run_combo_config.r"), config_file)
 
-  # Restore on exit
-  on.exit({
-    commandArgs <- old_commandArgs
-    unlink(config_file)
-    if (dir.exists(file.path(temp_dir, "short_filenames_combo_test"))) {
-      unlink(file.path(temp_dir, "short_filenames_combo_test"), recursive = TRUE)
+  with_mocked_bindings(
+    commandArgs = function(trailingOnly = FALSE) {
+      if (trailingOnly) {
+        return(args[-1])
+      } else {
+        return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", args[-1]))
+      }
+    },
+    .package = "base",
+    {
+      suppressMessages(suppressWarnings(expect_no_error(source(here::here("examples/run_combo_config.r")))))
     }
-  }, add = TRUE)
-
-  # Run the script and expect it to work
-  expect_no_error({
-    suppressMessages(suppressWarnings(source(here::here("examples/run_combo_config.r"))))
-  })
+  )
 
   # Verify that the output directory contains results with hashed functionality
-  out_dir <- file.path(temp_dir, "short_filenames_combo_test")
+  pipe_dir <- file.path(temp_dir, "short_filenames_combo_test")
+  out_dir <- file.path(pipe_dir, "results")
   expect_true(dir.exists(out_dir))
   
   # Find COMBO_RUN directory
