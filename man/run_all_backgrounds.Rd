@@ -41,6 +41,12 @@ results/warnings/errors with futile.logger}
 \item{precedence}{should perturbation or background mutation take
 precedence if there are conflicting effects on the same node,
 defaults to perturbation}
+
+\item{short_filenames}{logical. If TRUE, use MD5 hashes for long filenames
+to avoid Windows path length issues. Defaults to FALSE.}
+
+\item{file_hashtable_dir}{directory path where filename hashtables are stored
+when short_filenames=TRUE. Defaults to NULL.}
 }
 \value{
 Results are written as json files by BMA in directories

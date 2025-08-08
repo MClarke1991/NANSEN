@@ -465,6 +465,10 @@ make_pair_drugs <- function(drugs_single) {
 #' @param precedence should perturbation or background mutation take
 #'     precedence if there are conflicting effects on the same node,
 #'     defaults to perturbation
+#' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames 
+#'     to avoid Windows path length issues. Defaults to FALSE.
+#' @param file_hashtable_dir directory path where filename hashtables are stored 
+#'     when short_filenames=TRUE. Defaults to NULL.
 #' @return Results are written as json files by BMA in directories
 #'     created with the name of the background and the
 #'     combo_type. Individual files are named by combining the file
