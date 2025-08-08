@@ -22,6 +22,7 @@ combo(
   skip_drugs_single = FALSE,
   skip_drugs_pairs = FALSE,
   skip_all_pairs = FALSE,
+  short_filenames = FALSE,
   log_filename
 )
 }
@@ -70,6 +71,9 @@ check, only used for testing}
 \item{skip_drugs_pairs}{skip drug perturbations}
 
 \item{skip_all_pairs}{skip pairwise combinations of nodes}
+
+\item{short_filenames}{logical. If TRUE, use MD5 hashes for long filenames
+to avoid Windows path length issues. Defaults to FALSE.}
 
 \item{log_filename}{filename for log file}
 }

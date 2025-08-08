@@ -14,7 +14,9 @@ run_all_backgrounds(
   combo_type,
   results_dir,
   log_file,
-  precedence = "perturbation"
+  precedence = "perturbation",
+  short_filenames = FALSE,
+  file_hashtable_dir = NULL
 )
 }
 \arguments{

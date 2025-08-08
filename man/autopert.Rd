@@ -14,7 +14,8 @@ autopert(
   missing_nodes_perturbed_overide = FALSE,
   missing_nodes_expected_overide = FALSE,
   project_path = NA,
-  group_vars = c("source", "cell_line", "experiment_particular")
+  group_vars = c("source", "cell_line", "experiment_particular"),
+  short_filenames = FALSE
 )
 }
 \arguments{
@@ -48,6 +49,9 @@ experimental data), "cell_line" (cell line or tissue used,
 which determines background mutations for the experiment),
 "experiment_particular" (details of the experiment
 e.g. "Application of cisplatin")}
+
+\item{short_filenames}{logical. If TRUE, use MD5 hashes for long filenames
+to avoid Windows path length issues. Defaults to FALSE.}
 }
 \value{
 Writes out results as JSON, CSV and PNG

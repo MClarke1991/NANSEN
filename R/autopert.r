@@ -24,6 +24,8 @@
 #'     expected nodes that are missing from network
 #' @param project_path project path for git SHA log, point to git
 #'     repo of the network and specification being tested
+#' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames 
+#'     to avoid Windows path length issues. Defaults to FALSE.
 #' @return Writes out results as JSON, CSV and PNG
 #' @export
 autopert <- function(netw_file_path,
@@ -40,7 +42,8 @@ autopert <- function(netw_file_path,
                      group_vars = c(
                          "source", "cell_line",
                          "experiment_particular"
-                     )) {
+                     ),
+                     short_filenames = FALSE) {
 
     ## Output files
 
@@ -154,6 +157,14 @@ autopert <- function(netw_file_path,
             command = paste0(spec_command),
             file_name = paste0(file_name, ".json")
         )
+    
+    # Apply filename hashing if requested
+    if (short_filenames) {
+        commands <- commands %>%
+            dplyr::rename("full_file_name" = "file_name") %>%
+            dplyr::rowwise() %>%
+            dplyr::mutate(file_name = digest_filename(full_file_name))
+    }
 
     commands_short <- commands %>%
         dplyr::select(source, cell_line, file_name, command)
