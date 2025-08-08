@@ -223,3 +223,88 @@ out_dir = "%s"
   
   unlink(config_file)
 })
+
+test_that("validate_autopert_config handles short_filenames parameter correctly", {
+  # Test with short_filenames = true
+  config_short_filenames <- list(
+    netw_file_path = here::here("examples", "autopert", "helper_autopert_1.json"),
+    spec_path = here::here("examples", "autopert", "helper_spec_1.csv"),
+    out_dir = "test_output",
+    short_filenames = TRUE
+  )
+  
+  config_file <- file.path(temp_dir, "short_filenames_true.toml")
+  toml_content <- sprintf("
+netw_file_path = \"%s\"
+spec_path = \"%s\"
+out_dir = \"%s\"
+short_filenames = %s
+",
+    gsub("\\\\", "/", config_short_filenames$netw_file_path),
+    gsub("\\\\", "/", config_short_filenames$spec_path),
+    config_short_filenames$out_dir,
+    tolower(as.character(config_short_filenames$short_filenames))
+  )
+  writeLines(toml_content, config_file)
+  
+  result <- validate_autopert_config(config_file)
+  
+  expect_true(result$short_filenames)
+  expect_equal(result$netw_file_path, config_short_filenames$netw_file_path)
+  expect_equal(result$spec_path, config_short_filenames$spec_path)
+  
+  unlink(config_file)
+  
+  # Test with short_filenames = false
+  config_short_filenames_false <- list(
+    netw_file_path = here::here("examples", "autopert", "helper_autopert_1.json"),
+    spec_path = here::here("examples", "autopert", "helper_spec_1.csv"),
+    out_dir = "test_output",
+    short_filenames = FALSE
+  )
+  
+  config_file <- file.path(temp_dir, "short_filenames_false.toml")
+  toml_content <- sprintf("
+netw_file_path = \"%s\"
+spec_path = \"%s\"
+out_dir = \"%s\"
+short_filenames = %s
+",
+    gsub("\\\\", "/", config_short_filenames_false$netw_file_path),
+    gsub("\\\\", "/", config_short_filenames_false$spec_path),
+    config_short_filenames_false$out_dir,
+    tolower(as.character(config_short_filenames_false$short_filenames))
+  )
+  writeLines(toml_content, config_file)
+  
+  result <- validate_autopert_config(config_file)
+  
+  expect_false(result$short_filenames)
+  
+  unlink(config_file)
+  
+  # Test without short_filenames (should default to FALSE)
+  config_no_short_filenames <- list(
+    netw_file_path = here::here("examples", "autopert", "helper_autopert_1.json"),
+    spec_path = here::here("examples", "autopert", "helper_spec_1.csv"),
+    out_dir = "test_output"
+  )
+  
+  config_file <- file.path(temp_dir, "no_short_filenames.toml")
+  toml_content <- sprintf("
+netw_file_path = \"%s\"
+spec_path = \"%s\"
+out_dir = \"%s\"
+",
+    gsub("\\\\", "/", config_no_short_filenames$netw_file_path),
+    gsub("\\\\", "/", config_no_short_filenames$spec_path),
+    config_no_short_filenames$out_dir
+  )
+  writeLines(toml_content, config_file)
+  
+  result <- validate_autopert_config(config_file)
+  
+  expect_false(result$short_filenames)  # Should default to FALSE
+  
+  unlink(config_file)
+})

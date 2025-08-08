@@ -138,3 +138,92 @@ test_that("run_combo_config.r handles nonexistent config file", {
   # Test that script errors when config file doesn't exist
   expect_snapshot(source(here::here("examples/run_combo_config.r")), error = TRUE)
 })
+
+test_that("run_combo_config.r works with short_filenames configuration - Windows only", {
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools")
+
+  # Create test config with short_filenames = true
+  config_file <- file.path(temp_dir, "short_filenames_combo_config.toml")
+  toml_content <- sprintf("
+netw_file_path = \"%s\"
+backgrounds_path = \"%s\"
+out_dir = \"%s\"
+skip_autopert = %s
+skip_combo_sim = %s
+skip_heatmaps = %s
+skip_heatmaps_uc = %s
+pheno_only = %s
+phenotypes = [%s]
+project_path = \"\"
+node_col_name = \"%s\"
+use_vmcai = %s
+short_filenames = %s
+",
+    gsub("\\\\", "/", here::here("examples", "combo", "helper_combo_1.json")),
+    gsub("\\\\", "/", here::here("examples", "combo", "helper_combo_bkg_1.csv")),
+    "short_filenames_combo_test",
+    "true",
+    "true",
+    "true", 
+    "true",
+    "true",
+    "\"output_a\", \"output_b\"",
+    "node",
+    "true",
+    "true"
+  )
+  writeLines(toml_content, config_file)
+  
+  on.exit({
+    unlink(config_file)
+    if (dir.exists(file.path(temp_dir, "short_filenames_combo_test"))) {
+      unlink(file.path(temp_dir, "short_filenames_combo_test"), recursive = TRUE)
+    }
+  })
+
+  # Mock commandArgs to return our config file
+  old_commandArgs <- commandArgs
+  commandArgs <- function(trailingOnly = FALSE) {
+    if (trailingOnly) {
+      return(config_file)
+    } else {
+      return(c("R", "--slave", "--no-restore", "--file=script.R", "--args", config_file))
+    }
+  }
+
+  # Restore on exit
+  on.exit({
+    commandArgs <- old_commandArgs
+    unlink(config_file)
+    if (dir.exists(file.path(temp_dir, "short_filenames_combo_test"))) {
+      unlink(file.path(temp_dir, "short_filenames_combo_test"), recursive = TRUE)
+    }
+  }, add = TRUE)
+
+  # Run the script and expect it to work
+  expect_no_error({
+    suppressMessages(suppressWarnings(source(here::here("examples/run_combo_config.r"))))
+  })
+
+  # Verify that the output directory contains results with hashed functionality
+  out_dir <- file.path(temp_dir, "short_filenames_combo_test")
+  expect_true(dir.exists(out_dir))
+  
+  # Find COMBO_RUN directory
+  combo_dirs <- list.dirs(out_dir, full.names = FALSE, recursive = FALSE)
+  run_dir_name <- combo_dirs[grepl("^COMBO_RUN_", combo_dirs)]
+  expect_true(length(run_dir_name) == 1)
+  run_dir <- file.path(out_dir, run_dir_name)
+  
+  # Verify file_hashtables directory exists
+  hashtable_dir <- file.path(run_dir, "file_hashtables")
+  expect_true(dir.exists(hashtable_dir))
+  
+  # Verify hashtable files exist
+  hashtable_files <- list.files(hashtable_dir, pattern = "^file_hashtable_.*\.csv$")
+  expect_true(length(hashtable_files) > 0)
+  
+  # Verify results files exist
+  expect_true(file.exists(file.path(run_dir, "parsed_results.csv")))
+  expect_true(file.exists(file.path(run_dir, "processed_results.csv")))
+})
