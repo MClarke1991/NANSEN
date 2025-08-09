@@ -25,18 +25,19 @@ test_that("run_all_backgrounds works with short_filenames = FALSE - Windows only
     }
   })
 
-  # Create test data
-  background_commands <- data.frame(
-    background = "wt",
-    bk_command = "",
-    bk_filename_part = "growth_factor__1"
-  )
+  # Load real example data and generate proper data structures
+  backgrounds <- readr::read_csv(here::here("examples", "combo", "helper_combo_bkg_1.csv"), show_col_types = FALSE, lazy = FALSE)
+  netw_variables <- get_netw_variables(here::here("examples", "combo", "helper_combo_1.json")) %>%
+    dplyr::rename("node" = "name")
   
-  perts <- data.frame(
-    command_arg = "-ko 1 0",
-    filename_part = "a__0",
-    alt_filename_part = "node_a__0"
-  )
+  # Generate proper background commands using real function
+  background_commands <- make_bkg_commands_combo(backgrounds, netw_variables, node_col = "node") %>%
+    dplyr::filter(background == "wt")  # Use only wt background for this test
+  
+  # Generate realistic perturbations - just use first few for faster testing
+  perts <- make_single_muts(netw_variables, node_col = "node") %>%
+    dplyr::slice_head(n = 3) %>%  # Use only first 3 perturbations for faster testing
+    dplyr::mutate(alt_filename_part = NA)  # Add missing column like combo() does when skipping drugs
 
   # Test with short_filenames = FALSE
   expect_no_error({
@@ -92,18 +93,19 @@ test_that("run_all_backgrounds works with short_filenames = TRUE - Windows only"
     }
   })
 
-  # Create test data
-  background_commands <- data.frame(
-    background = "wt",
-    bk_command = "",
-    bk_filename_part = "growth_factor__1"
-  )
+  # Load real example data and generate proper data structures
+  backgrounds <- readr::read_csv(here::here("examples", "combo", "helper_combo_bkg_1.csv"), show_col_types = FALSE, lazy = FALSE)
+  netw_variables <- get_netw_variables(here::here("examples", "combo", "helper_combo_1.json")) %>%
+    dplyr::rename("node" = "name")
   
-  perts <- data.frame(
-    command_arg = "-ko 1 0",
-    filename_part = "a__0",
-    alt_filename_part = "node_a__0"
-  )
+  # Generate proper background commands using real function
+  background_commands <- make_bkg_commands_combo(backgrounds, netw_variables, node_col = "node") %>%
+    dplyr::filter(background == "wt")  # Use only wt background for this test
+  
+  # Generate realistic perturbations - just use first few for faster testing
+  perts <- make_single_muts(netw_variables, node_col = "node") %>%
+    dplyr::slice_head(n = 3) %>%  # Use only first 3 perturbations for faster testing
+    dplyr::mutate(alt_filename_part = NA)  # Add missing column like combo() does when skipping drugs
 
   # Test with short_filenames = TRUE
   expect_no_error({
@@ -187,18 +189,18 @@ test_that("run_all_backgrounds handles multiple backgrounds with hashing - Windo
     }
   })
 
-  # Create test data with multiple backgrounds
-  background_commands <- data.frame(
-    background = c("wt", "cancer"),
-    bk_command = c("", "-ko 2 1"),
-    bk_filename_part = c("growth_factor__1", "growth_factor__1__e__1")
-  )
+  # Load real example data and generate proper data structures with multiple backgrounds
+  backgrounds <- readr::read_csv(here::here("examples", "combo", "helper_combo_bkg_1.csv"), show_col_types = FALSE, lazy = FALSE)
+  netw_variables <- get_netw_variables(here::here("examples", "combo", "helper_combo_1.json")) %>%
+    dplyr::rename("node" = "name")
   
-  perts <- data.frame(
-    command_arg = "-ko 1 0",
-    filename_part = "a__0",
-    alt_filename_part = "node_a__0"
-  )
+  # Generate proper background commands using real function - use both backgrounds
+  background_commands <- make_bkg_commands_combo(backgrounds, netw_variables, node_col = "node")
+  
+  # Generate realistic perturbations - just use first few for faster testing
+  perts <- make_single_muts(netw_variables, node_col = "node") %>%
+    dplyr::slice_head(n = 3) %>%  # Use only first 3 perturbations for faster testing
+    dplyr::mutate(alt_filename_part = NA)  # Add missing column like combo() does when skipping drugs
 
   # Test with short_filenames = TRUE
   expect_no_error({

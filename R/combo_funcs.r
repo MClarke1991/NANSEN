@@ -564,7 +564,7 @@ run_all_backgrounds <- function(background_commands,
         if (precedence == "perturbation") {
             commands <- dplyr::mutate(commands, full_command =
                                           paste(command_arg, bk_command))
-        } else if (precede == "background") {
+        } else if (precedence == "background") {
             commands <- dplyr::mutate(commands, full_command =
                                           paste(bk_command, command_arg))
         } else {
