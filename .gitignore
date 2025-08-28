@@ -74,3 +74,4 @@ renv/staging/
 combo_results/
 debug_csv_output/
 tests/testthat/temp_test_outputs/
+NANSEN.Rproj
