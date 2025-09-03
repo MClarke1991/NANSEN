@@ -228,7 +228,9 @@ test_that("split_combo_results handles missing files", {
       drug_path = NA,
       node_col_name = "node"
     ),
-    error = TRUE
+    error = TRUE,
+    transform = function(x) gsub(pattern = "!.+(NANSEN.+)",
+                          replacement = "! '\\1", x = x)
   )
 })
 
@@ -258,7 +260,9 @@ test_that("split_combo_results handles invalid network file", {
       drug_path = NA,
       node_col_name = "node"
     ),
-    error = TRUE
+    error = TRUE,
+    transform = function(x) gsub(pattern = "!.+(NANSEN.+)",
+                                 replacement = "! '\\1", x = x)
   )
 })
 
@@ -288,6 +292,8 @@ test_that("split_combo_results handles invalid drug file", {
       drug_path = "nonexistent_drugs.csv",
       node_col_name = "node"
     ),
-    error = TRUE
+    error = TRUE,
+    transform = function(x) gsub(pattern = "\\(.+(NANSEN.+)",
+                                 replacement = "\\('\\1", x = x)
   )
 })
