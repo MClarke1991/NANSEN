@@ -7,3 +7,4 @@ missing_nodes_perturbed_overide = false
 missing_nodes_expected_overide = false
 project_path = ""
 group_vars = ["source", "cell_line", "experiment_particular"]
+short_filenames = false

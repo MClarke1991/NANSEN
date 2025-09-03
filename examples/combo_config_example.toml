@@ -10,3 +10,4 @@ phenotypes = ["output_a", "output_b"]
 project_path = ""
 node_col_name = "node"
 use_vmcai = true
+short_filenames = false

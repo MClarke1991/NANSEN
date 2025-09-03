@@ -84,6 +84,7 @@ if (!config$skip_autopert) {
              missing_nodes_perturbed_overide = config$missing_nodes_perturbed_overide,
              missing_nodes_expected_overide = config$missing_nodes_expected_overide,
              project_path = config$project_path,
+             short_filenames = config$short_filenames
              )
 } else {
     print("Skipping specification testing")
@@ -106,7 +107,8 @@ if (!config$skip_combo_sim) {
           drug_conflict_overide = config$drug_conflict_overide,
           skip_all_pairs = config$skip_all_pairs,
           skip_drugs_single = config$skip_combo_drugs_single,
-          skip_drugs_pairs = config$skip_combo_drugs_double
+          skip_drugs_pairs = config$skip_combo_drugs_double,
+          short_filenames = config$short_filenames
           )
 } else {
     print("Skipping combo")

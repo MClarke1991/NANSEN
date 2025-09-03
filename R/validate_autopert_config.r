@@ -38,7 +38,8 @@ validate_autopert_config <- function(config_path) {
         missing_nodes_perturbed_overide = FALSE,
         missing_nodes_expected_overide = FALSE,
         project_path = NA,
-        group_vars = c("source", "cell_line", "experiment_particular")
+        group_vars = c("source", "cell_line", "experiment_particular"),
+        short_filenames = FALSE
     )
     
     for (param in names(defaults)) {

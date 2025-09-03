@@ -175,3 +175,91 @@ test_that("autopert creates expected directory structure", {
     expect_true(file %in% results_files, info = paste("Missing PNG file:", file))
   }
 })
+
+test_that("autopert integration test with short filenames - Windows only", {
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA command line tools (BioCheckConsole.exe)")
+
+  # Create temporary directory for test outputs
+  out_dir <- file.path(temp_dir, "autopert_short_filenames_test")
+
+  # Set up test logging
+  setup_log_file(futile.logger::INFO)
+  on.exit({
+    cleanup_log_file()
+    if (dir.exists(out_dir)) {
+      unlink(out_dir, recursive = TRUE)
+    }
+  })
+
+  # Run autopert function with short_filenames = TRUE
+  expect_no_error(
+    autopert(
+      netw_file_path = here::here("examples", "autopert", "helper_autopert_1.json"),
+      spec_path = here::here("examples", "autopert", "helper_spec_1.csv"),
+      out_dir = out_dir,
+      bma_path = bma_path,
+      nosat = TRUE,
+      loserum = FALSE,
+      missing_nodes_perturbed_overide = FALSE,
+      missing_nodes_expected_overide = FALSE,
+      project_path = "",
+      group_vars = c("source", "cell_line", "experiment_particular"),
+      short_filenames = TRUE  # Test with hashing enabled
+    )
+  )
+
+  # Find the AP_RUN directory (should be created by autopert function)
+  ap_dirs <- list.dirs(out_dir, full.names = FALSE, recursive = FALSE)
+  run_dir_name <- ap_dirs[grepl("^AP_RUN_", ap_dirs)]
+  expect_true(length(run_dir_name) == 1, "Expected exactly one AP_RUN directory")
+  run_dir <- file.path(out_dir, run_dir_name)
+
+  # Verify all expected output files exist
+  expect_true(file.exists(file.path(run_dir, "AutoPertLogs.log")))
+  expect_true(dir.exists(file.path(run_dir, "BioCheck_output")))
+  expect_true(dir.exists(file.path(run_dir, "results")))
+
+  # Verify BioCheck output files exist and are hashed (should be 32-char MD5)
+  biocheck_files <- list.files(file.path(run_dir, "BioCheck_output"), pattern = "\\.json$")
+  expect_true(length(biocheck_files) > 0)
+
+  # Check that filenames are hashed (32 character MD5 + .json extension)
+  for (json_file in biocheck_files) {
+    filename_without_ext <- tools::file_path_sans_ext(json_file)
+    expect_true(nchar(filename_without_ext) == 32,
+               info = paste("Expected 32-char hash, got:", nchar(filename_without_ext), "for file:", json_file))
+    expect_match(filename_without_ext, "^[a-f0-9]{32}$",
+               info = paste("Expected MD5 hash format for file:", json_file))
+  }
+
+  # Verify results files are generated correctly
+  expect_true(file.exists(file.path(run_dir, "results", "results.csv")))
+  expect_true(file.exists(file.path(run_dir, "results", "results_short.csv")))
+  expect_true(file.exists(file.path(run_dir, "results", "results_score.csv")))
+  expect_true(file.exists(file.path(run_dir, "results", "results_mismatch.csv")))
+  expect_true(file.exists(file.path(run_dir, "results", "results_short_node_summary.csv")))
+  expect_true(file.exists(file.path(run_dir, "results", "parse_results.csv")))
+
+  # Verify results still contain meaningful data despite hashed filenames
+  results <- readr::read_csv(file.path(run_dir, "results", "results.csv"), show_col_types = FALSE)
+  expect_true(nrow(results) > 0)
+  expect_true(all(c("gene", "perturbation", "expectation_bma", "lo", "hi", "mean_result", "diff") %in% colnames(results)))
+
+  parse_results <- readr::read_csv(file.path(run_dir, "results", "parse_results.csv"), show_col_types = FALSE, col_types = readr::cols(formula = "c"))
+  expect_true(nrow(parse_results) > 0)
+  expect_true(all(c("filename", "time", "id", "lo", "hi", "name", "range_from", "range_to", "formula") %in% colnames(parse_results)))
+
+  # Verify that parse_results contains hashed filenames
+  for (filename in parse_results$filename) {
+    filename_without_ext <- tools::file_path_sans_ext(filename)
+    expect_true(nchar(filename_without_ext) == 32,
+               info = paste("Expected 32-char hash in parse_results, got:", nchar(filename_without_ext)))
+  }
+
+  # Verify JSON files can be parsed correctly
+  for (json_file in biocheck_files) {
+    json_content <- jsonlite::fromJSON(file.path(run_dir, "BioCheck_output", json_file))
+    expect_true("Status" %in% names(json_content))
+    expect_true("Ticks" %in% names(json_content))
+  }
+})

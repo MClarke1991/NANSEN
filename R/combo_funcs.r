@@ -465,6 +465,10 @@ make_pair_drugs <- function(drugs_single) {
 #' @param precedence should perturbation or background mutation take
 #'     precedence if there are conflicting effects on the same node,
 #'     defaults to perturbation
+#' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames 
+#'     to avoid Windows path length issues. Defaults to FALSE.
+#' @param file_hashtable_dir directory path where filename hashtables are stored 
+#'     when short_filenames=TRUE. Defaults to NULL.
 #' @return Results are written as json files by BMA in directories
 #'     created with the name of the background and the
 #'     combo_type. Individual files are named by combining the file
@@ -481,7 +485,9 @@ run_all_backgrounds <- function(background_commands,
                                 combo_type,
                                 results_dir,
                                 log_file,
-                                precedence = "perturbation") {
+                                precedence = "perturbation",
+                                short_filenames = FALSE,
+                                file_hashtable_dir = NULL) {
     ## Normalize BMA path for cross-platform compatibility
     # bma_path <- normalize_bma_path(bma_path)
 
@@ -528,6 +534,29 @@ run_all_backgrounds <- function(background_commands,
                                                            "PERT",
                                                            alt_filename_part,
                                                            sep = "__"), ".json"))
+                          
+        # Apply filename hashing if requested
+        if (short_filenames) {
+            # Store original filenames for hashtable
+            file_hashtable <- commands %>%
+                dplyr::select(full_filename, alt_full_filename) %>%
+                dplyr::rename("unhash_full_filename" = "full_filename",
+                             "unhash_alt_full_filename" = "alt_full_filename") %>%
+                dplyr::rowwise() %>%
+                dplyr::mutate(full_filename = digest_filename(unhash_full_filename, append_json = TRUE)) %>%
+                dplyr::rowwise() %>%
+                dplyr::mutate(alt_full_filename = digest_filename(unhash_alt_full_filename, append_json = TRUE))
+            
+            # Update commands with hashed filenames
+            commands <- commands %>%
+                dplyr::mutate(full_filename = file_hashtable$full_filename,
+                             alt_full_filename = file_hashtable$alt_full_filename)
+            
+            # Save hashtable for this background/combo_type combination
+            hashtable_filename <- paste0("file_hashtable_", combo_type, "__", 
+                                        background_commands$background[i], ".csv")
+            readr::write_csv(file_hashtable, file.path(file_hashtable_dir, hashtable_filename))
+        }
 
         ## ORDER MATTERS, if bk_command conflicts with
         ## command_arg, command_arg takes precedence as it
@@ -535,7 +564,7 @@ run_all_backgrounds <- function(background_commands,
         if (precedence == "perturbation") {
             commands <- dplyr::mutate(commands, full_command =
                                           paste(command_arg, bk_command))
-        } else if (precede == "background") {
+        } else if (precedence == "background") {
             commands <- dplyr::mutate(commands, full_command =
                                           paste(bk_command, command_arg))
         } else {
@@ -842,6 +871,8 @@ get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_fi
 #' @param skip_drugs_single  skip drug perturbations
 #' @param skip_drugs_pairs skip drug perturbations
 #' @param skip_all_pairs skip pairwise combinations of nodes
+#' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames 
+#'     to avoid Windows path length issues. Defaults to FALSE.
 #' @param log_filename filename for log file
 #' @return write a `parsed_results.csv` and `processed_results.csv`
 #' @export
@@ -864,6 +895,7 @@ combo <- function(netw_file_path,
                   skip_drugs_single = FALSE,
                   skip_drugs_pairs = FALSE,
                   skip_all_pairs = FALSE,
+                  short_filenames = FALSE,
                   log_filename) {
 
     results_dir <- get_combo_results_dir(results_prefix = results_prefix,
@@ -886,6 +918,15 @@ combo <- function(netw_file_path,
 
     if (!dir.exists(file.path(results_dir))) {
         dir.create(file.path(results_dir))
+    }
+    
+    # Create hashtable directory if short filenames are enabled
+    file_hashtable_dir <- NULL
+    if (short_filenames) {
+        file_hashtable_dir <- file.path(results_dir, "file_hashtables")
+        if (!dir.exists(file_hashtable_dir)) {
+            dir.create(file_hashtable_dir)
+        }
     }
 
     log_file <- file.path(results_dir, log_filename)
@@ -1007,7 +1048,9 @@ combo <- function(netw_file_path,
                         perts = s_muts_w_drugs,
                         combo_type = "single",
                         results_dir  = results_dir,
-                        log_file = log_file)
+                        log_file = log_file,
+                        short_filenames = short_filenames,
+                        file_hashtable_dir = file_hashtable_dir)
     futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
 
     if (!skip_all_pairs) {
@@ -1018,7 +1061,9 @@ combo <- function(netw_file_path,
                             perts = pairs_w_drugs,
                             combo_type = "double",
                             results_dir  = results_dir,
-                            log_file = log_file)
+                            log_file = log_file,
+                            short_filenames = short_filenames,
+                            file_hashtable_dir = file_hashtable_dir)
         futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
         futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
     } else {
@@ -1047,6 +1092,17 @@ combo <- function(netw_file_path,
     readr::write_csv(parsed_results,
               file = parsed_results_file)
     futile.logger::flog.info(capture.output(tictoc::toc()), name = log_file)
+
+    ## Map hashed filenames back to original names if hashing was used
+    if (short_filenames && !is.null(file_hashtable_dir)) {
+        file_hashtable <- get_all_hashtables(file_hashtable_dir, log_file)
+        
+        # Left join to map hashed filenames back to original names
+        parsed_results <- parsed_results %>%
+            dplyr::left_join(file_hashtable, by = c("filename" = "full_filename")) %>%
+            dplyr::mutate(filename = dplyr::coalesce(unhash_full_filename, filename)) %>%
+            dplyr::select(-unhash_full_filename, -unhash_alt_full_filename, -alt_full_filename)
+    }
 
     ## Process results and save cache
 
