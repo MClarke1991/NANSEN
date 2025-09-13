@@ -3,9 +3,10 @@ source(here::here("tests", "testthat", "testing_utils.r"))
 library(mockery)
 
 temp_dir <- here::here("tests/testthat/temp_test_outputs")
-if (!dir.exists(temp_dir)) {
-  dir.create(temp_dir)
-}
+setup_temp_dir(temp_dir)
+
+# Clean up temp directory after all tests complete
+on.exit(cleanup_temp_dir(temp_dir), add = TRUE)
 
 test_that("run_combo_config.r works with valid config", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
@@ -60,7 +61,15 @@ use_vmcai = %s
   writeLines(toml_content, config_file)
 
   # Clean up on exit
-  on.exit(if (file.exists(config_file)) file.remove(config_file))
+  on.exit({
+    if (file.exists(config_file)) file.remove(config_file)
+    # Clean up any output files created in temp_dir during the test
+    output_files <- list.files(temp_dir, full.names = TRUE, recursive = FALSE)
+    output_files <- output_files[!grepl("test_combo_config\\.toml$", output_files)]
+    if (length(output_files) > 0) {
+      unlink(output_files, recursive = TRUE)
+    }
+  })
 
   args <- c(here::here("examples/run_combo_config.r"), config_file)
 
@@ -147,8 +156,7 @@ test_that("run_combo_config.r works with short_filenames configuration - Windows
   toml_content <- sprintf("
 netw_file_path = \"%s\"
 backgrounds_path = \"%s\"
-out_dir = \"dummy\"
-pipe_dir = \"%s\"
+out_dir = \"%s\"
 skip_autopert = %s
 skip_combo_sim = %s
 skip_heatmaps = %s
@@ -177,9 +185,9 @@ short_filenames = %s
 
   on.exit({
     unlink(config_file)
-    pipe_dir <- file.path(temp_dir, "short_filenames_combo_test")
-    if (dir.exists(pipe_dir)) {
-      unlink(pipe_dir, recursive = TRUE)
+    out_dir <- file.path(temp_dir, "short_filenames_combo_test")
+    if (dir.exists(out_dir)) {
+      unlink(out_dir, recursive = TRUE)
     }
   })
 
@@ -200,8 +208,7 @@ short_filenames = %s
   )
 
   # Verify that the output directory contains results with hashed functionality
-  pipe_dir <- file.path(temp_dir, "short_filenames_combo_test")
-  out_dir <- file.path(pipe_dir, "results")
+  out_dir <- file.path(temp_dir, "short_filenames_combo_test")
   expect_true(dir.exists(out_dir))
 
   # Find COMBO_RUN directory

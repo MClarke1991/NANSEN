@@ -80,7 +80,6 @@ validate_combo_config <- function(config_path) {
         druggable_heat_dir_uc = "unclust_druggable_heatmaps",
         drug_heat_dir_uc = "unclust_drug_heatmaps",
         drug_conflict_overide = FALSE,
-        pipe_dir = "combo_results",
         log_filename = "PipeLog.log",
         short_filenames = FALSE
     )
