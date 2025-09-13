@@ -14,9 +14,9 @@ test_that("run_combo_config.r works with valid config", {
   valid_config <- list(
     netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
     backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
-    out_dir = "combo_results",
+    out_dir = temp_dir,
     skip_autopert = TRUE,
-    skip_combo_sim = TRUE,
+    skip_combo_sim = FALSE,
     skip_heatmaps = TRUE,
     skip_heatmaps_uc = TRUE,
     pheno_only = TRUE,
@@ -27,7 +27,7 @@ test_that("run_combo_config.r works with valid config", {
   )
 
   config_file <- file.path(temp_dir, "test_combo_config.toml")
-  
+
   # Write TOML directly to avoid configr issues with complex lists
   toml_content <- sprintf('
 netw_file_path = "%s"
@@ -56,7 +56,7 @@ use_vmcai = %s
     valid_config$node_col_name,
     tolower(valid_config$use_vmcai)
   )
-  
+
   writeLines(toml_content, config_file)
 
   # Clean up on exit
@@ -74,7 +74,7 @@ use_vmcai = %s
     },
     .package = "base",
     {
-      suppressMessages(expect_no_error(source(here::here("examples/run_combo_config.r"))))
+      suppressWarnings(suppressMessages(expect_no_error(source(here::here("examples/run_combo_config.r")))))
     }
   )
 })
@@ -165,7 +165,7 @@ short_filenames = %s
     file.path(temp_dir, "short_filenames_combo_test"),
     "true",
     "false",
-    "true", 
+    "true",
     "true",
     "true",
     "\"output_a\", \"output_b\"",
@@ -174,7 +174,7 @@ short_filenames = %s
     "true"
   )
   writeLines(toml_content, config_file)
-  
+
   on.exit({
     unlink(config_file)
     pipe_dir <- file.path(temp_dir, "short_filenames_combo_test")
@@ -203,21 +203,21 @@ short_filenames = %s
   pipe_dir <- file.path(temp_dir, "short_filenames_combo_test")
   out_dir <- file.path(pipe_dir, "results")
   expect_true(dir.exists(out_dir))
-  
+
   # Find COMBO_RUN directory
   combo_dirs <- list.dirs(out_dir, full.names = FALSE, recursive = FALSE)
   run_dir_name <- combo_dirs[grepl("^COMBO_RUN_", combo_dirs)]
   expect_true(length(run_dir_name) == 1)
   run_dir <- file.path(out_dir, run_dir_name)
-  
+
   # Verify file_hashtables directory exists
   hashtable_dir <- file.path(run_dir, "file_hashtables")
   expect_true(dir.exists(hashtable_dir))
-  
+
   # Verify hashtable files exist
   hashtable_files <- list.files(hashtable_dir, pattern = "^file_hashtable_.*\\.csv$")
   expect_true(length(hashtable_files) > 0)
-  
+
   # Verify results files exist
   expect_true(file.exists(file.path(run_dir, "parsed_results.csv")))
   expect_true(file.exists(file.path(run_dir, "processed_results.csv")))
