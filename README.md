@@ -72,8 +72,7 @@ Command line usage:
 Rscript examples/run_autopert_config.r examples/autopert_config_example.toml 
 ```
 
-
-
+For details of how to write specification files, see [examples/README.md](examples/README.md). 
 
 ### 2. Combination perturbation screening – `combo()` & helpers in `combo_funcs.r`
 
@@ -102,6 +101,10 @@ Command line usage:
 ```bash
 Rscript examples/run_combo_config.r examples/combo_config_example.toml
 ```
+
+For details of how to write specification files, see [examples/README.md](examples/README.md). 
+
+## Citation 
 
 If you use NANSEN in your research, please cite:
 
