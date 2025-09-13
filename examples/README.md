@@ -87,6 +87,110 @@ output_a
 output_b
 ```
 
+## Configuration Files
+
+NANSEN provides TOML configuration files that allow you to run complete workflows with a single command. These configuration files specify all parameters for AutoPert and Combo analyses, eliminating the need to modify R scripts directly.
+
+### AutoPert Configuration Files: `*_config_example.toml`
+
+AutoPert configuration files define parameters for running automated perturbation analysis.
+
+**Usage:**
+```bash
+Rscript examples/run_autopert_config.r examples/autopert_config_example.toml
+```
+
+**Required Fields:**
+- `netw_file_path` - Path to network JSON file (string)
+- `spec_path` - Path to specification CSV file (string)
+- `out_dir` - Output directory for results (string)
+
+**Optional Fields (with defaults):**
+- `nosat = true` - Run without SAT solver (boolean)
+- `loserum = false` - Experimental serum option (boolean)
+- `missing_nodes_perturbed_overide = false` - Override missing node checks for perturbed nodes (boolean)
+- `missing_nodes_expected_overide = false` - Override missing node checks for expected results (boolean)
+- `project_path = ""` - Git repository path for logging (string)
+- `group_vars = ["source", "cell_line", "experiment_particular"]` - Variables for grouping experiments (array of strings)
+- `short_filenames = false` - Use shortened filenames for Windows compatibility (boolean)
+
+**Example Configuration:**
+```toml
+netw_file_path = "examples/autopert/helper_autopert_1.json"
+spec_path = "examples/autopert/helper_spec_1.csv"
+out_dir = "auto_pert_results"
+nosat = true
+loserum = false
+missing_nodes_perturbed_overide = false
+missing_nodes_expected_overide = false
+project_path = ""
+group_vars = ["source", "cell_line", "experiment_particular"]
+short_filenames = false
+```
+
+### Combo Configuration Files: `combo_config_example.toml`
+
+Combo configuration files define parameters for running combination perturbation analysis.
+
+**Usage:**
+```bash
+Rscript examples/run_combo_config.r examples/combo_config_example.toml
+```
+
+**Required Fields:**
+- `netw_file_path` - Path to network JSON file (string)
+- `backgrounds_path` - Path to backgrounds CSV file (string)
+- `out_dir` - Output directory for results (string)
+
+**Key Optional Fields (with defaults):**
+- `drug_path = NA` - Path to drug perturbations CSV file (string or NA)
+- `combo_exclusions_path = NA` - Path to exclusions CSV file (string or NA)
+- `project_path = ""` - Git repository path for logging (string)
+- `phenotypes = ["output_a", "output_b"]` - List of phenotypes to measure (array of strings)
+- `pheno_only = true` - Only process phenotype nodes for their value under perturbation (boolean). This reduces the time of the processing step from hours to minutes. 
+- `skip_autopert = false` - Skip autopert step (boolean)
+- `skip_combo_sim = false` - Skip combo simulation (boolean)
+- `skip_heatmaps = false` - Skip heatmap generation (boolean)
+- `skip_heatmaps_uc = false` - Skip unclustered heatmaps (boolean)
+- `use_vmcai = true` - Use VMCAI solver (boolean)
+- `node_col_name = "node"` - Column name for node identifier (string)
+- `short_filenames = false` - Use shortened filenames for Windows compatibility (boolean)
+
+**Example Configuration:**
+```toml
+netw_file_path = "examples/combo/helper_combo_1.json"
+backgrounds_path = "examples/combo/helper_combo_bkg_1.csv"
+out_dir = "combo_results"
+skip_autopert = true
+skip_combo_sim = true
+skip_heatmaps = true
+skip_heatmaps_uc = true
+pheno_only = true
+phenotypes = ["output_a", "output_b"]
+project_path = ""
+node_col_name = "node"
+use_vmcai = true
+short_filenames = false
+```
+
+### Configuration File Guidelines
+
+**TOML Format Rules:**
+- Use standard TOML syntax (https://toml.io/)
+- Strings must be quoted: `"path/to/file"`
+- Booleans are lowercase: `true`, `false`
+- Arrays use square brackets: `["item1", "item2"]`
+- Comments start with `#`
+
+**Path Specifications:**
+- Use relative paths from your working directory
+- Forward slashes work on all platforms: `"examples/data/file.csv"`
+- Absolute paths are supported but reduce portability
+
+**File Naming:**
+- Use descriptive names: `my_experiment_autopert_config.toml`
+- Keep the `_config.toml` suffix for clarity
+
 ## File Format Guidelines
 
 ### General CSV Rules
@@ -110,10 +214,29 @@ output_b
 
 ## Usage
 
+### Using CSV Data Files
 Reference the existing example files in this folder as templates:
 - Copy an appropriate example file
 - Modify the data while preserving the column structure
 - Ensure all required columns are present with exact header names
 - Validate your CSV format before running analyses
 
-For more information on running analyses with these files, see the main package documentation and the example R scripts in this folder.
+### Using Configuration Files
+For automated workflows:
+1. **Copy an example configuration file:**
+   - `autopert_config_example.toml` for perturbation analysis
+   - `combo_config_example.toml` for combination screening
+2. **Modify paths and parameters** to match your data and requirements
+3. **Run the analysis:**
+   ```bash
+   Rscript examples/run_autopert_config.r your_config.toml
+   # or
+   Rscript examples/run_combo_config.r your_config.toml
+   ```
+4. **Validate configuration** - the scripts will check file paths and required fields before running
+
+### Additional Resources
+For more information on:
+- Function parameters and advanced options, see the main package documentation
+- Example data formats, examine the helper files in the `autopert/` and `combo/` subdirectories
+- Command-line usage, see the runner scripts in this folder
