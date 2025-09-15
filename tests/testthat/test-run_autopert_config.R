@@ -3,9 +3,10 @@ source(here::here("tests", "testthat", "testing_utils.r"))
 library(mockery)
 
 temp_dir <- here::here("tests/testthat/temp_test_outputs")
-if (!dir.exists(temp_dir)) {
-  dir.create(temp_dir)
-}
+setup_temp_dir(temp_dir)
+
+# Clean up temp directory after all tests complete
+on.exit(cleanup_temp_dir(temp_dir), add = TRUE)
 
 test_that("run_autopert_config.r works with valid config", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "autopert requires Windows BMA command line tools (BioCheckConsole.exe)")
@@ -14,7 +15,7 @@ test_that("run_autopert_config.r works with valid config", {
   valid_config <- list(
     netw_file_path = here::here("examples", "autopert", "helper_autopert_1.json"),
     spec_path = here::here("examples", "autopert", "helper_spec_1.csv"),
-    out_dir = "auto_pert_results",
+    out_dir = temp_dir,
     nosat = TRUE,
     loserum = FALSE,
     missing_nodes_perturbed_overide = FALSE,
@@ -50,7 +51,15 @@ group_vars = [%s]
   writeLines(toml_content, config_file)
 
   # Clean up on exit
-  on.exit(if (file.exists(config_file)) file.remove(config_file))
+  on.exit({
+    if (file.exists(config_file)) file.remove(config_file)
+    # Clean up any output files created in temp_dir during the test
+    output_files <- list.files(temp_dir, full.names = TRUE, recursive = FALSE)
+    output_files <- output_files[!grepl("test_config\\.toml$", output_files)]
+    if (length(output_files) > 0) {
+      unlink(output_files, recursive = TRUE)
+    }
+  })
 
   args <- c(here::here("examples/run_autopert_config.r"), config_file)
 

@@ -15,3 +15,18 @@ cleanup_log_file <- function() {
   # Reset futile.logger threshold to default
   futile.logger::flog.threshold(futile.logger::INFO)
 }
+
+# Helper function to set up temporary directory for tests
+setup_temp_dir <- function(temp_dir) {
+  if (dir.exists(temp_dir)) {
+    unlink(temp_dir, recursive = TRUE)
+  }
+  dir.create(temp_dir, recursive = TRUE)
+}
+
+# Helper function to clean up temporary directory after tests
+cleanup_temp_dir <- function(temp_dir) {
+  if (dir.exists(temp_dir)) {
+    unlink(temp_dir, recursive = TRUE)
+  }
+}

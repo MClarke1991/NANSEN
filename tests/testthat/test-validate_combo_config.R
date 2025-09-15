@@ -53,7 +53,6 @@ skip_autopert = %s
   expect_equal(result$skip_combo_sim, FALSE)
   expect_equal(result$node_col_name, "node")
   expect_equal(result$use_vmcai, TRUE)
-  expect_equal(result$pipe_dir, "combo_results")
 })
 
 test_that("validate_combo_config applies defaults correctly", {
@@ -101,7 +100,6 @@ test_that("validate_combo_config applies defaults correctly", {
   expect_equal(result$single_fontsize, 12)
   expect_equal(result$node_heat_dir, "node_heatmaps")
   expect_equal(result$drug_conflict_overide, FALSE)
-  expect_equal(result$pipe_dir, "combo_results")
   expect_equal(result$log_filename, "PipeLog.log")
 })
 

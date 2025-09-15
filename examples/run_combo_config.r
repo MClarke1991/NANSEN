@@ -54,22 +54,16 @@ cli::cli_alert_info("  Network file:", config$netw_file_path, "\n")
 cli::cli_alert_info("  Backgrounds file:", config$backgrounds_path, "\n")
 cli::cli_alert_info("  Output directory:", config$out_dir, "\n")
 
-## Directory that you can use to keep all results
-pipe_dir <- config$pipe_dir
 root_dir <- here() # put in manually if this folder is not a git or rproj root
 
 setwd(root_dir)
-
-if (!dir.exists(pipe_dir)) {
-    dir.create(pipe_dir)
-}
 
 ## Path to BMA install. Note exact format needed. By default is the
 ## path that the MSI installer from the BMA website uses
 bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 
-## Name for directory for all results from a run
-out_dir <- file.path(pipe_dir, "results")
+## Use the output directory specified in config
+out_dir <- config$out_dir
 
 ## Pipeline -----
 

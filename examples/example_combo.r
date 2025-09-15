@@ -4,21 +4,16 @@
 ## Created 2023-02-23
 
 
-library(conflicted)
-library(tidyverse)
 library(NANSEN)
-library(here)
-conflict_prefer("pull", "dplyr")
-conflict_prefer("filter", "dplyr")
 
 ## Directory that you can use to keep all results
-pipe_dir <- "combo_results"
+out_dir <- "combo_results"
 root_dir <- here() # put in manually if this folder is not a git or rproj root
 
 setwd(root_dir)
 
-if (!dir.exists(pipe_dir)) {
-    dir.create(pipe_dir)
+if (!dir.exists(out_dir)) {
+    dir.create(out_dir)
 }
 
 ## USER TO ADJUST -------------------
@@ -136,7 +131,7 @@ bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 ## Allow drug conflicts override
 drug_conflict_overide <- TRUE
 ## Name for directory for all results from a run
-out_dir <- file.path(pipe_dir, "results")
+out_dir <- file.path(out_dir, "results")
 ## Filename for log of any errors
 log_filename <- "PipeLog.log"
 
@@ -173,7 +168,7 @@ if (!skip_combo_sim) {
           phenotypes = phenotypes,
           use_exclusions = use_exclusions,
           exclusions_path = NA,
-          log_filename = "Combo.log", 
+          log_filename = "Combo.log",
           drug_conflict_overide = drug_conflict_overide,
           skip_all_pairs = skip_all_pairs,
           skip_drugs_single = skip_combo_drugs_single,
@@ -190,7 +185,7 @@ split_combo_results(
     project_path = project_path,
     out_dir = out_dir,
     netw_file_path = netw_file_path,
-    drug_path = combo_drug_path, 
+    drug_path = combo_drug_path,
     node_col_name = node_col_name
 )
 
