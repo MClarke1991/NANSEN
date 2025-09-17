@@ -8,12 +8,12 @@ test_that("example_parallel_combo.r runs without errors", {
   setup_log_file(futile.logger::INFO)
   
   # clean up on exit
-  pipe.dir <- file.path("combo_results", "parallel_combo_results")
+  out_dir <- file.path("combo_results", "parallel_combo_results")
   
   on.exit({
     cleanup_log_file()
-    if(dir.exists(pipe.dir)){
-      unlink(pipe.dir, recursive = TRUE)
+    if(dir.exists(out_dir)){
+      unlink(out_dir, recursive = TRUE)
     }
   })
   
@@ -25,7 +25,7 @@ test_that("example_parallel_combo.r runs without errors", {
   backgrounds <- c("cancer", "wt")
   
   for(background in backgrounds){
-    results_dir <- file.path(pipe.dir, paste0("results_", background), "COMBO_RUN_helper_combo_1")
+    results_dir <- file.path(out_dir, paste0("results_", background), "COMBO_RUN_helper_combo_1")
     
     expect_true(dir.exists(results_dir))
     expect_true(dir.exists(file.path(results_dir, paste0("RAW__single__", background))))
