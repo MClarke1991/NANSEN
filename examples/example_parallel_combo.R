@@ -1,12 +1,9 @@
-library(conflicted)
 library(tidyverse)
 library(NANSEN)
 library(magrittr)
 library(here)
 library(foreach)
 library(doParallel)
-conflict_prefer("pull", "dplyr")
-conflict_prefer("filter", "dplyr")
 
 ## Directory that you can use to keep all results
 pipe_dir <- file.path("combo_results", "parallel_combo_results")
@@ -117,7 +114,7 @@ if (!skip_combo_sim) {
             background_tmp_path <- paste0(current_background, "_tmp_background.csv")
             
             backgrounds %>%
-              filter(background == current_background) %>%
+              dplyr::filter(background == current_background) %>%
               write_csv(background_tmp_path)
             
             on.exit(if (file.exists(background_tmp_path)) file.remove(background_tmp_path))
