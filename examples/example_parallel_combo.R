@@ -9,7 +9,7 @@ conflict_prefer("pull", "dplyr")
 conflict_prefer("filter", "dplyr")
 
 ## Directory that you can use to keep all results
-pipe_dir <- "combo_results"
+pipe_dir <- file.path("combo_results", "parallel_combo_results")
 root_dir <- here() # put in manually if this folder is not a git or rproj root
 
 setwd(root_dir)
@@ -58,7 +58,7 @@ pheno_only <- TRUE
 use_exclusions <- FALSE
 
 ## Control which things to run
-skip_autopert <- FALSE
+skip_autopert <- TRUE
 skip_combo_sim <- FALSE
 skip_all_pairs <- FALSE ## skip pairwise combinations of nodes
 skip_combo_drugs_single <- TRUE
@@ -106,15 +106,15 @@ if (!skip_autopert) {
 
 ## combo
 if (!skip_combo_sim) {
-  backgrounds = read_csv(combo_backgrounds_path)
-  background_list = unique(backgrounds$background)
+  backgrounds <- read_csv(combo_backgrounds_path)
+  background_list <- unique(backgrounds$background)
   
-  n_cores = detectCores()
+  n_cores <- detectCores()
   registerDoParallel(n_cores - 1)
   foreach(current_background = background_list,
           .packages = c("NANSEN", "readr", "here", "dplyr")) %dopar% {
             
-            background_tmp_path = paste0(current_background, "_tmp_background.csv")
+            background_tmp_path <- paste0(current_background, "_tmp_background.csv")
             
             backgrounds %>%
               filter(background == current_background) %>%
@@ -122,7 +122,7 @@ if (!skip_combo_sim) {
             
             on.exit(if (file.exists(background_tmp_path)) file.remove(background_tmp_path))
             
-            current_out_dir = paste(out_dir, current_background, sep = "_")
+            current_out_dir <- paste(out_dir, current_background, sep = "_")
             
             combo(netw_file_path = netw_file_path,
                   backgrounds_path = background_tmp_path,
@@ -154,21 +154,21 @@ if (!skip_combo_sim) {
           }
   
   ### Integrate results
-  parsed_results = list.dirs(pipe_dir, recursive = FALSE) %>%
+  parsed_results <- list.dirs(pipe_dir, recursive = FALSE) %>%
     map(\(x) list.dirs(x, recursive = FALSE)) %>%
     list_flatten() %>%
     map(\(x) read_csv(paste0(x, "/parsed_results.csv"))) %>%
     list_rbind() %T>%
     write_csv(paste0(pipe_dir, "/parsed_integrated_results.csv"))
 
-  node_results = list.dirs(pipe_dir, recursive = FALSE) %>%
+  node_results <- list.dirs(pipe_dir, recursive = FALSE) %>%
     map(\(x) list.dirs(x, recursive = FALSE)) %>%
     list_flatten() %>%
     map(\(x) read_csv(paste0(x, "/node_results.csv"))) %>%
     list_rbind() %T>%
     write_csv(paste0(pipe_dir, "/node_integrated_results.csv"))
   
-  processed_results = list.dirs(pipe_dir, recursive = FALSE) %>%
+  processed_results <- list.dirs(pipe_dir, recursive = FALSE) %>%
     map(\(x) list.dirs(x, recursive = FALSE)) %>%
     list_flatten() %>%
     map(\(x) read_csv(paste0(x, "/processed_results.csv"))) %>%
