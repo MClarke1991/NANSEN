@@ -1,7 +1,4 @@
-library(tidyverse)
 library(NANSEN)
-library(magrittr)
-library(here)
 library(foreach)
 library(doParallel)
 
