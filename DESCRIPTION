@@ -46,6 +46,5 @@ Suggests:
     testthat (>= 3.0.0),
     mockery,
     foreach,
-    doParallel,
-    conflicted
+    doParallel
 Config/testthat/edition: 3
