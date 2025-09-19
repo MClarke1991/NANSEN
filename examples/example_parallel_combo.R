@@ -3,13 +3,13 @@ library(foreach)
 library(doParallel)
 
 ## Directory that you can use to keep all results
-pipe_dir <- file.path("combo_results", "parallel_combo_results")
+out_dir <- file.path("combo_results", "parallel_combo_results")
 root_dir <- here() # put in manually if this folder is not a git or rproj root
 
 setwd(root_dir)
 
-if (!dir.exists(pipe_dir)) {
-  dir.create(pipe_dir)
+if (!dir.exists(out_dir)) {
+  dir.create(out_dir)
 }
 
 ## USER TO ADJUST -------------------
@@ -74,7 +74,7 @@ bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 ## Allow drug conflicts override
 drug_conflict_overide <- TRUE
 ## Name for directory for all results from a run
-out_dir <- file.path(pipe_dir, "results")
+out_dir <- file.path(out_dir, "results")
 ## Filename for log of any errors
 log_filename <- "PipeLog.log"
 
@@ -148,26 +148,26 @@ if (!skip_combo_sim) {
           }
   
   ### Integrate results
-  parsed_results <- list.dirs(pipe_dir, recursive = FALSE) %>%
+  parsed_results <- list.dirs(out_dir, recursive = FALSE) %>%
     map(\(x) list.dirs(x, recursive = FALSE)) %>%
     list_flatten() %>%
     map(\(x) read_csv(paste0(x, "/parsed_results.csv"))) %>%
     list_rbind() %T>%
-    write_csv(paste0(pipe_dir, "/parsed_integrated_results.csv"))
+    write_csv(paste0(out_dir, "/parsed_integrated_results.csv"))
 
-  node_results <- list.dirs(pipe_dir, recursive = FALSE) %>%
+  node_results <- list.dirs(out_dir, recursive = FALSE) %>%
     map(\(x) list.dirs(x, recursive = FALSE)) %>%
     list_flatten() %>%
     map(\(x) read_csv(paste0(x, "/node_results.csv"))) %>%
     list_rbind() %T>%
-    write_csv(paste0(pipe_dir, "/node_integrated_results.csv"))
+    write_csv(paste0(out_dir, "/node_integrated_results.csv"))
   
-  processed_results <- list.dirs(pipe_dir, recursive = FALSE) %>%
+  processed_results <- list.dirs(out_dir, recursive = FALSE) %>%
     map(\(x) list.dirs(x, recursive = FALSE)) %>%
     list_flatten() %>%
     map(\(x) read_csv(paste0(x, "/processed_results.csv"))) %>%
     list_rbind() %T>%
-    write_csv(paste0(pipe_dir, "/processed_integrated_results.csv"))
+    write_csv(paste0(out_dir, "/processed_integrated_results.csv"))
   
 } else {
   print("Skipping combo")
