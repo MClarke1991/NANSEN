@@ -48,17 +48,17 @@ test_that("example_parallel_combo.r runs without errors", {
   }
   
   # Integrated files are correctly created
-  expected_integrated_files <- c("parsed_integrated_results.csv", 
+  expected_integrated_files <- c("parsed_integrated_results.csv",
                                  "processed_integrated_results.csv",
                                  "node_integrated_results.csv")
-  
+
   for (file in expected_integrated_files) {
-    expect_true(file.exists(file.path(pipe_dir, file)), info = paste("Missing file:", file))
+    expect_true(file.exists(file.path(out_dir, file)), info = paste("Missing file:", file))
   }
-  
+
   # Snapshot testing
   for (file in expected_integrated_files) {
-    data <- readr::read_csv(file.path(pipe_dir, file), show_col_types = FALSE)
+    data <- readr::read_csv(file.path(out_dir, file), show_col_types = FALSE)
     expect_snapshot(data)
   }
   
