@@ -1,6 +1,4 @@
 library(NANSEN)
-library(foreach)
-library(doParallel)
 
 ## Directory that you can use to keep all results
 
