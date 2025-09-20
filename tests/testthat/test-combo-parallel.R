@@ -170,7 +170,7 @@ test_that("combo_parallel handles invalid core count", {
     }
   })
 
-  # Test with invalid core count (should throw error now)
+  # Test with invalid core count
   expect_error(
     combo_parallel(
       netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
