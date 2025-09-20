@@ -1259,22 +1259,22 @@ combo_parallel <- function(netw_file_path,
       purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
       purrr::list_flatten() %>%
       purrr::map(function(x) readr::read_csv(paste0(x, "/parsed_results.csv"), show_col_types = FALSE)) %>%
-      purrr::list_rbind() %T>%
-      readr::write_csv(paste0(out_dir, "/parsed_integrated_results.csv"))
+      purrr::list_rbind()
+    readr::write_csv(parsed_results, paste0(out_dir, "/parsed_integrated_results.csv"))
 
     node_results <- list.dirs(out_dir, recursive = FALSE) %>%
       purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
       purrr::list_flatten() %>%
       purrr::map(function(x) readr::read_csv(paste0(x, "/node_results.csv"), show_col_types = FALSE)) %>%
-      purrr::list_rbind() %T>%
-      readr::write_csv(paste0(out_dir, "/node_integrated_results.csv"))
+      purrr::list_rbind()
+    readr::write_csv(node_results, paste0(out_dir, "/node_integrated_results.csv"))
 
     processed_results <- list.dirs(out_dir, recursive = FALSE) %>%
       purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
       purrr::list_flatten() %>%
       purrr::map(function(x) readr::read_csv(paste0(x, "/processed_results.csv"), show_col_types = FALSE)) %>%
-      purrr::list_rbind() %T>%
-      readr::write_csv(paste0(out_dir, "/processed_integrated_results.csv"))
+      purrr::list_rbind()
+    readr::write_csv(processed_results, paste0(out_dir, "/processed_integrated_results.csv"))
 
     return(invisible(NULL))
 }
