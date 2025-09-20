@@ -103,75 +103,29 @@ if (!skip_autopert) {
 
 ## combo
 if (!skip_combo_sim) {
-  backgrounds <- readr::read_csv(combo_backgrounds_path)
-  background_list <- unique(backgrounds$background)
-
   n_cores <- detectCores()
-  registerDoParallel(n_cores - 1)
-  foreach(current_background = background_list,
-          .packages = c("NANSEN", "readr", "here", "dplyr")) %dopar% {
 
-            background_tmp_path <- paste0(current_background, "_tmp_background.csv")
-
-            backgrounds %>%
-              dplyr::filter(background == current_background) %>%
-              readr::write_csv(background_tmp_path)
-
-            on.exit(if (file.exists(background_tmp_path)) file.remove(background_tmp_path))
-
-            current_out_dir <- paste(out_dir, current_background, sep = "_")
-
-            combo(netw_file_path = netw_file_path,
-                  backgrounds_path = background_tmp_path,
-                  drug_path = combo_drug_path,
-                  out_dir = current_out_dir,
-                  project_path = project_path,
-                  node_col_name = node_col_name,
-                  use_vmcai = use_vmcai,
-                  pheno_only = pheno_only,
-                  phenotypes = phenotypes,
-                  use_exclusions = use_exclusions,
-                  exclusions_path = exclsions_path,
-                  log_filename = combo_log_name,
-                  drug_conflict_overide = drug_conflict_overide,
-                  skip_all_pairs = skip_all_pairs,
-                  skip_drugs_single = skip_combo_drugs_single,
-                  skip_drugs_pairs = skip_combo_drugs_double
-            )
-
-            ### Post-processing
-            split_combo_results(
-              results_prefix = results_prefix,
-              project_path = project_path,
-              out_dir = current_out_dir,
-              netw_file_path = netw_file_path,
-              drug_path = combo_drug_path,
-              node_col_name = node_col_name
-            )
-          }
-
-  ### Integrate results
-  parsed_results <- list.dirs(out_dir, recursive = FALSE) %>%
-    map(\(x) list.dirs(x, recursive = FALSE)) %>%
-    list_flatten() %>%
-    map(\(x) read_csv(paste0(x, "/parsed_results.csv"))) %>%
-    list_rbind() %T>%
-    write_csv(paste0(out_dir, "/parsed_integrated_results.csv"))
-
-  node_results <- list.dirs(out_dir, recursive = FALSE) %>%
-    map(\(x) list.dirs(x, recursive = FALSE)) %>%
-    list_flatten() %>%
-    map(\(x) read_csv(paste0(x, "/node_results.csv"))) %>%
-    list_rbind() %T>%
-    write_csv(paste0(out_dir, "/node_integrated_results.csv"))
-
-  processed_results <- list.dirs(out_dir, recursive = FALSE) %>%
-    map(\(x) list.dirs(x, recursive = FALSE)) %>%
-    list_flatten() %>%
-    map(\(x) read_csv(paste0(x, "/processed_results.csv"))) %>%
-    list_rbind() %T>%
-    write_csv(paste0(out_dir, "/processed_integrated_results.csv"))
-
+  combo_parallel(
+    netw_file_path = netw_file_path,
+    combo_backgrounds_path = combo_backgrounds_path,
+    n_cores = n_cores - 1,
+    results_prefix = results_prefix,
+    out_dir = out_dir,
+    project_path = project_path,
+    combo_drug_path = combo_drug_path,
+    bma_path = bma_path,
+    node_col_name = node_col_name,
+    use_vmcai = use_vmcai,
+    pheno_only = pheno_only,
+    phenotypes = phenotypes,
+    use_exclusions = use_exclusions,
+    exclusions_path = combo_exclusions_path,
+    drug_conflict_overide = drug_conflict_overide,
+    skip_all_pairs = skip_all_pairs,
+    skip_combo_drugs_single = skip_combo_drugs_single,
+    skip_combo_drugs_double = skip_combo_drugs_double,
+    log_filename = combo_log_name
+  )
 } else {
   print("Skipping combo")
 }

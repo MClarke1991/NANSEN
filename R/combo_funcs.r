@@ -1143,3 +1143,138 @@ combo <- function(netw_file_path,
     futile.logger::flog.info(print("Combinations done"), name = log_file)
     futile.logger::flog.info("End", name = log_file)
 }
+
+#' Run combination screen in parallel across different backgrounds
+#'
+#' This function parallelizes the combo workflow by splitting backgrounds
+#' and running each background in a separate parallel worker. It handles
+#' temporary file creation, parallel execution, post-processing, and
+#' results integration.
+#'
+#' @param netw_file_path path to network JSON file
+#' @param combo_backgrounds_path path to backgrounds CSV file containing
+#'     multiple backgrounds
+#' @param n_cores number of cores to use for parallel processing, defaults
+#'     to detectCores() - 1
+#' @param results_prefix prefix for results directory name
+#' @param out_dir output directory where results will be stored
+#' @param project_path project path for git SHA log, point to git
+#'     repo of the network and specification being tested
+#' @param combo_drug_path path to list of drug perturbations to be applied
+#'     in addition to node perturbations (CSV), defaults to NA
+#' @param bma_path path to BMA command line installation, defaults to
+#'     the path produced by the one click installer (.msi)
+#' @param node_col_name name of the node column in the mutational
+#'     background file and drug file, defaults to "node"
+#' @param use_vmcai Use VMCAI mode, defaults to TRUE
+#' @param pheno_only Only evaluate the level of phenotype nodes
+#'     supplied by the phenotypes argument, defaults to TRUE
+#' @param phenotypes list of phenotypes in format c("node_name_1",
+#'     "node_name_2") for use if pheno_only is TRUE
+#' @param use_exclusions exclude perturbation of a set of nodes
+#'     supplied to the exclusions_path argument, defaults to FALSE
+#' @param exclusions_path path to CSV file with nodes to exclude
+#' @param drug_conflict_overide allow overide of drug conflicts
+#'     check, only used for testing, defaults to TRUE
+#' @param skip_all_pairs skip pairwise combinations of nodes,
+#'     defaults to FALSE
+#' @param skip_combo_drugs_single skip single drug perturbations,
+#'     defaults to TRUE
+#' @param skip_combo_drugs_double skip double drug perturbations,
+#'     defaults to TRUE
+#' @param log_filename filename for log file, defaults to "Combo.log"
+#'
+#' @return Creates results directories for each background and writes
+#'     integrated results files: parsed_integrated_results.csv,
+#'     node_integrated_results.csv, and processed_integrated_results.csv
+#' @family combination_therapy
+#' @export
+combo_parallel <- function(netw_file_path,
+                           combo_backgrounds_path,
+                           n_cores = parallel::detectCores() - 1,
+                           results_prefix = "COMBO_RUN",
+                           out_dir,
+                           project_path = "",
+                           combo_drug_path = NA,
+                           bma_path = 'C:\\\"Program Files (x86)\"\\BMA\\BioCheckConsole.exe',
+                           node_col_name = "node",
+                           use_vmcai = TRUE,
+                           pheno_only = TRUE,
+                           phenotypes = c("output_a", "output_b"),
+                           use_exclusions = FALSE,
+                           exclusions_path = NA,
+                           drug_conflict_overide = TRUE,
+                           skip_all_pairs = FALSE,
+                           skip_combo_drugs_single = TRUE,
+                           skip_combo_drugs_double = TRUE,
+                           log_filename = "Combo.log") {
+
+    backgrounds <- readr::read_csv(combo_backgrounds_path, show_col_types = FALSE, lazy = FALSE)
+    background_list <- unique(backgrounds$background)
+
+    doParallel::registerDoParallel(n_cores)
+    foreach::foreach(current_background = background_list,
+            .packages = c("NANSEN", "readr", "here", "dplyr")) %dopar% {
+
+              background_tmp_path <- paste0(current_background, "_tmp_background.csv")
+
+              backgrounds %>%
+                dplyr::filter(background == current_background) %>%
+                readr::write_csv(background_tmp_path)
+
+              on.exit(if (file.exists(background_tmp_path)) file.remove(background_tmp_path))
+
+              current_out_dir <- paste(out_dir, current_background, sep = "_")
+
+              combo(netw_file_path = netw_file_path,
+                    backgrounds_path = background_tmp_path,
+                    drug_path = combo_drug_path,
+                    out_dir = current_out_dir,
+                    project_path = project_path,
+                    node_col_name = node_col_name,
+                    use_vmcai = use_vmcai,
+                    pheno_only = pheno_only,
+                    phenotypes = phenotypes,
+                    use_exclusions = use_exclusions,
+                    exclusions_path = exclusions_path,
+                    log_filename = log_filename,
+                    drug_conflict_overide = drug_conflict_overide,
+                    skip_all_pairs = skip_all_pairs,
+                    skip_drugs_single = skip_combo_drugs_single,
+                    skip_drugs_pairs = skip_combo_drugs_double
+              )
+
+              split_combo_results(
+                results_prefix = results_prefix,
+                project_path = project_path,
+                out_dir = current_out_dir,
+                netw_file_path = netw_file_path,
+                drug_path = combo_drug_path,
+                node_col_name = node_col_name
+              )
+            }
+
+    # Integrate results
+    parsed_results <- list.dirs(out_dir, recursive = FALSE) %>%
+      purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
+      purrr::list_flatten() %>%
+      purrr::map(function(x) readr::read_csv(paste0(x, "/parsed_results.csv"), show_col_types = FALSE)) %>%
+      purrr::list_rbind() %T>%
+      readr::write_csv(paste0(out_dir, "/parsed_integrated_results.csv"))
+
+    node_results <- list.dirs(out_dir, recursive = FALSE) %>%
+      purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
+      purrr::list_flatten() %>%
+      purrr::map(function(x) readr::read_csv(paste0(x, "/node_results.csv"), show_col_types = FALSE)) %>%
+      purrr::list_rbind() %T>%
+      readr::write_csv(paste0(out_dir, "/node_integrated_results.csv"))
+
+    processed_results <- list.dirs(out_dir, recursive = FALSE) %>%
+      purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
+      purrr::list_flatten() %>%
+      purrr::map(function(x) readr::read_csv(paste0(x, "/processed_results.csv"), show_col_types = FALSE)) %>%
+      purrr::list_rbind() %T>%
+      readr::write_csv(paste0(out_dir, "/processed_integrated_results.csv"))
+
+    return(invisible(NULL))
+}
