@@ -1209,8 +1209,30 @@ combo_parallel <- function(netw_file_path,
                            skip_combo_drugs_double = TRUE,
                            log_filename = "Combo.log") {
 
+    # Input validation
+    if (n_cores < 1) {
+        stop("n_cores must be >= 1")
+    }
+
+    if (!file.exists(combo_backgrounds_path)) {
+        stop("Backgrounds file does not exist: ", combo_backgrounds_path)
+    }
+
+    if (!file.exists(netw_file_path)) {
+        stop("Network file does not exist: ", netw_file_path)
+    }
+
+    # Create output directory if it doesn't exist
+    if (!dir.exists(out_dir)) {
+        dir.create(out_dir, recursive = TRUE)
+    }
+
     backgrounds <- readr::read_csv(combo_backgrounds_path, show_col_types = FALSE, lazy = FALSE)
     background_list <- unique(backgrounds$background)
+
+    if (length(background_list) == 0) {
+        stop("No backgrounds found in backgrounds file")
+    }
 
     doParallel::registerDoParallel(n_cores)
     foreach::foreach(current_background = background_list,
@@ -1254,27 +1276,76 @@ combo_parallel <- function(netw_file_path,
               )
             }
 
-    # Integrate results
-    parsed_results <- list.dirs(out_dir, recursive = FALSE) %>%
-      purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
-      purrr::list_flatten() %>%
-      purrr::map(function(x) readr::read_csv(paste0(x, "/parsed_results.csv"), show_col_types = FALSE)) %>%
-      purrr::list_rbind()
-    readr::write_csv(parsed_results, paste0(out_dir, "/parsed_integrated_results.csv"))
+    # Integrate results across all background directories
+    # Find all background-specific output directories
+    background_dirs <- purrr::map_chr(background_list, function(bg) paste(out_dir, bg, sep = "_"))
 
-    node_results <- list.dirs(out_dir, recursive = FALSE) %>%
-      purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
-      purrr::list_flatten() %>%
-      purrr::map(function(x) readr::read_csv(paste0(x, "/node_results.csv"), show_col_types = FALSE)) %>%
-      purrr::list_rbind()
-    readr::write_csv(node_results, paste0(out_dir, "/node_integrated_results.csv"))
+    # Find the actual results directories within each background directory
+    results_dirs <- background_dirs %>%
+      purrr::map(function(bg_dir) {
+        if (dir.exists(bg_dir)) {
+          list.dirs(bg_dir, recursive = FALSE)
+        } else {
+          character(0)
+        }
+      }) %>%
+      purrr::list_flatten()
 
-    processed_results <- list.dirs(out_dir, recursive = FALSE) %>%
-      purrr::map(function(x) list.dirs(x, recursive = FALSE)) %>%
-      purrr::list_flatten() %>%
-      purrr::map(function(x) readr::read_csv(paste0(x, "/processed_results.csv"), show_col_types = FALSE)) %>%
+    if (length(results_dirs) == 0) {
+        warning("No results directories found to integrate")
+        return(invisible(NULL))
+    }
+
+    # Integrate parsed results
+    parsed_results <- results_dirs %>%
+      purrr::map(function(x) {
+        parsed_file <- file.path(x, "parsed_results.csv")
+        if (file.exists(parsed_file)) {
+          readr::read_csv(parsed_file, show_col_types = FALSE)
+        } else {
+          NULL
+        }
+      }) %>%
+      purrr::discard(is.null) %>%
       purrr::list_rbind()
-    readr::write_csv(processed_results, paste0(out_dir, "/processed_integrated_results.csv"))
+
+    if (nrow(parsed_results) > 0) {
+      readr::write_csv(parsed_results, file.path(out_dir, "parsed_integrated_results.csv"))
+    }
+
+    # Integrate node results
+    node_results <- results_dirs %>%
+      purrr::map(function(x) {
+        node_file <- file.path(x, "node_results.csv")
+        if (file.exists(node_file)) {
+          readr::read_csv(node_file, show_col_types = FALSE)
+        } else {
+          NULL
+        }
+      }) %>%
+      purrr::discard(is.null) %>%
+      purrr::list_rbind()
+
+    if (nrow(node_results) > 0) {
+      readr::write_csv(node_results, file.path(out_dir, "node_integrated_results.csv"))
+    }
+
+    # Integrate processed results
+    processed_results <- results_dirs %>%
+      purrr::map(function(x) {
+        processed_file <- file.path(x, "processed_results.csv")
+        if (file.exists(processed_file)) {
+          readr::read_csv(processed_file, show_col_types = FALSE)
+        } else {
+          NULL
+        }
+      }) %>%
+      purrr::discard(is.null) %>%
+      purrr::list_rbind()
+
+    if (nrow(processed_results) > 0) {
+      readr::write_csv(processed_results, file.path(out_dir, "processed_integrated_results.csv"))
+    }
 
     return(invisible(NULL))
 }
