@@ -1188,6 +1188,7 @@ combo <- function(netw_file_path,
 #'     integrated results files: parsed_integrated_results.csv,
 #'     node_integrated_results.csv, and processed_integrated_results.csv
 #' @family combination_therapy
+#' @importFrom foreach %dopar%
 #' @export
 combo_parallel <- function(netw_file_path,
                            combo_backgrounds_path,

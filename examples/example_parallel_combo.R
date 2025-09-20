@@ -99,7 +99,7 @@ if (!skip_autopert) {
 
 ## combo
 if (!skip_combo_sim) {
-  n_cores <- detectCores()
+  n_cores <- parallel::detectCores()
 
   combo_parallel(
     netw_file_path = netw_file_path,
