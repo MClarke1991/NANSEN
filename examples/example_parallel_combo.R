@@ -8,7 +8,7 @@ root_dir <- here::here() # put in manually if this folder is not a git or rproj 
 out_dir <- file.path(root_dir, "combo_results", "parallel_combo_results")
 
 if (!dir.exists(out_dir)) {
-  dir.create(out_dir)
+  dir.create(out_dir, recursive = TRUE)
 }
 
 ## USER TO ADJUST -------------------
@@ -73,8 +73,6 @@ bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 
 ## Allow drug conflicts override
 drug_conflict_overide <- TRUE
-## Name for directory for all results from a run
-out_dir <- file.path(out_dir, "results")
 ## Filename for log of any errors
 log_filename <- "PipeLog.log"
 node_col_name <- "node"
