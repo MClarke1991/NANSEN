@@ -2,9 +2,7 @@ source(here::here("tests", "testthat", "testing_utils.r"))
 
 # Create a directory for test outputs
 temp_dir <- here::here("tests/testthat/temp_test_outputs")
-if (!dir.exists(temp_dir)) {
-  dir.create(temp_dir)
-}
+setup_temp_dir(temp_dir)
 
 bma_path = 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 
@@ -20,6 +18,13 @@ test_that("combo_parallel integration test - Windows only", {
     cleanup_log_file()
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
+    }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                            pattern = ".*_tmp_background\\.csv$",
+                            full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
     }
   })
 
@@ -122,6 +127,13 @@ test_that("combo_parallel handles missing network file", {
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
     }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                            pattern = ".*_tmp_background\\.csv$",
+                            full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
+    }
   })
 
   expect_error(
@@ -145,6 +157,13 @@ test_that("combo_parallel handles missing backgrounds file", {
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
     }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                            pattern = ".*_tmp_background\\.csv$",
+                            full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
+    }
   })
 
   expect_error(
@@ -167,6 +186,13 @@ test_that("combo_parallel handles invalid core count", {
     cleanup_log_file()
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
+    }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                            pattern = ".*_tmp_background\\.csv$",
+                            full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
     }
   })
 
@@ -195,6 +221,13 @@ test_that("combo_parallel cleans up temporary files", {
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
     }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                            pattern = ".*_tmp_background\\.csv$",
+                            full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
+    }
   })
 
   # Run parallel combo
@@ -212,7 +245,9 @@ test_that("combo_parallel cleans up temporary files", {
   )
 
   # Check that temporary background files are cleaned up
-  tmp_files <- list.files(pattern = ".+_tmp_background.csv$")
+  tmp_files <- list.files(here::here("tests", "testthat"),
+                         pattern = ".+_tmp_background.csv$",
+                         full.names = TRUE)
   expect_true(length(tmp_files) == 0, info = "Temporary background files have not been deleted")
 })
 
@@ -226,6 +261,13 @@ test_that("combo_parallel handles single core gracefully", {
     cleanup_log_file()
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
+    }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                            pattern = ".*_tmp_background\\.csv$",
+                            full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
     }
   })
 
@@ -265,6 +307,13 @@ test_that("combo_parallel creates expected directory structure", {
     cleanup_log_file()
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
+    }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                            pattern = ".*_tmp_background\\.csv$",
+                            full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
     }
   })
 
@@ -328,6 +377,13 @@ test_that("combo_parallel detects drug conflicts when override is FALSE", {
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
     }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                            pattern = ".*_tmp_background\\.csv$",
+                            full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
+    }
   })
 
   # Test with conflicting drugs (default helper_combo_drugs_1.csv has conflicts)
@@ -346,4 +402,18 @@ test_that("combo_parallel detects drug conflicts when override is FALSE", {
       )
     )
   )
+})
+
+# Global cleanup after all tests
+teardown({
+  # Clean up temp directory
+  cleanup_temp_dir(temp_dir)
+
+  # Remove any remaining temporary background files
+  temp_files <- list.files(here::here("tests", "testthat"),
+                          pattern = ".*_tmp_background\\.csv$",
+                          full.names = TRUE)
+  if (length(temp_files) > 0) {
+    file.remove(temp_files)
+  }
 })
