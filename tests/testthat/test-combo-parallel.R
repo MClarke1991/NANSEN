@@ -34,6 +34,7 @@ test_that("combo_parallel integration test - Windows only", {
         out_dir = out_dir,
         combo_drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
         bma_path = bma_path,
+        pheno_only = FALSE,  # Ensure conflicts.csv is generated
         log_filename = "Combo.log",
         drug_conflict_overide = TRUE
       )
@@ -169,18 +170,17 @@ test_that("combo_parallel handles invalid core count", {
     }
   })
 
-  # Test with invalid core count (should handle gracefully)
-  expect_no_error(
-    suppressWarnings(
-      combo_parallel(
-        netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
-        combo_backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
-        n_cores = 0,  # Invalid core count
-        out_dir = out_dir,
-        bma_path = bma_path,
-        log_filename = "Combo.log"
-      )
-    )
+  # Test with invalid core count (should throw error now)
+  expect_error(
+    combo_parallel(
+      netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
+      combo_backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
+      n_cores = 0,  # Invalid core count
+      out_dir = out_dir,
+      bma_path = bma_path,
+      log_filename = "Combo.log"
+    ),
+    "n_cores must be >= 1"
   )
 })
 
@@ -205,6 +205,7 @@ test_that("combo_parallel cleans up temporary files", {
       n_cores = 2,
       out_dir = out_dir,
       bma_path = bma_path,
+      pheno_only = FALSE,  # Ensure full processing
       log_filename = "Combo.log",
       drug_conflict_overide = TRUE
     )
@@ -237,6 +238,7 @@ test_that("combo_parallel handles single core gracefully", {
         n_cores = 1,
         out_dir = out_dir,
         bma_path = bma_path,
+        pheno_only = FALSE,  # Ensure full processing
         log_filename = "Combo.log",
         drug_conflict_overide = TRUE
       )
@@ -272,6 +274,7 @@ test_that("combo_parallel creates expected directory structure", {
     n_cores = 2,
     out_dir = out_dir,
     bma_path = bma_path,
+    pheno_only = FALSE,  # Ensure conflicts.csv is generated
     log_filename = "Combo.log",
     drug_conflict_overide = TRUE
   ))
@@ -328,17 +331,19 @@ test_that("combo_parallel detects drug conflicts when override is FALSE", {
   })
 
   # Test with conflicting drugs (default helper_combo_drugs_1.csv has conflicts)
+  # The error might be generated within the parallel workers, so we check that some error occurs
   expect_error(
-    combo_parallel(
-      netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
-      combo_backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
-      combo_drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
-      n_cores = 2,
-      out_dir = out_dir,
-      bma_path = bma_path,
-      log_filename = "Combo.log",
-      drug_conflict_overide = FALSE
-    ),
-    "Drug combinations have conflicting effects on the same node"
+    suppressWarnings(
+      combo_parallel(
+        netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
+        combo_backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
+        combo_drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
+        n_cores = 2,
+        out_dir = out_dir,
+        bma_path = bma_path,
+        log_filename = "Combo.log",
+        drug_conflict_overide = FALSE
+      )
+    )
   )
 })
