@@ -15,7 +15,7 @@ Then install NANSEN from GitHub:
 remotes::install_github("jfisher-lab/nansen")
 ```
 
-
+NANSEN uses the [here](https://here.r-lib.org/) to enable easy file referencing, and so works best in a [git](https://git-scm.com/) repository. 
 
 ## Key Features
 
