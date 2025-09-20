@@ -2,6 +2,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom parallel detectCores
 #' @importFrom stats formula
 #' @importFrom stats na.omit
 #' @importFrom stats time
