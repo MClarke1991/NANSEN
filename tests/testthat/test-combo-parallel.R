@@ -404,16 +404,3 @@ test_that("combo_parallel detects drug conflicts when override is FALSE", {
   )
 })
 
-# Global cleanup after all tests
-teardown({
-  # Clean up temp directory
-  cleanup_temp_dir(temp_dir)
-
-  # Remove any remaining temporary background files
-  temp_files <- list.files(here::here("tests", "testthat"),
-                          pattern = ".*_tmp_background\\.csv$",
-                          full.names = TRUE)
-  if (length(temp_files) > 0) {
-    file.remove(temp_files)
-  }
-})
