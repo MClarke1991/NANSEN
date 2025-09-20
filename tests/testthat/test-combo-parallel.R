@@ -4,6 +4,20 @@ source(here::here("tests", "testthat", "testing_utils.r"))
 temp_dir <- here::here("tests/testthat/temp_test_outputs")
 setup_temp_dir(temp_dir)
 
+# Setup cleanup to run after all tests in this file complete
+withr::defer({
+  # Clean up temp directory
+  cleanup_temp_dir(temp_dir)
+
+  # Remove any remaining temporary background files
+  temp_files <- list.files(here::here("tests", "testthat"),
+                          pattern = ".*_tmp_background\\.csv$",
+                          full.names = TRUE)
+  if (length(temp_files) > 0) {
+    file.remove(temp_files)
+  }
+}, teardown_env())
+
 bma_path = 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 
 test_that("combo_parallel integration test - Windows only", {
