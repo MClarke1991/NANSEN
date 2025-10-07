@@ -41,10 +41,11 @@ Imports:
     pheatmap,
     ggplotify,
     configr,
-    digest
+    digest,
+    parallel,
+    doParallel,
+    foreach
 Suggests: 
     testthat (>= 3.0.0),
-    mockery,
-    foreach,
-    doParallel
+    mockery
 Config/testthat/edition: 3

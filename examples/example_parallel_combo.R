@@ -1,15 +1,12 @@
 library(NANSEN)
-library(foreach)
-library(doParallel)
 
 ## Directory that you can use to keep all results
-out_dir <- file.path("combo_results", "parallel_combo_results")
-root_dir <- here() # put in manually if this folder is not a git or rproj root
 
-setwd(root_dir)
+root_dir <- here::here() # put in manually if this folder is not a git or rproj root
+out_dir <- file.path(root_dir, "combo_results", "parallel_combo_results")
 
 if (!dir.exists(out_dir)) {
-  dir.create(out_dir)
+  dir.create(out_dir, recursive = TRUE)
 }
 
 ## USER TO ADJUST -------------------
@@ -20,12 +17,12 @@ if (!dir.exists(out_dir)) {
 ## directory, not an absolute path, due to how BMA command line
 ## works. All other paths can be absolute or relative.
 netw_file_path <- file.path("examples", "combo", "helper_combo_1.json")
-spec_path <- file.path("examples", "autopert", "helper_spec_2.csv")
-combo_backgrounds_path <- file.path("examples", "combo", "helper_combo_bkg_1.csv")
+spec_path <- here::here("examples", "autopert", "helper_spec_2.csv")
+combo_backgrounds_path <- here::here("examples", "combo", "helper_combo_bkg_1.csv")
 combo_drug_path <- NA
 
 ## Optional: list of nodes not to perturb, so as to speed up computation
-combo_exclusions_path <- file.path("tests", "testthat", "combo", "helper_combo_exclude.csv")
+combo_exclusions_path <- here::here("tests", "testthat", "combo", "helper_combo_exclude.csv")
 ## Optional: path for root directory of the project
 project_path <- ""
 
@@ -50,6 +47,7 @@ pheno_only <- TRUE
 
 ## Exclude some nodes from mono and combo screen for faster results
 use_exclusions <- FALSE
+exclusions_path <- NA
 
 ## Control which things to run
 skip_autopert <- TRUE
@@ -73,10 +71,11 @@ bma_path <- 'C:\\"Program Files (x86)"\\BMA\\BioCheckConsole.exe'
 
 ## Allow drug conflicts override
 drug_conflict_overide <- TRUE
-## Name for directory for all results from a run
-out_dir <- file.path(out_dir, "results")
 ## Filename for log of any errors
 log_filename <- "PipeLog.log"
+node_col_name <- "node"
+combo_log_name <- "Combo.log"
+results_prefix <- "COMBO_RUN"
 
 ## Pipeline -----
 
@@ -100,75 +99,29 @@ if (!skip_autopert) {
 
 ## combo
 if (!skip_combo_sim) {
-  backgrounds <- read_csv(combo_backgrounds_path)
-  background_list <- unique(backgrounds$background)
-  
-  n_cores <- detectCores()
-  registerDoParallel(n_cores - 1)
-  foreach(current_background = background_list,
-          .packages = c("NANSEN", "readr", "here", "dplyr")) %dopar% {
-            
-            background_tmp_path <- paste0(current_background, "_tmp_background.csv")
-            
-            backgrounds %>%
-              dplyr::filter(background == current_background) %>%
-              write_csv(background_tmp_path)
-            
-            on.exit(if (file.exists(background_tmp_path)) file.remove(background_tmp_path))
-            
-            current_out_dir <- paste(out_dir, current_background, sep = "_")
-            
-            combo(netw_file_path = netw_file_path,
-                  backgrounds_path = background_tmp_path,
-                  drug_path = combo_drug_path,
-                  out_dir = current_out_dir,
-                  project_path = project_path,
-                  node_col_name = "node",
-                  use_vmcai = use_vmcai,
-                  pheno_only = pheno_only,
-                  phenotypes = phenotypes,
-                  use_exclusions = use_exclusions,
-                  exclusions_path = NA,
-                  log_filename = "Combo.log", 
-                  drug_conflict_overide = drug_conflict_overide,
-                  skip_all_pairs = skip_all_pairs,
-                  skip_drugs_single = skip_combo_drugs_single,
-                  skip_drugs_pairs = skip_combo_drugs_double
-            )
-            
-            ### Post-processing
-            split_combo_results(
-              results_prefix = "COMBO_RUN",
-              project_path = project_path,
-              out_dir = current_out_dir,
-              netw_file_path = netw_file_path,
-              drug_path = combo_drug_path, 
-              node_col_name = node_col_name
-            )
-          }
-  
-  ### Integrate results
-  parsed_results <- list.dirs(out_dir, recursive = FALSE) %>%
-    map(\(x) list.dirs(x, recursive = FALSE)) %>%
-    list_flatten() %>%
-    map(\(x) read_csv(paste0(x, "/parsed_results.csv"))) %>%
-    list_rbind() %T>%
-    write_csv(paste0(out_dir, "/parsed_integrated_results.csv"))
+  n_cores <- parallel::detectCores()
 
-  node_results <- list.dirs(out_dir, recursive = FALSE) %>%
-    map(\(x) list.dirs(x, recursive = FALSE)) %>%
-    list_flatten() %>%
-    map(\(x) read_csv(paste0(x, "/node_results.csv"))) %>%
-    list_rbind() %T>%
-    write_csv(paste0(out_dir, "/node_integrated_results.csv"))
-  
-  processed_results <- list.dirs(out_dir, recursive = FALSE) %>%
-    map(\(x) list.dirs(x, recursive = FALSE)) %>%
-    list_flatten() %>%
-    map(\(x) read_csv(paste0(x, "/processed_results.csv"))) %>%
-    list_rbind() %T>%
-    write_csv(paste0(out_dir, "/processed_integrated_results.csv"))
-  
+  combo_parallel(
+    netw_file_path = netw_file_path,
+    combo_backgrounds_path = combo_backgrounds_path,
+    n_cores = n_cores - 1,
+    results_prefix = results_prefix,
+    out_dir = out_dir,
+    project_path = project_path,
+    combo_drug_path = combo_drug_path,
+    bma_path = bma_path,
+    node_col_name = node_col_name,
+    use_vmcai = use_vmcai,
+    pheno_only = pheno_only,
+    phenotypes = phenotypes,
+    use_exclusions = use_exclusions,
+    exclusions_path = combo_exclusions_path,
+    drug_conflict_overide = drug_conflict_overide,
+    skip_all_pairs = skip_all_pairs,
+    skip_combo_drugs_single = skip_combo_drugs_single,
+    skip_combo_drugs_double = skip_combo_drugs_double,
+    log_filename = combo_log_name
+  )
 } else {
   print("Skipping combo")
 }

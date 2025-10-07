@@ -8,7 +8,7 @@ library(NANSEN)
 
 ## Directory that you can use to keep all results
 out_dir <- "combo_results"
-root_dir <- here() # put in manually if this folder is not a git or rproj root
+root_dir <- here::here() # put in manually if this folder is not a git or rproj root
 
 setwd(root_dir)
 
