@@ -27,6 +27,7 @@ on the same node, which will cause issues in combinations
 Other combination_therapy: 
 \code{\link{check_drug_nodes}()},
 \code{\link{check_drugs_in_range}()},
+\code{\link{combo_parallel}()},
 \code{\link{get_drugs_commands}()},
 \code{\link{make_bkg_commands_combo}()},
 \code{\link{make_command_args}()},
