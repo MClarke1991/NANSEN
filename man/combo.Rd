@@ -23,7 +23,8 @@ combo(
   skip_drugs_pairs = FALSE,
   skip_all_pairs = FALSE,
   short_filenames = FALSE,
-  log_filename
+  log_filename,
+  ...
 )
 }
 \arguments{
@@ -76,6 +77,10 @@ check, only used for testing}
 to avoid Windows path length issues. Defaults to FALSE.}
 
 \item{log_filename}{filename for log file}
+
+\item{...}{Additional arguments (for backwards compatibility).
+The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
+but ignored with a warning. Other arguments will cause an error.}
 }
 \value{
 write a \code{parsed_results.csv} and \code{processed_results.csv}

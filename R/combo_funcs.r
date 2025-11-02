@@ -874,6 +874,9 @@ get_combo_results_dir <- function(results_prefix, project_path, out_dir, netw_fi
 #' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames
 #'     to avoid Windows path length issues. Defaults to FALSE.
 #' @param log_filename filename for log file
+#' @param ... Additional arguments (for backwards compatibility).
+#'     The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
+#'     but ignored with a warning. Other arguments will cause an error.
 #' @return write a `parsed_results.csv` and `processed_results.csv`
 #' @export
 combo <- function(netw_file_path,
@@ -896,7 +899,34 @@ combo <- function(netw_file_path,
                   skip_drugs_pairs = FALSE,
                   skip_all_pairs = FALSE,
                   short_filenames = FALSE,
-                  log_filename) {
+                  log_filename,
+                  ...) {
+
+    ## Handle deprecated arguments
+    extra_args <- list(...)
+    deprecated_args <- c("git_log", "bma_tools_path")
+
+    if (length(extra_args) > 0) {
+        arg_names <- names(extra_args)
+
+        # Check for deprecated arguments
+        if ("git_log" %in% arg_names) {
+            .Deprecated(msg = "Argument 'git_log' is deprecated as of NANSEN version 1.0.0 and will be ignored.")
+        }
+        if ("bma_tools_path" %in% arg_names) {
+            .Deprecated(msg = "Argument 'bma_tools_path' is deprecated as of NANSEN version 1.0.0 and will be ignored.")
+        }
+
+        # Check for unexpected arguments
+        unexpected_args <- setdiff(arg_names, deprecated_args)
+        if (length(unexpected_args) > 0) {
+            stop(
+                "Unknown arguments passed: ",
+                paste(unexpected_args, collapse = ", "),
+                ". Only 'git_log' and 'bma_tools_path' are accepted as deprecated arguments."
+            )
+        }
+    }
 
     results_dir <- get_combo_results_dir(results_prefix = results_prefix,
                                          project_path = project_path,
@@ -1183,6 +1213,9 @@ combo <- function(netw_file_path,
 #' @param skip_combo_drugs_double skip double drug perturbations,
 #'     defaults to TRUE
 #' @param log_filename filename for log file, defaults to "Combo.log"
+#' @param ... Additional arguments (for backwards compatibility).
+#'     The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
+#'     but ignored with a warning. Other arguments will cause an error.
 #'
 #' @return Creates results directories for each background and writes
 #'     integrated results files: parsed_integrated_results.csv,
@@ -1208,7 +1241,34 @@ combo_parallel <- function(netw_file_path,
                            skip_all_pairs = FALSE,
                            skip_combo_drugs_single = TRUE,
                            skip_combo_drugs_double = TRUE,
-                           log_filename = "Combo.log") {
+                           log_filename = "Combo.log",
+                           ...) {
+
+    ## Handle deprecated arguments
+    extra_args <- list(...)
+    deprecated_args <- c("git_log", "bma_tools_path")
+
+    if (length(extra_args) > 0) {
+        arg_names <- names(extra_args)
+
+        # Check for deprecated arguments
+        if ("git_log" %in% arg_names) {
+            .Deprecated(msg = "Argument 'git_log' is deprecated as of NANSEN version 1.0.0 and will be ignored.")
+        }
+        if ("bma_tools_path" %in% arg_names) {
+            .Deprecated(msg = "Argument 'bma_tools_path' is deprecated as of NANSEN version 1.0.0 and will be ignored.")
+        }
+
+        # Check for unexpected arguments
+        unexpected_args <- setdiff(arg_names, deprecated_args)
+        if (length(unexpected_args) > 0) {
+            stop(
+                "Unknown arguments passed: ",
+                paste(unexpected_args, collapse = ", "),
+                ". Only 'git_log' and 'bma_tools_path' are accepted as deprecated arguments."
+            )
+        }
+    }
 
     # Input validation
     if (n_cores < 1) {

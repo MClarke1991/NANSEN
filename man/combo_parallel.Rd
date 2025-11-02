@@ -23,7 +23,8 @@ combo_parallel(
   skip_all_pairs = FALSE,
   skip_combo_drugs_single = TRUE,
   skip_combo_drugs_double = TRUE,
-  log_filename = "Combo.log"
+  log_filename = "Combo.log",
+  ...
 )
 }
 \arguments{
@@ -77,6 +78,10 @@ defaults to TRUE}
 defaults to TRUE}
 
 \item{log_filename}{filename for log file, defaults to "Combo.log"}
+
+\item{...}{Additional arguments (for backwards compatibility).
+The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
+but ignored with a warning. Other arguments will cause an error.}
 }
 \value{
 Creates results directories for each background and writes
