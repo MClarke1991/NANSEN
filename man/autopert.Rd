@@ -15,7 +15,8 @@ autopert(
   missing_nodes_expected_overide = FALSE,
   project_path = NA,
   group_vars = c("source", "cell_line", "experiment_particular"),
-  short_filenames = FALSE
+  short_filenames = FALSE,
+  ...
 )
 }
 \arguments{
@@ -52,6 +53,10 @@ e.g. "Application of cisplatin")}
 
 \item{short_filenames}{logical. If TRUE, use MD5 hashes for long filenames
 to avoid Windows path length issues. Defaults to FALSE.}
+
+\item{...}{Additional arguments (for backwards compatibility).
+The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
+but ignored with a warning. Other arguments will cause an error.}
 }
 \value{
 Writes out results as JSON, CSV and PNG

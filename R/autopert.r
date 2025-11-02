@@ -24,8 +24,11 @@
 #'     expected nodes that are missing from network
 #' @param project_path project path for git SHA log, point to git
 #'     repo of the network and specification being tested
-#' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames 
+#' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames
 #'     to avoid Windows path length issues. Defaults to FALSE.
+#' @param ... Additional arguments (for backwards compatibility).
+#'     The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
+#'     but ignored with a warning. Other arguments will cause an error.
 #' @return Writes out results as JSON, CSV and PNG
 #' @export
 autopert <- function(netw_file_path,
@@ -43,7 +46,34 @@ autopert <- function(netw_file_path,
                          "source", "cell_line",
                          "experiment_particular"
                      ),
-                     short_filenames = FALSE) {
+                     short_filenames = FALSE,
+                     ...) {
+
+    ## Handle deprecated arguments
+    extra_args <- list(...)
+    deprecated_args <- c("git_log", "bma_tools_path")
+
+    if (length(extra_args) > 0) {
+        arg_names <- names(extra_args)
+
+        # Check for deprecated arguments
+        if ("git_log" %in% arg_names) {
+            .Deprecated(msg = "Argument 'git_log' is deprecated as of NANSEN version 1.0.0 and will be ignored.")
+        }
+        if ("bma_tools_path" %in% arg_names) {
+            .Deprecated(msg = "Argument 'bma_tools_path' is deprecated as of NANSEN version 1.0.0 and will be ignored.")
+        }
+
+        # Check for unexpected arguments
+        unexpected_args <- setdiff(arg_names, deprecated_args)
+        if (length(unexpected_args) > 0) {
+            stop(
+                "Unknown arguments passed: ",
+                paste(unexpected_args, collapse = ", "),
+                ". Only 'git_log' and 'bma_tools_path' are accepted as deprecated arguments."
+            )
+        }
+    }
 
     ## Output files
 
