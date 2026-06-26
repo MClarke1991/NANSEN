@@ -130,6 +130,117 @@ test_that("combo_parallel integration test - Windows only", {
   expect_snapshot(processed_integrated)
 })
 
+test_that("combo_parallel with short_filenames = TRUE integration test - Windows only", {
+  skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
+  
+  # Create temporary directory for test outputs
+  out_dir <- file.path(temp_dir, "combo_parallel_test_output")
+  
+  # Set up test logging
+  setup_log_file(futile.logger::INFO)
+  on.exit({
+    cleanup_log_file()
+    if (dir.exists(out_dir)) {
+      unlink(out_dir, recursive = TRUE)
+    }
+    # Clean up any temporary background files
+    temp_files <- list.files(here::here("tests", "testthat"),
+                             pattern = ".*_tmp_background\\.csv$",
+                             full.names = TRUE)
+    if (length(temp_files) > 0) {
+      file.remove(temp_files)
+    }
+  })
+  
+  # Run combo_parallel function with example data
+  expect_no_error(
+    suppressWarnings(
+      combo_parallel(
+        netw_file_path = here::here("examples", "combo", "helper_combo_1.json"),
+        combo_backgrounds_path = here::here("examples", "combo", "helper_combo_bkg_1.csv"),
+        n_cores = 2,  # Use 2 cores for testing
+        results_prefix = "COMBO_RUN",
+        out_dir = out_dir,
+        combo_drug_path = here::here("examples", "combo", "helper_combo_drugs_1.csv"),
+        bma_path = bma_path,
+        pheno_only = FALSE,  # Ensure conflicts.csv is generated
+        log_filename = "Combo.log",
+        short_filenames = TRUE,
+        drug_conflict_overide = TRUE
+      )
+    )
+  )
+  
+  # Verify per-background directory structure exists
+  backgrounds <- c("wt", "cancer")
+  
+  for (background in backgrounds) {
+    background_dir <- paste(out_dir, background, sep = "_")
+    run_dir <- file.path(background_dir, "COMBO_RUN_helper_combo_1")
+    
+    expect_true(dir.exists(run_dir), info = paste("Missing run directory for background:", background))
+    expect_true(dir.exists(file.path(run_dir, paste0("RAW__single__", background))))
+    expect_true(dir.exists(file.path(run_dir, paste0("RAW__double__", background))))
+    
+    # Verify key files exist for each background
+    expect_true(file.exists(file.path(run_dir, "parsed_results.csv")))
+    expect_true(file.exists(file.path(run_dir, "processed_results.csv")))
+    expect_true(file.exists(file.path(run_dir, "node_results.csv")))
+    expect_true(file.exists(file.path(run_dir, "conflicts.csv")))
+  }
+  
+  # Verify integrated results files exist
+  expected_integrated_files <- c("parsed_integrated_results.csv",
+                                 "node_integrated_results.csv",
+                                 "processed_integrated_results.csv")
+  
+  for (file in expected_integrated_files) {
+    expect_true(file.exists(file.path(out_dir, file)), info = paste("Missing integrated file:", file))
+  }
+  
+  # Verify CSV structure and content for integrated files
+  parsed_integrated <- readr::read_csv(file.path(out_dir, "parsed_integrated_results.csv"),
+                                       show_col_types = FALSE, col_types = readr::cols(formula = "c"))
+  expect_true(all(c("filename", "time", "id", "lo", "hi", "node", "range_from", "range_to", "formula") %in% colnames(parsed_integrated)))
+  
+  processed_integrated <- readr::read_csv(file.path(out_dir, "processed_integrated_results.csv"),
+                                          show_col_types = FALSE, col_types = readr::cols(formula = "c"))
+  expect_true(all(c("case", "background", "bkg_pert", "muta", "leva", "mutb", "levb", "time", "id", "lo", "hi", "node", "range_from", "range_to", "formula", "mean", "uncertainty") %in% colnames(processed_integrated)))
+  
+  node_integrated <- readr::read_csv(file.path(out_dir, "node_integrated_results.csv"),
+                                     show_col_types = FALSE, col_types = readr::cols(formula = "c"))
+  expect_true(all(c("case", "background", "bkg_pert", "muta", "leva", "mutb", "levb", "time", "id", "lo", "hi", "node", "range_from", "range_to", "formula", "mean", "uncertainty") %in% colnames(node_integrated)))
+  
+  # Verify that integrated files contain data from both backgrounds
+  expect_true("wt" %in% unique(processed_integrated$background))
+  expect_true("cancer" %in% unique(processed_integrated$background))
+  
+  # Verify JSON files exist in RAW directories for each background
+  for (background in backgrounds) {
+    background_dir <- paste(out_dir, background, sep = "_")
+    run_dir <- file.path(background_dir, "COMBO_RUN_helper_combo_1")
+    
+    single_files <- list.files(file.path(run_dir, paste0("RAW__single__", background)), pattern = "\\.json$")
+    expect_true(length(single_files) > 0, info = paste("No JSON files in single directory for", background))
+    
+    double_files <- list.files(file.path(run_dir, paste0("RAW__double__", background)), pattern = "\\.json$")
+    expect_true(length(double_files) > 0, info = paste("No JSON files in double directory for", background))
+  }
+  
+  # Verify each JSON file in one directory is valid JSON
+  first_background_dir <- paste(out_dir, backgrounds[1], sep = "_")
+  first_run_dir <- file.path(first_background_dir, "COMBO_RUN_helper_combo_1")
+  single_files <- list.files(file.path(first_run_dir, paste0("RAW__single__", backgrounds[1])), pattern = "\\.json$")
+  
+  for (json_file in head(single_files, 3)) {  # Test first 3 files to avoid long test times
+    json_path <- file.path(first_run_dir, paste0("RAW__single__", backgrounds[1]), json_file)
+    expect_no_error(jsonlite::fromJSON(json_path))
+  }
+  
+  # Snapshot test for integrated processed results to ensure output doesn't change
+  expect_snapshot(processed_integrated)
+})
+
 test_that("combo_parallel handles missing network file", {
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
 
