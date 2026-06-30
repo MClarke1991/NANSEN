@@ -1125,13 +1125,19 @@ combo <- function(netw_file_path,
 
     ## Map hashed filenames back to original names if hashing was used
     if (short_filenames && !is.null(file_hashtable_dir)) {
-        file_hashtable <- get_all_hashtables(file_hashtable_dir, log_file)
+        file_hashtable <- get_all_hashtables(file_hashtable_dir, log_file) %>%
+            dplyr::select(full_filename, unhash_full_filename) %>%
+            dplyr::distinct()
 
-        # Left join to map hashed filenames back to original names
+        # Join on basename so the dir-prefixed parsed filename
+        # (e.g. "RAW__single__wt/<hash>.json") matches the bare hashed
+        # filename ("<hash>.json") stored in the hashtable.
         parsed_results <- parsed_results %>%
-            dplyr::left_join(file_hashtable, by = c("filename" = "full_filename")) %>%
+            dplyr::mutate(.hash_basename = basename(filename)) %>%
+            dplyr::left_join(file_hashtable,
+                             by = c(".hash_basename" = "full_filename")) %>%
             dplyr::mutate(filename = dplyr::coalesce(unhash_full_filename, filename)) %>%
-            dplyr::select(-unhash_full_filename, -unhash_alt_full_filename, -alt_full_filename)
+            dplyr::select(-.hash_basename, -unhash_full_filename)
     }
 
     ## Process results and save cache
