@@ -1213,6 +1213,8 @@ combo <- function(netw_file_path,
 #' @param skip_combo_drugs_double skip double drug perturbations,
 #'     defaults to TRUE
 #' @param log_filename filename for log file, defaults to "Combo.log"
+#' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames
+#'     to avoid Windows path length issues. Defaults to FALSE.
 #' @param ... Additional arguments (for backwards compatibility).
 #'     The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
 #'     but ignored with a warning. Other arguments will cause an error.
@@ -1242,6 +1244,7 @@ combo_parallel <- function(netw_file_path,
                            skip_combo_drugs_single = TRUE,
                            skip_combo_drugs_double = TRUE,
                            log_filename = "Combo.log",
+                           short_filenames = FALSE,
                            ...) {
 
     ## Handle deprecated arguments
@@ -1331,6 +1334,7 @@ combo_parallel <- function(netw_file_path,
                     use_exclusions = use_exclusions,
                     exclusions_path = exclusions_path,
                     log_filename = log_filename,
+                    short_filenames = short_filenames,
                     drug_conflict_overide = drug_conflict_overide,
                     skip_all_pairs = skip_all_pairs,
                     skip_drugs_single = skip_combo_drugs_single,
