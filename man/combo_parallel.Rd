@@ -24,6 +24,7 @@ combo_parallel(
   skip_combo_drugs_single = TRUE,
   skip_combo_drugs_double = TRUE,
   log_filename = "Combo.log",
+  short_filenames = FALSE,
   ...
 )
 }
@@ -79,6 +80,9 @@ defaults to TRUE}
 
 \item{log_filename}{filename for log file, defaults to "Combo.log"}
 
+\item{short_filenames}{logical. If TRUE, use MD5 hashes for long filenames
+to avoid Windows path length issues. Defaults to FALSE.}
+
 \item{...}{Additional arguments (for backwards compatibility).
 The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
 but ignored with a warning. Other arguments will cause an error.}
@@ -95,16 +99,16 @@ temporary file creation, parallel execution, post-processing, and
 results integration.
 }
 \seealso{
-Other combination_therapy: 
-\code{\link{check_drug_conflicts}()},
-\code{\link{check_drug_nodes}()},
-\code{\link{check_drugs_in_range}()},
-\code{\link{get_drugs_commands}()},
-\code{\link{make_bkg_commands_combo}()},
-\code{\link{make_command_args}()},
-\code{\link{make_pair_muts}()},
-\code{\link{make_single_muts}()},
-\code{\link{process_results}()},
-\code{\link{run_all_backgrounds}()}
+Other combination_therapy:
+\code{\link[=check_drug_conflicts]{check_drug_conflicts()}},
+\code{\link[=check_drug_nodes]{check_drug_nodes()}},
+\code{\link[=check_drugs_in_range]{check_drugs_in_range()}},
+\code{\link[=get_drugs_commands]{get_drugs_commands()}},
+\code{\link[=make_bkg_commands_combo]{make_bkg_commands_combo()}},
+\code{\link[=make_command_args]{make_command_args()}},
+\code{\link[=make_pair_muts]{make_pair_muts()}},
+\code{\link[=make_single_muts]{make_single_muts()}},
+\code{\link[=process_results]{process_results()}},
+\code{\link[=run_all_backgrounds]{run_all_backgrounds()}}
 }
 \concept{combination_therapy}
