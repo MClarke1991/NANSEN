@@ -800,7 +800,8 @@ check_conflicts <- function(results, backgrounds, node_col = "name", drugs = NUL
                           TRUE ~ "background")
                       )
 
-    if (unique(dplyr::pull(conflicts, precedence)) != "perturbation") {
+    precedence_values <- unique(dplyr::pull(conflicts, precedence))
+    if (length(precedence_values) > 0 && any(precedence_values != "perturbation")) {
         warning("Conflicts between background and perturbation detected that do not ALL conform to default of mutation taking precedence.")
     }
 
@@ -1125,13 +1126,23 @@ combo <- function(netw_file_path,
 
     ## Map hashed filenames back to original names if hashing was used
     if (short_filenames && !is.null(file_hashtable_dir)) {
-        file_hashtable <- get_all_hashtables(file_hashtable_dir, log_file)
+        file_hashtable <- get_all_hashtables(file_hashtable_dir, log_file) %>%
+            dplyr::select(full_filename, unhash_full_filename) %>%
+            dplyr::distinct()
 
-        # Left join to map hashed filenames back to original names
+        # Join on basename so the dir-prefixed parsed filename
+        # (e.g. "RAW__single__wt/<hash>.json") matches the bare hashed
+        # filename ("<hash>.json") stored in the hashtable.
         parsed_results <- parsed_results %>%
-            dplyr::left_join(file_hashtable, by = c("filename" = "full_filename")) %>%
-            dplyr::mutate(filename = dplyr::coalesce(unhash_full_filename, filename)) %>%
-            dplyr::select(-unhash_full_filename, -unhash_alt_full_filename, -alt_full_filename)
+            dplyr::mutate(.hash_dir      = dirname(filename),
+                          .hash_basename = basename(filename)) %>%
+            dplyr::left_join(file_hashtable,
+                             by = c(".hash_basename" = "full_filename")) %>%
+            dplyr::mutate(filename = dplyr::if_else(
+                !is.na(unhash_full_filename),
+                file.path(.hash_dir, unhash_full_filename),
+                filename)) %>%
+            dplyr::select(-.hash_dir, -.hash_basename, -unhash_full_filename)
     }
 
     ## Process results and save cache
@@ -1213,6 +1224,8 @@ combo <- function(netw_file_path,
 #' @param skip_combo_drugs_double skip double drug perturbations,
 #'     defaults to TRUE
 #' @param log_filename filename for log file, defaults to "Combo.log"
+#' @param short_filenames logical. If TRUE, use MD5 hashes for long filenames
+#'     to avoid Windows path length issues. Defaults to FALSE.
 #' @param ... Additional arguments (for backwards compatibility).
 #'     The deprecated arguments 'git_log' and 'bma_tools_path' are accepted
 #'     but ignored with a warning. Other arguments will cause an error.
@@ -1242,6 +1255,7 @@ combo_parallel <- function(netw_file_path,
                            skip_combo_drugs_single = TRUE,
                            skip_combo_drugs_double = TRUE,
                            log_filename = "Combo.log",
+                           short_filenames = FALSE,
                            ...) {
 
     ## Handle deprecated arguments
@@ -1319,6 +1333,10 @@ combo_parallel <- function(netw_file_path,
 
               current_out_dir <- paste(out_dir, current_background, sep = "_")
 
+              if (dir.exists(current_out_dir)) {
+                unlink(current_out_dir, recursive = TRUE)
+              }
+
               combo(netw_file_path = netw_file_path,
                     backgrounds_path = background_tmp_path,
                     drug_path = combo_drug_path,
@@ -1331,6 +1349,7 @@ combo_parallel <- function(netw_file_path,
                     use_exclusions = use_exclusions,
                     exclusions_path = exclusions_path,
                     log_filename = log_filename,
+                    short_filenames = short_filenames,
                     drug_conflict_overide = drug_conflict_overide,
                     skip_all_pairs = skip_all_pairs,
                     skip_drugs_single = skip_combo_drugs_single,
