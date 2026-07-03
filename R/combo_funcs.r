@@ -800,7 +800,8 @@ check_conflicts <- function(results, backgrounds, node_col = "name", drugs = NUL
                           TRUE ~ "background")
                       )
 
-    if (unique(dplyr::pull(conflicts, precedence)) != "perturbation") {
+    precedence_values <- unique(dplyr::pull(conflicts, precedence))
+    if (length(precedence_values) > 0 && any(precedence_values != "perturbation")) {
         warning("Conflicts between background and perturbation detected that do not ALL conform to default of mutation taking precedence.")
     }
 
@@ -1331,6 +1332,10 @@ combo_parallel <- function(netw_file_path,
               on.exit(if (file.exists(background_tmp_path)) file.remove(background_tmp_path))
 
               current_out_dir <- paste(out_dir, current_background, sep = "_")
+
+              if (dir.exists(current_out_dir)) {
+                unlink(current_out_dir, recursive = TRUE)
+              }
 
               combo(netw_file_path = netw_file_path,
                     backgrounds_path = background_tmp_path,

@@ -33,6 +33,9 @@ test_that("combo_parallel integration test - Windows only", {
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
     }
+    for (bg in c("wt", "cancer")) {
+      unlink(paste(out_dir, bg, sep = "_"), recursive = TRUE)
+    }
     # Clean up any temporary background files
     temp_files <- list.files(here::here("tests", "testthat"),
                             pattern = ".*_tmp_background\\.csv$",
@@ -134,14 +137,17 @@ test_that("combo_parallel with short_filenames = TRUE integration test - Windows
   skip_if_not(Sys.info()[["sysname"]] == "Windows", "combo requires Windows BMA command line tools (BioCheckConsole.exe)")
   
   # Create temporary directory for test outputs
-  out_dir <- file.path(temp_dir, "combo_parallel_test_output")
-  
+  out_dir <- file.path(temp_dir, "combo_parallel_short_filenames_test_output")
+
   # Set up test logging
   setup_log_file(futile.logger::INFO)
   on.exit({
     cleanup_log_file()
     if (dir.exists(out_dir)) {
       unlink(out_dir, recursive = TRUE)
+    }
+    for (bg in c("wt", "cancer")) {
+      unlink(paste(out_dir, bg, sep = "_"), recursive = TRUE)
     }
     # Clean up any temporary background files
     temp_files <- list.files(here::here("tests", "testthat"),
@@ -151,7 +157,7 @@ test_that("combo_parallel with short_filenames = TRUE integration test - Windows
       file.remove(temp_files)
     }
   })
-  
+
   # Run combo_parallel function with example data
   expect_no_error(
     suppressWarnings(
