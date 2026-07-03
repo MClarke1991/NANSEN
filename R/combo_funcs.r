@@ -1133,11 +1133,15 @@ combo <- function(netw_file_path,
         # (e.g. "RAW__single__wt/<hash>.json") matches the bare hashed
         # filename ("<hash>.json") stored in the hashtable.
         parsed_results <- parsed_results %>%
-            dplyr::mutate(.hash_basename = basename(filename)) %>%
+            dplyr::mutate(.hash_dir      = dirname(filename),
+                          .hash_basename = basename(filename)) %>%
             dplyr::left_join(file_hashtable,
                              by = c(".hash_basename" = "full_filename")) %>%
-            dplyr::mutate(filename = dplyr::coalesce(unhash_full_filename, filename)) %>%
-            dplyr::select(-.hash_basename, -unhash_full_filename)
+            dplyr::mutate(filename = dplyr::if_else(
+                !is.na(unhash_full_filename),
+                file.path(.hash_dir, unhash_full_filename),
+                filename)) %>%
+            dplyr::select(-.hash_dir, -.hash_basename, -unhash_full_filename)
     }
 
     ## Process results and save cache
